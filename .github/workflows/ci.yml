@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: astro check
+        run: npm run check
+      - name: Link check
+        run: |
+          npx astro preview --port 4321 &
+          npx --yes wait-on@9 -t 60000 http://localhost:4321/
+          npx linkinator http://localhost:4321/ --recurse --retry --timeout 20000 \
+            --skip '^https://specstride\.ai' --skip '^https://(www\.)?linkedin\.com'
+      - name: Lighthouse CI
+        run: npx --yes @lhci/cli@0.15.x autorun
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse
+          path: .lighthouseci/
+          if-no-files-found: ignore
