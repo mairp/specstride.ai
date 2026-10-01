@@ -131,3 +131,35 @@ format instead of a screenshot.
   party. A redeploy refreshes them.
 - **The `[DIGEST]` line** is shown as its format, taken from the mixture-of-loops launcher's source,
   and labelled as such, not as captured output.
+
+## Cloudflare
+
+Only the `specstride.ai` zone and the new Worker `specstride-site` were touched. No other zone or
+Worker was listed, read or changed.
+
+- **Workers with static assets, not Pages** (as the brief asks). `wrangler.jsonc` deploys `dist/`
+  with `not_found_handling: "404-page"` and the custom domains `specstride.ai` and
+  `www.specstride.ai`, which created their DNS records.
+- **www → apex in the Worker.** A zone Redirect Rule was the first choice, but the API token has no
+  permission on the zone's rulesets (`Authentication error` on the `http_request_dynamic_redirect`
+  phase entrypoint; the missing permission is *Zone → Single Redirect: Edit*, or *Zone WAF/Rulesets*
+  edit). The brief allows the redirect in the Worker, so `worker/index.js` answers `www` with a 301 to
+  the apex, keeping path and query, and hands every other request to the assets binding
+  (`run_worker_first: true`). If the permission is added later, a Redirect Rule can replace it and
+  the Worker code can go.
+- **Zone settings** set through the API: SSL Full (strict), Always Use HTTPS, Automatic HTTPS
+  Rewrites, minimum TLS 1.2, TLS 1.3 on, HSTS `max-age=15552000; includeSubDomains` without preload
+  (with nosniff), Brotli and HTTP/3 on.
+- **Headers** from `public/_headers`: a CSP of `'self'` only with `frame-ancestors 'none'`,
+  `X-Content-Type-Options`, `Referrer-Policy: strict-origin-when-cross-origin`, a restrictive
+  `Permissions-Policy`, `X-Frame-Options: DENY`, COOP. Hashed `/_astro/*` files are cached for a year
+  as immutable; HTML and everything else revalidates on each request (the platform default).
+- **Null mail.** `TXT @ "v=spf1 -all"`, `TXT _dmarc "v=DMARC1; p=reject; sp=reject; adkim=s;
+  aspf=s"` and `MX 0 .`, since the domain sends and receives no mail.
+- **No Web Analytics.** Enabling Cloudflare Web Analytics for the zone also failed with
+  `Authentication error` (missing *Account → Account Analytics: Edit* / RUM). Rather than claim it,
+  the footer says the site has no cookies, no trackers and no analytics, and the CSP allows no third
+  party. Turning it on later needs that permission, the beacon origins added to the CSP, and the
+  footer line changed back.
+- **Deploys stay on the host.** CI builds and checks but never deploys; the admin token is not in
+  GitHub secrets.

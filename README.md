@@ -42,7 +42,8 @@ every pull request and on `main`.
 ## Deploy
 
 The site is a Cloudflare Worker with static assets (`wrangler.jsonc`, Worker `specstride-site`) on the
-custom domains `specstride.ai` and `www.specstride.ai`. Deploys run from a trusted machine, not CI:
+custom domains `specstride.ai` and `www.specstride.ai`. `worker/index.js` only redirects `www` to the
+apex. Deploys run from a trusted machine, not CI:
 
 ```bash
 npm run deploy     # builds, then `wrangler deploy` with credentials from ~/.cf-admin.env
