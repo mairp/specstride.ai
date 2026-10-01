@@ -1,0 +1,20 @@
+# Hosts: the apps a Specstride plugin runs inside. A host here says nothing about
+# status; each product that targets a host carries its own status.
+- id: shell
+  name: Your shell
+  order: 0
+  blurb: The CLI on its own. Bash and Python, no host needed.
+- id: claude-code
+  name: Claude Code
+  url: https://docs.anthropic.com/en/docs/claude-code/overview
+  order: 1
+  blurb: The first host. Skills, hook shims and a small binary shim that finds the CLI.
+- id: dsh
+  name: dsh
+  order: 2
+  blurb: DeepSeek Harness. Skills only; alerts arrive through status and the digest.
+- id: codex
+  name: Codex
+  url: https://github.com/openai/codex
+  order: 3
+  blurb: OpenAI's coding agent CLI.

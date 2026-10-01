@@ -1,0 +1,67 @@
+# Install paths. Rules: a step goes here only after it was run by hand, exactly as
+# written, and the date goes in `verified`. Paths that don't work yet have no
+# steps; they get a status and something to watch instead.
+- id: git
+  label: git clone
+  status: available
+  order: 1
+  product: specstride-cli
+  summary: Clone the CLI and run the bundled three-phase Spec Kit example end to end. Claude writes the code; a critic signs off each phase.
+  prereqs:
+    - Linux, Bash, git and Python 3.13 (the CLI uses the standard library only)
+    - The [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) CLI, logged in, for the proposer
+    - "`ANTHROPIC_API_KEY` in the environment for the `claude` critic, which calls the API directly (or set `SPECSTRIDE_CRITIC` to `codex` with `OPENAI_API_KEY`, or to `dsh`)"
+  steps:
+    - cmd: git clone https://github.com/mairp/specstride && cd specstride
+    - cmd: mkdir -p /tmp/demo/specs/001-greeting && cp examples/speckit-tasks.example.md /tmp/demo/specs/001-greeting/tasks.md
+    - cmd: SPECSTRIDE_PROPOSER=claude SPECSTRIDE_CRITIC=claude ./specstride run -w /tmp/demo --verification off
+  after: Follow it from a second terminal with `./specstride watch -w /tmp/demo`. `--verification off` skips the test-plan gate, which wants a test command the empty demo directory doesn't have yet; leave it on in a real project.
+  verified: '2026-10-01'
+- id: shell
+  label: shell function
+  status: available
+  order: 2
+  product: specstride-cli
+  summary: Keep one checkout and get a `specstride` command everywhere. The script owns its routing, so the function is only a pointer. Add these two lines to `~/.bashrc` or `~/.zshrc`.
+  prereqs:
+    - A clone of the repository (the previous tab), here at `~/specstride`
+  steps:
+    - cmd: export SPECSTRIDE_HOME="$HOME/specstride"
+    - cmd: specstride() { "$SPECSTRIDE_HOME/specstride" "$@"; }
+    - note: then, from any directory
+      cmd: specstride status -w /tmp/demo
+  after: "`specstride run`, `watch`, `events`, `verdicts`, `stop` and `resume` all go through the same command."
+  verified: '2026-10-01'
+- id: reverse
+  label: reverse a codebase
+  status: available
+  order: 3
+  product: specstride-cli
+  summary: No spec yet? Inventory a codebase and see the five gated phases that would write its as-is Spec Kit feature. The dry run makes no model call and changes nothing.
+  prereqs:
+    - A clone of the repository, as in the first tab
+  steps:
+    - cmd: ./specstride reverse ~/projects/foo --dry-run
+  after: Drop `--dry-run` to write `specs/NNN-as-is-foo/` through the gated loop. It reads your source and never changes it.
+  verified: '2026-10-01'
+- id: claude-code
+  label: Claude Code plugin
+  status: in-progress
+  order: 4
+  product: claude-code-plugin
+  summary: "`specstride-run` and `specstride-reverse` as Claude Code skills. Specified, and built after the TypeScript core it sits on. There is nothing to install yet."
+  watch:
+    label: Watch the repository on GitHub
+    href: https://github.com/mairp/specstride
+- id: dsh
+  label: dsh plugin
+  status: planned
+  order: 5
+  product: dsh-plugin
+  summary: The same skills on dsh, in the second wave. Nothing to install yet.
+- id: codex
+  label: Codex plugin
+  status: planned
+  order: 6
+  product: codex-plugin
+  summary: The same skills inside Codex. On the roadmap, not scheduled. Nothing to install yet.

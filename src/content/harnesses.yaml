@@ -1,0 +1,67 @@
+# Harnesses: agents Specstride can drive as proposer (the coding agent) or use as
+# critic (the judge). `status` is the adapter's status; `testedToday` is true only
+# when the shipped CLI (mairp/specstride) has a tested backend for it.
+- id: claude
+  name: Claude
+  url: https://docs.anthropic.com/en/docs/claude-code/overview
+  order: 1
+  roles: [proposer, critic]
+  status: available
+  testedToday: true
+  note: Backend in the CLI today. Default proposer and critic of the TypeScript core.
+- id: codex
+  name: Codex
+  url: https://github.com/openai/codex
+  order: 2
+  roles: [proposer, critic]
+  status: available
+  testedToday: true
+  note: Backend in the CLI today. TypeScript adapter in the first wave.
+- id: dsh
+  name: dsh
+  order: 3
+  roles: [proposer, critic]
+  status: available
+  testedToday: true
+  note: Backend in the CLI today, with an optional provider/model qualifier.
+- id: pi
+  name: pi
+  order: 4
+  roles: [proposer, critic]
+  status: in-progress
+  note: TypeScript adapter in the first wave. Proposer, plus a tool-less critic.
+- id: gemini-cli
+  name: Gemini CLI
+  url: https://github.com/google-gemini/gemini-cli
+  order: 5
+  roles: [proposer, critic]
+  status: planned
+  note: Own adapter in a later wave. Tool-less critic by a deny-all policy.
+- id: copilot
+  name: Copilot CLI
+  url: https://github.com/github/copilot-cli
+  order: 6
+  roles: [proposer]
+  status: planned
+  note: Own adapter in a later wave. Proposer only; never picked as critic.
+- id: opencode
+  name: opencode
+  url: https://opencode.ai
+  order: 7
+  roles: [proposer, critic]
+  status: planned
+  note: Own adapter in a later wave, driven through its server.
+- id: openrouter
+  name: OpenRouter
+  url: https://openrouter.ai
+  order: 8
+  roles: [critic]
+  status: planned
+  note: Critic. A proposer only through a harness that runs the tool loop.
+- id: zai
+  name: z.ai
+  url: https://z.ai
+  order: 9
+  roles: [critic]
+  status: planned
+  note: Critic. A proposer only through a harness that runs the tool loop.

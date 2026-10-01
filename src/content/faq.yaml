@@ -1,0 +1,32 @@
+- id: spec-kit
+  order: 1
+  q: Do I need Spec Kit?
+  a: The CLI reads a [Spec Kit](https://github.com/github/spec-kit) feature's `tasks.md`, an OpenSpec change, or its own plain format; the feature's `spec.md`, `plan.md` and contracts ride along as read-only context. No spec yet? `specstride reverse` writes an as-is feature from an existing codebase.
+- id: agents
+  order: 2
+  q: Which agents and models can it use?
+  a: Today the CLI drives Claude, Codex or dsh, and the proposer and the critic are chosen independently, so a cheap model can write while a stronger one judges. The TypeScript core adds pi in its first wave, more adapters later, and discovers agents you already have installed.
+- id: rubber-stamp
+  order: 3
+  q: What stops the critic from waving work through?
+  a: The critic never takes the agent's word. It reads the phase's acceptance criteria and the evidence, then reads the files the evidence cites in a read-only grounding pass before it answers. A reply it can't parse counts as a rejection. The self-tuning loop can't change anything the critic reads, and a test locks that.
+- id: stuck
+  order: 4
+  q: What happens when a phase gets stuck?
+  a: When a rejection names new unmet criteria, the diagnostician reads the whole rejection history and the full files and says whether the critic couldn't see the proof or the gap is real. The accelerator then fixes only those criteria. After a bounded number of rejections the run halts with exit code 2 and leaves everything on disk for you.
+- id: local
+  order: 5
+  q: Does anything leave my machine?
+  a: Specstride runs where you run it. It calls the agents and providers you configure, with your keys, and nothing else. Telemetry is off until you point it at your own collector, and every record is redacted before it is shown or written.
+- id: cost
+  order: 6
+  q: What does it cost?
+  a: Specstride is free and open source. You pay your model providers as usual; the live view prints the cost, tokens and duration of every pass, so the spend is visible while the run is going.
+- id: typescript
+  order: 7
+  q: Will I have to migrate to the TypeScript version?
+  a: It takes the same Spec Kit features. It is held to a parity suite that replays today's CLI behaviour, and it is not released until every parity test passes.
+- id: contribute
+  order: 8
+  q: How do I contribute?
+  a: Issues, Discussions and pull requests on [GitHub](https://github.com/mairp/specstride). Sign off your commits (`git commit -s`); there is no CLA.
