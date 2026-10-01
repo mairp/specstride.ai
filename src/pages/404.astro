@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Not found" description="This page does not exist." noindex>
+  <div class="wrap page">
+    <pre class="term mono" aria-hidden="true"><span class="muted">$</span> specstride status --page {'\n'}  state: <span class="err">HALTED</span> — no such page{'\n'}  <span class="err">✗</span> 404   evidence missing{'\n'}  next: go back to the start of the track</pre>
+    <h1>404: no evidence for this page</h1>
+    <p class="lede">The gate held: nothing lives at this address.</p>
+    <p class="ctas"><a class="btn btn-primary" href="/">Back to the start</a> <a class="btn" href="/docs/">Docs</a></p>
+  </div>
+</Base>
+
+<style>
+  .page { padding: var(--space-8) var(--gutter); }
+  .term { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: var(--space-4); overflow-x: auto; margin-bottom: var(--space-6); font-size: 0.875rem; }
+  .err { color: var(--err); }
+  .ctas { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+</style>

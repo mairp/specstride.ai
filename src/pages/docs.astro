@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+const W = 'https://github.com/mairp/specstride/blob/main/wiki';
+const docs = [
+  { href: 'https://github.com/mairp/specstride#readme', title: 'README', body: 'The whole picture: the three loops, the quick start, the CLI and the on-disk contract.' },
+  { href: `${W}/Getting-Started.md`, title: 'Getting started', body: 'From a clone to a first gated run.' },
+  { href: `${W}/Architecture.md`, title: 'Architecture', body: 'Proposer, critic, diagnostician and accelerator, and the files between them.' },
+  { href: `${W}/CLI-Reference.md`, title: 'CLI reference', body: 'Every verb and flag of the single front-door command.' },
+  { href: `${W}/Spec-Formats.md`, title: 'Spec formats', body: 'Spec Kit tasks, OpenSpec changes and the native format.' },
+  { href: `${W}/Configuration.md`, title: 'Configuration', body: 'Backends per role, budgets, timeouts and the privacy controls.' },
+  { href: `${W}/On-Disk-Contract.md`, title: 'On-disk contract', body: 'What a run writes under .specstride/, and the event stream.' },
+  { href: `${W}/Learning.md`, title: 'Learning', body: 'The self-tuning loop: observe, suggest, apply, evaluate, roll back.' },
+  { href: `${W}/Reverse-Engineering.md`, title: 'Reverse engineering', body: 'Turning a codebase into an as-is Spec Kit feature.' },
+  { href: `${W}/Telemetry.md`, title: 'Telemetry', body: 'Loki, OpenTelemetry and the bundled dashboard.' },
+  { href: `${W}/Hardening.md`, title: 'Hardening', body: 'Breakers, watchdogs and how a run fails safely.' },
+];
+---
+<Base title="Docs" description="Specstride documentation lives with the code on GitHub. This page links to the README and every wiki page.">
+  <div class="wrap page">
+    <p class="eyebrow mono">// docs</p>
+    <h1>Docs</h1>
+    <p class="lede">The documentation lives next to the code, so it changes when the code does. These links go to it on GitHub.</p>
+    <ul class="docs" role="list">
+      {docs.map((d) => (
+        <li class="card"><h2 class="t"><a href={d.href}>{d.title}</a></h2><p>{d.body}</p></li>
+      ))}
+    </ul>
+    <p class="muted">Questions go to <a href="https://github.com/mairp/specstride/discussions">GitHub Discussions</a>; bugs to <a href="https://github.com/mairp/specstride/issues">issues</a>.</p>
+  </div>
+</Base>
+
+<style>
+  .page { padding-top: var(--space-7); }
+  .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-2); }
+  .lede { margin-bottom: var(--space-6); color: var(--muted); }
+  .docs { list-style: none; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); margin-bottom: var(--space-6); }
+  .t { font-size: var(--step-0); margin-bottom: var(--space-2); }
+  .docs p { margin: 0; font-size: 0.9375rem; }
+</style>

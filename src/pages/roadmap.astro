@@ -1,0 +1,56 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import StatusChip from '../components/StatusChip.astro';
+import { STATUS_LABEL, type Status } from '../lib/site';
+
+const items = (await getCollection('roadmap')).sort((a, b) => a.data.order - b.data.order);
+const withProduct = await Promise.all(items.map(async (i) => ({ item: i, product: await getEntry(i.data.product) })));
+const groups: Status[] = ['available', 'in-progress', 'planned'];
+---
+<Base title="Roadmap" description="What Specstride does today, what is being built, and what is planned, generated from the site's data.">
+  <div class="wrap page">
+    <p class="eyebrow mono">// roadmap</p>
+    <h1>Roadmap</h1>
+    <p class="lede">Three states only. <strong>Available</strong> ships in the CLI today. <strong>In progress</strong> is specified and being built in the TypeScript core's first wave. <strong>Planned</strong> is decided but not started. Each later step comes back only with the measurement it waits on.</p>
+    {groups.map((g) => {
+      const list = withProduct.filter(({ item }) => item.data.status === g);
+      return list.length > 0 && (
+        <section class="group" aria-labelledby={`g-${g}`}>
+          <h2 id={`g-${g}`}><StatusChip status={g} /> <span class="visually-hidden">{STATUS_LABEL[g]}</span></h2>
+          <ol class="items" role="list">
+            {list.map(({ item, product }) => (
+              <li class="item" id={item.id}>
+                <div class="head">
+                  <h3>{item.data.title}</h3>
+                  <span class="stage mono">{item.data.stage}</span>
+                </div>
+                <p>{item.data.summary}</p>
+                <p class="meta mono">
+                  <a href={`/products/${product?.id}/`}>{product?.data.name}</a>
+                  {item.data.links.map((l) => <> · <a href={l.href}>{l.label}</a></>)}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      );
+    })}
+  </div>
+</Base>
+
+<style>
+  .page { padding-top: var(--space-7); }
+  .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-2); }
+  .lede { margin-bottom: var(--space-6); color: var(--muted); max-width: 52rem; }
+  .group { margin-top: var(--space-7); }
+  .group h2 :global(.chip) { font-size: 0.9rem; }
+  .items { list-style: none; padding: 0; margin: 0; border-left: 2px solid var(--border); }
+  .item { padding: var(--space-2) 0 var(--space-5) var(--space-5); position: relative; }
+  .item::before { content: ''; position: absolute; left: -6px; top: 0.85rem; width: 10px; height: 10px; border-radius: 50%; background: var(--bg); border: 2px solid var(--muted); }
+  .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-4); }
+  .head h3 { margin: 0; }
+  .stage { font-size: 0.75rem; color: var(--muted); }
+  .item p { margin: var(--space-2) 0 0; max-width: 48rem; }
+  .meta { font-size: 0.8125rem; color: var(--muted); }
+</style>

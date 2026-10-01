@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import InstallTabs from '../components/InstallTabs.astro';
+const entries = await getCollection('install');
+---
+<Base title="Install" description="Every way to install Specstride that works today, with prerequisites, each run by hand as shown. Plugins that are in progress or planned are listed with their status.">
+  <div class="wrap page">
+    <p class="eyebrow mono">// install</p>
+    <h1>Install</h1>
+    <p class="lede">Only what works today has commands. Every command below was run by hand, exactly as written, on the date shown under it. Plugins that aren't out yet say so.</p>
+    <InstallTabs entries={entries} full id="install-page" headingLevel="h2" />
+    <h2 class="next">After the first run</h2>
+    <ul>
+      <li>Point it at a real Spec Kit feature: <code>specstride run -w ~/projects/foo</code> discovers the feature when there is one, or pass <code>-s specs/002-billing/tasks.md</code>.</li>
+      <li>Inspect a run from its files: <code>specstride status</code>, <code>events</code>, <code>verdicts</code>, <code>feedback 3</code>.</li>
+      <li>Configuration, exit codes and hardening are in the <a href="https://github.com/mairp/specstride/tree/main/wiki">wiki</a>.</li>
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .page { padding-top: var(--space-7); }
+  .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-2); }
+  .lede { margin-bottom: var(--space-6); color: var(--muted); }
+  .next { margin-top: var(--space-8); }
+</style>

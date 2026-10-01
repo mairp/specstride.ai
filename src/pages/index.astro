@@ -1,0 +1,167 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import AsciiArt from '../components/AsciiArt.astro';
+import InstallTabs from '../components/InstallTabs.astro';
+import LoopDiagram from '../components/LoopDiagram.astro';
+import Section from '../components/Section.astro';
+import StatusChip from '../components/StatusChip.astro';
+import HarnessGrid from '../components/HarnessGrid.astro';
+import ProductCard from '../components/ProductCard.astro';
+import Terminal from '../components/Terminal.astro';
+import FAQ from '../components/FAQ.astro';
+import { SITE } from '../lib/site';
+import { repoFacts } from '../lib/github';
+import { SAMPLE_EVENT } from '../data/demo-timeline';
+
+const facts = await repoFacts();
+const install = (await getCollection('install')).filter((e) => e.data.status !== 'planned');
+const products = (await getCollection('products')).sort((a, b) => a.data.order - b.data.order);
+
+const why = [
+  { status: 'in-progress', title: 'Fail fast', body: 'Long checks stop at the first failure, so a broken phase shows up in minutes, not after an hour-long job finishes failing.' },
+  { status: 'in-progress', title: 'Small units of work', body: 'Units sized so no pass is killed by its time cap, and work that was done is kept when a pass ends.' },
+  { status: 'in-progress', title: 'Runs that look after themselves', body: 'Relaunch after a transient stop, within a budget, and a plain signal when a run is blocked on you instead of retrying forever.' },
+  { status: 'in-progress', title: 'Context carried forward', body: 'A pass picks up a ledger and a handoff instead of re-reading the whole feature from cold, mostly to cut cost.' },
+  { status: 'available', title: 'Self-tuning, with rollback', body: 'Per-phase budgets learned from telemetry, judged against their baseline after every approved phase, and reverted automatically when a guardrail breaks.' },
+] as const;
+---
+<Base>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap hero-stack">
+      <div class="hero-art"><AsciiArt /></div>
+      <p class="oss mono">Open source <span aria-hidden="true">·</span> Runs on your machine <span aria-hidden="true">·</span> Your models, your keys</p>
+      <h1 id="hero-title"><span class="line">{SITE.tagline}</span> <span class="line caption">{SITE.caption}</span></h1>
+      <p class="lede">Specstride drives your coding agent through a Spec Kit feature, phase by phase. Nothing advances until a critic approves it on cited evidence. When a phase is stuck, a diagnostician finds out why and an accelerator fixes only what failed.</p>
+      <p class="ctas">
+        <a class="btn btn-primary" href="#install">Install</a>
+        <a class="btn" href={SITE.repoUrl}>GitHub{facts.stars !== null && <span class="muted"> ★ {facts.stars}</span>}</a>
+        {facts.release && <a class="release mono" href={facts.release.url}>{facts.release.tag} · {facts.release.date}</a>}
+      </p>
+    </div>
+    <div class="wrap install-wrap" id="install">
+      <h2 class="visually-hidden">Install</h2>
+      <InstallTabs entries={install} id="home-install" />
+      <p class="more mono"><a href="/install/">Prerequisites and every install path →</a></p>
+    </div>
+  </section>
+
+  <Section id="loop" eyebrow="01 · the loop" title="A gate on every phase" intro="The proposer works in fresh, stateless passes until the phase's evidence file exists. The critic reads the acceptance criteria, the evidence and the files it cites, then approves or rejects. A rejection with new unmet criteria goes to the diagnostician; its hint drives a narrowed retry that touches only what failed.">
+    <LoopDiagram />
+  </Section>
+
+  <Section id="why" eyebrow="02 · why" title="Where unattended runs actually lose time" tone="raised">
+    <p class="lede evidence">A long real-world run spent about two-thirds of its live time waiting on verification jobs, one of which kept going long after it had already failed. Over a third of the agent's time went to passes killed at their time cap, their work lost. One phase ran about fifty passes while blocked on a human decision it had no way to report. The critic took well under one percent.</p>
+    <div class="grid grid-3 why">
+      {why.map((w) => (
+        <div class="card">
+          <StatusChip status={w.status} />
+          <h3>{w.title}</h3>
+          <p>{w.body}</p>
+        </div>
+      ))}
+    </div>
+    <p class="muted small">Available: in the CLI today. In progress: specified for the TypeScript core and being built.</p>
+  </Section>
+
+  <Section id="agents" eyebrow="03 · bring your own agents" title="Any agent writes, any agent judges" intro="The proposer and the critic are chosen independently, so a cheap model can write while a stronger one judges. This list is a starting point, not a boundary.">
+    <HarnessGrid compact />
+    <p class="more mono"><a href="/ecosystem/">Roles and adapters in detail →</a></p>
+  </Section>
+
+  <Section id="plugins" eyebrow="04 · hosts and plugins" title="One engine, several front doors" intro="The engine runs detached. Hosts reach it through one CLI protocol, so a plugin is a thin layer of skills over it." tone="raised">
+    <div class="grid grid-2 products">
+      {products.filter((p) => p.data.kind === 'core').map((p) => <ProductCard product={p} showSkills={false} />)}
+    </div>
+    <div class="grid grid-3 products plugins">
+      {products.filter((p) => p.data.kind === 'plugin').map((p) => <ProductCard product={p} showSkills={p.data.status !== 'planned'} />)}
+    </div>
+  </Section>
+
+  <Section id="observability" eyebrow="05 · observability" title="Every step is an event" intro="A run is a stream of structured events in .specstride/events.jsonl. The live presenter renders it in your terminal; the same stream ships to Loki or over OTLP to an OpenTelemetry collector, with cost, tokens and duration as metrics.">
+    <div class="grid grid-2 obs">
+      <Terminal title="events.jsonl · one record from the recorded run" label="An event record">
+        <pre class="wrap-pre">{SAMPLE_EVENT}</pre>
+      </Terminal>
+      <Terminal title="mixture-of-loops · the last line of a run" label="The digest line">
+        <pre class="wrap-pre"><span class="muted"># format, as printed by the launcher</span>{'\n'}[DIGEST] state=completed exit=0 last-stage=&lt;stage&gt; evidence=&lt;run dir&gt;</pre>
+      </Terminal>
+    </div>
+    <ul class="obs-list">
+      <li><StatusChip status="available" /> <span><code>--otel --otel-url http://localhost:4318</code> ships OTLP/HTTP with no SDK; <code>--telemetry</code> ships to Loki. Off by default.</span></li>
+      <li><StatusChip status="available" /> <span><code>[DIGEST]</code> is the one line a supervising agent reads at the end of a run: state, exit code, last stage, evidence. Today it comes from the <a href="https://github.com/mairp/mixture-of-loops">mixture-of-loops</a> launcher.</span></li>
+      <li><StatusChip status="in-progress" /> <span>In the TypeScript core the detached runtime prints the digest itself, so every host reads the same line.</span></li>
+    </ul>
+  </Section>
+
+  <Section id="built-by-itself" eyebrow="06 · built by itself" title="The next version is being built by this one" tone="raised">
+    <div class="grid grid-2 self">
+      <div>
+        <p>The TypeScript core was specified first: 41 Spec Kit features, 1,643 functional requirements, 2,983 tasks, and a parity suite the port has to pass against today's CLI before any release.</p>
+        <p>Since 30 September 2026 the current Specstride has been implementing those features unattended, one at a time, each phase held at the gate until its critic approved it. A human reads the result and arbitrates only what the machines can't settle.</p>
+        <p class="muted small">The TypeScript repository isn't public yet. Its status here is <StatusChip status="in-progress" />.</p>
+      </div>
+      <Terminal title="git log --oneline · the TypeScript core, 1 Oct 2026" label="Recent commits in the TypeScript core">
+        <pre class="wrap-pre">specstride: phase 7 approved — User Story 5 - A consumer invokes a host skill
+specstride: phase 6 approved — User Story 4 - An author describes a harness as data
+specstride: phase 5 approved — User Story 3 - An author adds an implementation without touching the core
+specstride: phase 4 approved — User Story 2 - An operator reads an exit code and a stop reason</pre>
+      </Terminal>
+    </div>
+  </Section>
+
+  <Section id="open-source" eyebrow="07 · open source" title="Yours to run, read and change">
+    <div class="grid grid-3">
+      <div class="card">
+        <h3>Apache-2.0</h3>
+        <p>The whole product: the CLI, the TypeScript core and every plugin. A patent grant from every contributor, contributions taken under the same licence with no CLA, and the Specstride name kept for the project.</p>
+        <p><a href={SITE.licenseUrl}>Read the licence</a></p>
+      </div>
+      <div class="card">
+        <h3>Runs on your machine</h3>
+        <p>No service in the middle. Runs, state and logs live under <code>.specstride/</code> in your project, readable and resumable from the files alone.</p>
+      </div>
+      <div class="card">
+        <h3>Your models, your keys</h3>
+        <p>It calls the agents and providers you configure, with your credentials, and nothing else. Telemetry stays off until you point it at your own collector.</p>
+      </div>
+    </div>
+    <p class="ctas">
+      <a class="btn" href={SITE.repoUrl}>Star or fork on GitHub</a>
+      <a class="btn" href={SITE.discussionsUrl}>Discussions</a>
+      <a class="btn" href="https://github.com/mairp/specstride/blob/main/CONTRIBUTING.md">Contributing</a>
+    </p>
+  </Section>
+
+  <Section id="faq" eyebrow="08 · faq" title="Questions" tone="raised">
+    <FAQ />
+  </Section>
+</Base>
+
+<style>
+  .hero { padding: var(--space-7) 0 var(--space-8); }
+  .hero-stack { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: var(--space-7); }
+  .hero-art { margin-bottom: var(--space-6); max-width: 100%; }
+  .hero-stack .lede { margin-left: auto; margin-right: auto; }
+  .hero-stack .ctas { justify-content: center; }
+  .install-wrap { max-width: 60rem; }
+  .oss { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-4); }
+  h1 { margin-bottom: var(--space-5); font-size: clamp(1.3rem, 5.4vw, 2.75rem); }
+  .line { display: block; }
+  .caption { color: var(--muted); }
+  .ctas { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-5); }
+  .release { font-size: var(--step--1); color: var(--muted); }
+  .more { font-size: var(--step--1); margin-top: var(--space-4); }
+  .evidence { margin-bottom: var(--space-6); max-width: 52rem; }
+  .why h3 { margin-top: var(--space-3); }
+  .small { font-size: var(--step--1); margin-top: var(--space-4); }
+  .products { align-items: stretch; }
+  .plugins { margin-top: var(--space-4); }
+  .obs { margin-bottom: var(--space-5); }
+  .wrap-pre { white-space: pre-wrap !important; overflow-wrap: anywhere; }
+  .obs-list { list-style: none; padding: 0; display: grid; gap: var(--space-3); }
+  .obs-list li { display: grid; grid-template-columns: 7.5rem 1fr; gap: var(--space-3); align-items: baseline; }
+  @media (max-width: 560px) { .obs-list li { grid-template-columns: 1fr; gap: var(--space-1); } }
+  .obs-list :global(.chip) { justify-self: start; }
+  .self { align-items: start; }
+</style>

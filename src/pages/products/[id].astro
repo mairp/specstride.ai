@@ -1,0 +1,74 @@
+---
+// One page per product, generated from src/content/products/. The front matter
+// fills the page; the Markdown body, if any, is added as prose.
+import { getCollection, getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import StatusChip from '../../components/StatusChip.astro';
+import InstallTabs from '../../components/InstallTabs.astro';
+import { inlineMd } from '../../lib/inline-md';
+
+export async function getStaticPaths() {
+  const products = await getCollection('products');
+  return products.map((p) => ({ params: { id: p.id }, props: { product: p } }));
+}
+const { product } = Astro.props;
+const d = product.data;
+const host = d.host ? await getEntry(d.host) : undefined;
+const install = d.install ? await getEntry(d.install) : undefined;
+const roadmap = (await getCollection('roadmap')).filter((r) => r.data.product.id === product.id).sort((a, b) => a.data.order - b.data.order);
+const { Content } = await render(product);
+---
+<Base title={d.name} description={d.summary}>
+  <div class="wrap page">
+    <p class="eyebrow mono">// {d.kind === 'plugin' ? 'plugin' : 'engine'}{host && host.id !== 'shell' ? ` · ${host.data.name}` : ''}</p>
+    <h1>{d.name}</h1>
+    <p class="status"><StatusChip status={d.status} /> <span class="muted">{d.statusNote}</span></p>
+    <p class="lede">{d.summary}</p>
+    <div class="prose"><Content /></div>
+
+    {d.skills.length > 0 && (
+      <section aria-labelledby="skills">
+        <h2 id="skills">{d.kind === 'plugin' ? 'Skills' : 'Commands'}</h2>
+        <dl class="skills">
+          {d.skills.map((s) => (<><dt><code>{s.name}</code></dt><dd set:html={inlineMd(s.does)} /></>))}
+        </dl>
+      </section>
+    )}
+
+    {install && (
+      <section aria-labelledby="install">
+        <h2 id="install">Install</h2>
+        <InstallTabs entries={[install]} full id={`p-${product.id}`} />
+      </section>
+    )}
+
+    {roadmap.length > 0 && (
+      <section aria-labelledby="road">
+        <h2 id="road">On the roadmap</h2>
+        <ul class="road">
+          {roadmap.map((r) => <li><StatusChip status={r.data.status} /> <a href={`/roadmap/#${r.id}`}>{r.data.title}</a> <span class="muted mono">{r.data.stage}</span></li>)}
+        </ul>
+      </section>
+    )}
+
+    {(d.repo || d.links.length > 0) && (
+      <p class="links">
+        {d.repo && <a class="btn" href={d.repo}>Repository</a>}
+        {d.links.map((l) => <a class="btn" href={l.href}>{l.label}</a>)}
+      </p>
+    )}
+  </div>
+</Base>
+
+<style>
+  .page { padding-top: var(--space-7); max-width: 56rem; }
+  .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-2); }
+  .status { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+  .lede { margin: var(--space-5) 0; }
+  section { margin-top: var(--space-7); }
+  .skills { display: grid; gap: var(--space-2) var(--space-5); grid-template-columns: max-content 1fr; }
+  @media (max-width: 640px) { .skills { grid-template-columns: 1fr; } .skills dd { margin-bottom: var(--space-3); } }
+  .skills dd { margin: 0; }
+  .road { list-style: none; padding: 0; display: grid; gap: var(--space-3); }
+  .links { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-7); }
+</style>
