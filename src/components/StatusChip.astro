@@ -1,0 +1,27 @@
+---
+// A status chip. The three states are the only claims the site makes about
+// availability; colours come from the --chip-* tokens.
+import { STATUS_GLYPH, STATUS_LABEL, type Status } from '../lib/site';
+interface Props { status: Status; label?: string }
+const { status, label } = Astro.props;
+---
+<span class={`chip chip-${status}`}><span aria-hidden="true">{STATUS_GLYPH[status]}</span> {label ?? STATUS_LABEL[status]}</span>
+
+<style>
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1;
+    padding: 0.3em 0.6em;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .chip-available { color: var(--chip-available-fg); background: var(--chip-available-bg); }
+  .chip-in-progress { color: var(--chip-in-progress-fg); background: var(--chip-in-progress-bg); }
+  .chip-planned { color: var(--chip-planned-fg); background: var(--chip-planned-bg); }
+</style>

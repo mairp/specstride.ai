@@ -1,0 +1,48 @@
+---
+// Copies `text` to the clipboard. Without JavaScript the button stays hidden and
+// the command is still selectable.
+interface Props { text: string; label?: string }
+const { text, label = 'Copy' } = Astro.props;
+---
+<button type="button" class="copy" data-copy={text} hidden>
+  <span class="copy-label">{label}</span>
+  <span class="visually-hidden" aria-live="polite"></span>
+</button>
+
+<style>
+  .copy {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    min-height: 32px;
+    min-width: 44px;
+  }
+  .copy:hover { color: var(--fg-strong); border-color: var(--accent); }
+  .copy[data-done] { color: var(--ok); border-color: var(--ok); }
+</style>
+
+<script>
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('button.copy[data-copy]')) {
+    if (!navigator.clipboard) continue;
+    btn.hidden = false;
+    const label = btn.querySelector('.copy-label')!;
+    const live = btn.querySelector('[aria-live]')!;
+    const original = label.textContent;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy ?? '');
+        label.textContent = 'Copied';
+        live.textContent = 'Copied to clipboard';
+        btn.dataset.done = '';
+      } catch {
+        label.textContent = 'Select to copy';
+      }
+      setTimeout(() => { label.textContent = original; live.textContent = ''; delete btn.dataset.done; }, 1800);
+    });
+  }
+</script>

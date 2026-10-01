@@ -1,0 +1,104 @@
+/* Design tokens: the only place colours, type, spacing and status chips are
+   defined. Dark first; light follows prefers-color-scheme, and the toggle
+   (data-theme on <html>) overrides both ways. The palette is the terminal theme
+   of the product's own recordings (docs/media/specstride.tape). */
+
+:root {
+  /* type */
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.125rem;
+  --step-2: 1.375rem;
+  --step-3: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  --step-4: clamp(1.85rem, 1.3rem + 2vw, 2.75rem);
+  --leading: 1.6;
+
+  /* spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 6.5rem;
+  --gutter: 16px;
+  --max: 72rem;
+  --radius: 6px;
+
+  /* colour: dark */
+  --bg: #141414;
+  --surface: #1c1c1c;
+  --surface-2: #242424;
+  --border: #333333;
+  --fg: #d4d4d4;
+  --fg-strong: #ffffff;
+  --muted: #9aa2b2;
+  --accent: #f07cc0;
+  --accent-ink: #141414;
+  --ok: #4ade80;
+  --warn: #f5b342;
+  --err: #ff6b6b;
+  --info: #8b9cff;
+  --cyan: #5ee0c8;
+  --focus: #5ee0c8;
+
+  /* status chips */
+  --chip-available-fg: var(--ok);
+  --chip-available-bg: rgb(74 222 128 / 0.1);
+  --chip-in-progress-fg: var(--warn);
+  --chip-in-progress-bg: rgb(245 179 66 / 0.1);
+  --chip-planned-fg: var(--info);
+  --chip-planned-bg: rgb(139 156 255 / 0.1);
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --bg: #fafaf7;
+    --surface: #ffffff;
+    --surface-2: #f0efea;
+    --border: #d9d8d2;
+    --fg: #26272b;
+    --fg-strong: #000000;
+    --muted: #575c66;
+    --accent: #b0136e;
+    --accent-ink: #ffffff;
+    --ok: #0e6a2f;
+    --warn: #774700;
+    --err: #c42b2b;
+    --info: #3043c2;
+    --cyan: #0b7a6a;
+    --focus: #3b4fd6;
+    --chip-available-bg: rgb(21 127 59 / 0.09);
+    --chip-in-progress-bg: rgb(138 83 0 / 0.09);
+    --chip-planned-bg: rgb(59 79 214 / 0.08);
+    color-scheme: light;
+  }
+}
+
+:root[data-theme='light'] {
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --surface-2: #f0efea;
+  --border: #d9d8d2;
+  --fg: #26272b;
+  --fg-strong: #000000;
+  --muted: #575c66;
+  --accent: #b0136e;
+  --accent-ink: #ffffff;
+  --ok: #0e6a2f;
+  --warn: #774700;
+  --err: #c42b2b;
+  --info: #3043c2;
+  --cyan: #0b7a6a;
+  --focus: #3b4fd6;
+  --chip-available-bg: rgb(21 127 59 / 0.09);
+  --chip-in-progress-bg: rgb(138 83 0 / 0.09);
+  --chip-planned-bg: rgb(59 79 214 / 0.08);
+  color-scheme: light;
+}

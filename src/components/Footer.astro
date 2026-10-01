@@ -1,0 +1,38 @@
+---
+import { NAV, SITE } from '../lib/site';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <p class="mono brand">specstride</p>
+        <p class="muted">{SITE.tagline} {SITE.caption}</p>
+        <p class="muted">Specstride is open source.</p>
+      </div>
+      <nav aria-label="Footer">
+        <ul role="list">
+          {NAV.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+          <li><a href={SITE.repoUrl}>GitHub</a></li>
+          <li><a href={SITE.discussionsUrl}>Discussions</a></li>
+        </ul>
+      </nav>
+      <div class="legal">
+        <p>Specstride is licensed under <a href={SITE.licenseUrl}>{SITE.productLicense}</a>.</p>
+        <p>This site is <a href={SITE.siteRepoUrl}>open source</a> under {SITE.siteLicense}.</p>
+        <p class="muted">No cookies, no trackers. Cookie-free, aggregate page counts by Cloudflare Web Analytics.</p>
+        <p class="muted">© {year} {SITE.copyright}</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer { border-top: 1px solid var(--border); padding: var(--space-7) 0 var(--space-6); font-size: var(--step--1); }
+  .cols { display: grid; gap: var(--space-5); }
+  @media (min-width: 768px) { .cols { grid-template-columns: 1.3fr 1fr 1.6fr; } }
+  .brand { color: var(--fg-strong); font-weight: 700; margin-bottom: var(--space-2); }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-1); }
+  ul a { display: inline-block; padding: var(--space-1) 0; }
+  p { margin-bottom: var(--space-2); }
+</style>

@@ -1,0 +1,40 @@
+---
+// A terminal window frame. Put a <pre> (or anything) in the default slot; an
+// optional `actions` slot sits in the title bar (e.g. a CopyButton).
+interface Props { title?: string; label?: string; class?: string }
+const { title = 'bash', label, class: cls } = Astro.props;
+---
+<div class:list={['term', cls]} role={label ? 'region' : undefined} aria-label={label}>
+  <div class="bar">
+    <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="title mono">{title}</span>
+    <span class="actions"><slot name="actions" /></span>
+  </div>
+  <div class="body" tabindex="0" aria-label={label ?? title}><slot /></div>
+</div>
+
+<style>
+  .term {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+    min-height: 40px;
+  }
+  .dots { display: inline-flex; gap: 6px; }
+  .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--border); display: block; }
+  .title { font-size: 0.75rem; color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .actions { display: inline-flex; gap: var(--space-2); }
+  .body { padding: var(--space-4); overflow-x: auto; }
+  .body:focus-visible { outline-offset: -2px; }
+  .body :global(pre) { font-size: 0.8125rem; line-height: 1.65; color: var(--fg); white-space: pre; }
+</style>

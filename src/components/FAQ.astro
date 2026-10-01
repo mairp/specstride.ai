@@ -1,0 +1,33 @@
+---
+// Questions and answers from src/content/faq.yaml, as native disclosure widgets.
+import { getCollection } from 'astro:content';
+import { inlineMd } from '../lib/inline-md';
+const items = (await getCollection('faq')).sort((a, b) => a.data.order - b.data.order);
+---
+<div class="faq">
+  {items.map((f) => (
+    <details id={`faq-${f.id}`}>
+      <summary><span class="q">{f.data.q}</span></summary>
+      <p set:html={inlineMd(f.data.a)} />
+    </details>
+  ))}
+</div>
+
+<style>
+  .faq { border-top: 1px solid var(--border); max-width: 52rem; }
+  details { border-bottom: 1px solid var(--border); }
+  summary {
+    cursor: pointer;
+    list-style: none;
+    padding: var(--space-4) 0;
+    font-family: var(--font-mono);
+    color: var(--fg-strong);
+    display: flex;
+    gap: var(--space-3);
+    min-height: 44px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: '+'; color: var(--accent); flex: none; width: 1ch; }
+  details[open] summary::before { content: '−'; }
+  details p { margin: 0 0 var(--space-4) calc(1ch + var(--space-3)); }
+</style>

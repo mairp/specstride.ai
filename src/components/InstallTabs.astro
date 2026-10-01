@@ -1,0 +1,124 @@
+---
+// Install paths as tabs. Without JavaScript every panel is shown in turn; the
+// script turns them into an ARIA tab set (arrow keys, Home, End).
+import type { CollectionEntry } from 'astro:content';
+import CopyButton from './CopyButton.astro';
+import StatusChip from './StatusChip.astro';
+import Terminal from './Terminal.astro';
+import { inlineMd } from '../lib/inline-md';
+
+interface Props { entries: CollectionEntry<'install'>[]; full?: boolean; id?: string; headingLevel?: 'h2' | 'h3' }
+const { entries, full = false, id = 'install-tabs', headingLevel = 'h3' } = Astro.props;
+const H = headingLevel;
+const items = [...entries].sort((a, b) => a.data.order - b.data.order);
+---
+<div class="tabs" data-tabs id={id}>
+  <div class="tablist" role="tablist" aria-label="Install options" hidden>
+    {items.map((e, i) => (
+      <button type="button" role="tab" id={`${id}-tab-${e.id}`} aria-controls={`${id}-panel-${e.id}`}
+        aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
+        {e.data.label}
+        {e.data.status !== 'available' && <span class={`dot dot-${e.data.status}`} aria-hidden="true"></span>}
+      </button>
+    ))}
+  </div>
+  {items.map((e) => {
+    const cmds = e.data.steps.map((s) => s.cmd).join('\n');
+    return (
+      <div class="panel" role="tabpanel" id={`${id}-panel-${e.id}`} aria-labelledby={`${id}-tab-${e.id}`} tabindex="0">
+        <div class="panel-head">
+          <H class="panel-title">{e.data.label}</H>
+          <StatusChip status={e.data.status} />
+        </div>
+        <p class="summary" set:html={inlineMd(e.data.summary)} />
+        {full && e.data.prereqs.length > 0 && (
+          <div class="prereqs">
+            <p class="mono small">Needs</p>
+            <ul>{e.data.prereqs.map((p) => <li set:html={inlineMd(p)} />)}</ul>
+          </div>
+        )}
+        {e.data.steps.length > 0 && (
+          <Terminal title={e.data.label} label={`${e.data.label} commands`}>
+            <CopyButton slot="actions" text={cmds} label="Copy" />
+            <pre>{e.data.steps.map((s) => (
+              <>{s.note && <span class="note"># {s.note}{'\n'}</span>}<span class="prompt">{s.cmd}</span>{'\n'}</>
+            ))}</pre>
+          </Terminal>
+        )}
+        {e.data.after && <p class="after" set:html={inlineMd(e.data.after)} />}
+        {e.data.watch && <p><a class="btn" href={e.data.watch.href}>{e.data.watch.label} <span aria-hidden="true">→</span></a></p>}
+        {full && e.data.verified && <p class="verified mono">Commands last run as shown: {e.data.verified}</p>}
+      </div>
+    );
+  })}
+</div>
+
+<style>
+  .tablist { display: flex; flex-wrap: wrap; gap: var(--space-1); margin-bottom: var(--space-3); }
+  .tablist[hidden] { display: none; }
+  /* with scripts on, render the final tab state from the first paint */
+  :global(.js) .tablist[hidden] { display: flex; }
+  :global(.js) [data-tabs]:not([data-enhanced]) .panel ~ .panel { display: none; }
+  :global(.js) [data-tabs]:not([data-enhanced]) .panel-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  :global(.js) [data-tabs]:not([data-enhanced]) .panel + .panel { margin-top: 0; }
+  [role='tab'] {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    padding: 0.5rem 0.85rem;
+    cursor: pointer;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  [role='tab']:hover { color: var(--fg-strong); }
+  [role='tab'][aria-selected='true'] { color: var(--fg-strong); border-color: var(--border); background: var(--surface); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .dot-in-progress { background: var(--warn); }
+  .dot-planned { background: var(--info); }
+  .panel { min-width: 0; }
+  .panel + .panel { margin-top: var(--space-6); }
+  [data-enhanced] .panel + .panel { margin-top: 0; }
+  .panel[hidden] { display: none; }
+  .panel-head { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2); }
+  .panel-title { margin: 0; font-size: var(--step-0); font-family: var(--font-mono); }
+  [data-enhanced] .panel-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .summary { color: var(--muted); max-width: 48rem; }
+  .note { color: var(--muted); }
+  .prereqs .small { font-size: var(--step--1); color: var(--muted); margin-bottom: var(--space-1); }
+  .after { margin-top: var(--space-3); color: var(--muted); font-size: 0.9375rem; }
+  .verified { margin-top: var(--space-3); font-size: 0.75rem; color: var(--muted); }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
+    const list = root.querySelector<HTMLElement>('[role="tablist"]')!;
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls')!)!);
+    const select = (i: number, focus = false) => {
+      tabs.forEach((t, j) => {
+        const on = i === j;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        panels[j].hidden = !on;
+      });
+      if (focus) tabs[i].focus();
+    };
+    list.hidden = false;
+    root.dataset.enhanced = '';
+    select(0);
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(i));
+      t.addEventListener('keydown', (ev) => {
+        const n = tabs.length;
+        const k = ev.key;
+        const next = k === 'ArrowRight' ? (i + 1) % n : k === 'ArrowLeft' ? (i - 1 + n) % n : k === 'Home' ? 0 : k === 'End' ? n - 1 : -1;
+        if (next >= 0) { ev.preventDefault(); select(next, true); }
+      });
+    });
+  }
+</script>

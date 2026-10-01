@@ -1,0 +1,47 @@
+---
+import { NAV, SITE } from '../lib/site';
+import { repoFacts } from '../lib/github';
+import ThemeToggle from './ThemeToggle.astro';
+const facts = await repoFacts();
+const path = Astro.url.pathname;
+---
+<header class="site-header">
+  <div class="wrap bar">
+    <a class="brand mono" href="/" aria-label="Specstride home">
+      <img src="/favicon.svg" alt="" width="22" height="22" />
+      <span>specstride</span>
+    </a>
+    <nav aria-label="Main">
+      <ul role="list">
+        {NAV.map((n) => <li><a href={n.href} aria-current={path.startsWith(n.href) ? 'page' : undefined}>{n.label}</a></li>)}
+        <li>
+          <a class="gh" href={SITE.repoUrl}>GitHub{facts.stars !== null && <span class="stars"><span aria-hidden="true"> ★ </span><span class="visually-hidden">, stars: </span>{facts.stars}</span>}</a>
+        </li>
+      </ul>
+    </nav>
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .bar { display: flex; align-items: center; gap: var(--space-3); min-height: 60px; flex-wrap: wrap; padding-top: var(--space-1); padding-bottom: var(--space-1); }
+  .brand { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--fg-strong); text-decoration: none; font-weight: 700; margin-right: auto; min-height: 44px; }
+  nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 0 var(--space-1); margin: 0; padding: 0; }
+  nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-2); color: var(--fg); text-decoration: none; font-family: var(--font-mono); font-size: var(--step--1); }
+  nav a:hover, nav a[aria-current='page'] { color: var(--accent); }
+  .stars { color: var(--muted); white-space: nowrap; }
+  .gh { white-space: nowrap; }
+  @media (max-width: 560px) {
+    .bar { row-gap: 0; }
+    nav { order: 3; width: 100%; overflow-x: auto; }
+    nav ul { flex-wrap: nowrap; }
+    nav a { padding: 0 var(--space-2) 0 0; margin-right: var(--space-2); }
+    .stars { display: none; }
+  }
+</style>

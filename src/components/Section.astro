@@ -1,0 +1,22 @@
+---
+// A home-page section: an anchor, a numbered terminal-style eyebrow, a title and
+// an optional intro. Content goes in the default slot.
+interface Props { id: string; eyebrow?: string; title: string; intro?: string; tone?: 'plain' | 'raised' }
+const { id, eyebrow, title, intro, tone = 'plain' } = Astro.props;
+---
+<section id={id} class:list={['section', tone]} aria-labelledby={`${id}-title`}>
+  <div class="wrap">
+    {eyebrow && <p class="eyebrow mono"><span aria-hidden="true">// </span>{eyebrow}</p>}
+    <h2 id={`${id}-title`}>{title}</h2>
+    {intro && <p class="lede intro">{intro}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .section { padding: var(--space-8) 0; border-top: 1px solid var(--border); }
+  .raised { background: var(--surface); }
+  .raised :global(.card) { background: var(--bg); }
+  .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-2); letter-spacing: 0.02em; }
+  .intro { margin-bottom: var(--space-6); color: var(--muted); }
+</style>
