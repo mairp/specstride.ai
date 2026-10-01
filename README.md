@@ -50,7 +50,13 @@ npm run deploy     # builds, then `wrangler deploy` with credentials from ~/.cf-
 ```
 
 The env file holds `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` and never enters the repository
-(`CF_ENV_FILE` points elsewhere). Security headers are in `public/_headers`. Zone settings, DNS and the
+(`CF_ENV_FILE` points elsewhere).
+
+**Deploy from CI (optional).** The `deploy` job in `ci.yml` ships every push to `main` once two
+repository secrets exist: `CLOUDFLARE_DEPLOY_TOKEN`, a token with only *Account → Workers Scripts:
+Edit* on this account, and `CLOUDFLARE_ACCOUNT_ID`. It uploads a new version of the Worker and
+deploys it with `wrangler versions upload` / `versions deploy`, which leave the custom domains alone,
+so the token needs no zone permission. Without the secrets the job is skipped. Security headers are in `public/_headers`. Zone settings, DNS and the
 `www` redirect are described in [DECISIONS.md](DECISIONS.md#cloudflare).
 
 ## Layout

@@ -38,3 +38,44 @@ jobs:
           name: lighthouse
           path: .lighthouseci/
           if-no-files-found: ignore
+
+  deploy:
+    # Deploys main after the checks pass. Skipped until the repository has the
+    # CLOUDFLARE_DEPLOY_TOKEN and CLOUDFLARE_ACCOUNT_ID secrets (see README).
+    # The token needs only Account → Workers Scripts: Edit; triggers and custom
+    # domains are left as they are, so no zone permission is required.
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency: deploy-production
+    env:
+      HAS_TOKEN: ${{ secrets.CLOUDFLARE_DEPLOY_TOKEN != '' }}
+    steps:
+      - name: Skip without a deploy token
+        if: env.HAS_TOKEN != 'true'
+        run: echo "No CLOUDFLARE_DEPLOY_TOKEN secret; deploy from the host with npm run deploy."
+      - uses: actions/checkout@v4
+        if: env.HAS_TOKEN == 'true'
+      - uses: actions/setup-node@v4
+        if: env.HAS_TOKEN == 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - if: env.HAS_TOKEN == 'true'
+        run: npm ci
+      - name: Build
+        if: env.HAS_TOKEN == 'true'
+        run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload and deploy a new version
+        if: env.HAS_TOKEN == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_DEPLOY_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          out=$(npx wrangler versions upload --message "ci ${GITHUB_SHA::7}")
+          echo "$out"
+          id=$(echo "$out" | sed -n 's/.*Worker Version ID: *\([0-9a-f-]*\).*/\1/p' | tail -1)
+          test -n "$id"
+          npx wrangler versions deploy "$id@100%" --yes

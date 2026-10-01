@@ -169,3 +169,8 @@ Worker was listed, read or changed.
   (reporting), and the footer says the site counts pages with it and sets no cookies.
 - **Deploys stay on the host.** CI builds and checks but never deploys; the admin token is not in
   GitHub secrets.
+- **CI deploy, ready but off.** The admin token cannot create tokens (*User → API Tokens: Edit* is
+  missing), so no deploy token was minted. `ci.yml` has a `deploy` job for `main` that runs once the
+  `CLOUDFLARE_DEPLOY_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets exist. It uses `wrangler versions
+  upload` + `versions deploy`, which leave triggers and custom domains alone, so the token needs only
+  *Account → Workers Scripts: Edit*. The path was tested from the host on 2026-10-01.
