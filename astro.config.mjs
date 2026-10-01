@@ -13,5 +13,6 @@ export default defineConfig({
     // Keep every style and script in its own file so the CSP needs no 'unsafe-inline'.
     inlineStylesheets: 'never',
   },
-  vite: { build: { assetsInlineLimit: 0 } },
+  // One small stylesheet for the whole site: a single render-blocking request.
+  vite: { build: { assetsInlineLimit: 0, cssCodeSplit: false } },
 });

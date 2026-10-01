@@ -6,6 +6,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE } from '../lib/site';
 import { repoFacts } from '../lib/github';
+import { THEME_INIT } from '../lib/theme-init';
 
 interface Props { title?: string; description?: string; noindex?: boolean }
 const { title, description = SITE.description, noindex = false } = Astro.props;
@@ -32,7 +33,7 @@ const jsonLd = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline src="/theme-init.js"></script>
+    <script is:inline set:html={THEME_INIT} />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />

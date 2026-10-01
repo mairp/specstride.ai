@@ -73,14 +73,19 @@ format instead of a screenshot.
 
 - **Astro 7, static output, TypeScript strict.** Zero framework JavaScript. Four small scripts, each
   its own file: install tabs, copy buttons, the loop replay and the theme toggle, plus a 5-line
-  blocking `theme-init.js` that applies a saved theme and marks `.js` before first paint (it also
+  inline theme init that applies a saved theme and marks `.js` before first paint (it also
   prevents a layout shift from the tabs).
 - **Plain CSS with tokens, not Tailwind.** One tokens file is easier to read and reuse than a utility
   config for a site of this size, and component styles are scoped by Astro.
 - **Content collections with Zod** for products (Markdown, so a product can carry prose), hosts,
   harnesses, roadmap, FAQ and install (YAML).
-- **Every style and script is an external file** (`inlineStylesheets: 'never'`, `assetsInlineLimit:
-  0`), so the CSP needs no `'unsafe-inline'`. JSON-LD is a data block, which CSP doesn't govern.
+- **No `'unsafe-inline'` in the CSP.** Styles are one external stylesheet for the whole site
+  (`cssCodeSplit: false`; it is 27 KB, and one render-blocking request beat five on the home page).
+  Component scripts are external files. The one inline script, the theme init that must run before
+  first paint, is allowed by its SHA-256, which `scripts/csp-hash.mjs` writes into `dist/_headers`
+  after every build; the build fails if any other inline script appears. It started as an external
+  file and was inlined because the extra round trip showed up in first paint. JSON-LD is a data
+  block, which CSP doesn't govern.
 
 ## Design
 
