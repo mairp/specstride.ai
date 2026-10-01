@@ -156,10 +156,11 @@ Worker was listed, read or changed.
   as immutable; HTML and everything else revalidates on each request (the platform default).
 - **Null mail.** `TXT @ "v=spf1 -all"`, `TXT _dmarc "v=DMARC1; p=reject; sp=reject; adkim=s;
   aspf=s"` and `MX 0 .`, since the domain sends and receives no mail.
-- **No Web Analytics.** Enabling Cloudflare Web Analytics for the zone also failed with
-  `Authentication error` (missing *Account → Account Analytics: Edit* / RUM). Rather than claim it,
-  the footer says the site has no cookies, no trackers and no analytics, and the CSP allows no third
-  party. Turning it on later needs that permission, the beacon origins added to the CSP, and the
-  footer line changed back.
+- **Web Analytics.** Enabling it through the API failed with `Authentication error` (the token lacks
+  *Account → Account Analytics: Edit* / RUM), but the first production Lighthouse run showed that
+  Cloudflare Web Analytics is already active for the zone: the edge injects its cookie-free beacon
+  into every page, and the strict CSP was blocking it (a console error, Best Practices 92). The CSP
+  now allows exactly `static.cloudflareinsights.com` (script) and `cloudflareinsights.com`
+  (reporting), and the footer says the site counts pages with it and sets no cookies.
 - **Deploys stay on the host.** CI builds and checks but never deploys; the admin token is not in
   GitHub secrets.
