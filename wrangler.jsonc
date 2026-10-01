@@ -1,6 +1,6 @@
 {
-  // Static site on Workers with static assets. worker/index.js only redirects
-  // www to the apex (see DECISIONS.md); headers come from public/_headers.
+  // The full site. Which config deploys is decided by the site-mode file; see
+  // wrangler.construction.jsonc and scripts/deploy.sh.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "specstride-site",
   "compatibility_date": "2026-09-30",

@@ -41,6 +41,9 @@ every pull request and on `main`.
 
 ## Deploy
 
+> **Currently under construction.** `site-mode` says `construction`, so deploys ship only the
+> placeholder page. Set it to `live` to deploy the full site.
+
 The site is a Cloudflare Worker with static assets (`wrangler.jsonc`, Worker `specstride-site`) on the
 custom domains `specstride.ai` and `www.specstride.ai`. `worker/index.js` only redirects `www` to the
 apex. Deploys run from a trusted machine, not CI:

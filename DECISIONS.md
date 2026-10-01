@@ -174,3 +174,19 @@ Worker was listed, read or changed.
   `CLOUDFLARE_DEPLOY_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets exist. It uses `wrangler versions
   upload` + `versions deploy`, which leave triggers and custom domains alone, so the token needs only
   *Account → Workers Scripts: Edit*. The path was tested from the host on 2026-10-01.
+
+## Under construction (2026-10-01)
+
+The owner put the site under construction while product-repo issues are resolved: the live domain
+shows only the mark and "under construction", the full content is not exposed, and the site repo is
+private until relaunch.
+
+- **`site-mode`** (committed) is the single switch: `construction` or `live`. `npm run deploy` and
+  the CI deploy job both read it, so the full site can't be relaunched by accident.
+- **Construction mode** deploys `dist-construction/` (built by `scripts/build-construction.mjs`):
+  one page, its stylesheet, the bold mono font and the icons. None of the full site's pages, data
+  or social card is uploaded. The Worker (`SITE_MODE=construction`, from
+  `wrangler.construction.jsonc`) answers every other URL with the placeholder, `503`,
+  `Retry-After: 86400`, `X-Robots-Tag: noindex, nofollow` and `Cache-Control: no-store`, so search
+  engines treat it as temporary and drop the old pages without penalising the domain.
+- **Relaunch:** set `site-mode` to `live`, run `npm run deploy`, make the repo public again.

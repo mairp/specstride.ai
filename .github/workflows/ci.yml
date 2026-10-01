@@ -63,9 +63,15 @@ jobs:
           cache: npm
       - if: env.HAS_TOKEN == 'true'
         run: npm ci
-      - name: Build
+      - name: Build what site-mode asks for
         if: env.HAS_TOKEN == 'true'
-        run: npm run build
+        run: |
+          if [ "$(tr -d '[:space:]' < site-mode)" = live ]; then
+            npm run build; echo "WRANGLER_CONFIG=wrangler.jsonc" >> "$GITHUB_ENV"
+          else
+            node scripts/gen-ascii.mjs && node scripts/build-construction.mjs
+            echo "WRANGLER_CONFIG=wrangler.construction.jsonc" >> "$GITHUB_ENV"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload and deploy a new version
@@ -74,8 +80,8 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_DEPLOY_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          out=$(npx wrangler versions upload --message "ci ${GITHUB_SHA::7}")
+          out=$(npx wrangler versions upload -c "$WRANGLER_CONFIG" --message "ci ${GITHUB_SHA::7}")
           echo "$out"
           id=$(echo "$out" | sed -n 's/.*Worker Version ID: *\([0-9a-f-]*\).*/\1/p' | tail -1)
           test -n "$id"
-          npx wrangler versions deploy "$id@100%" --yes
+          npx wrangler versions deploy -c "$WRANGLER_CONFIG" "$id@100%" --yes

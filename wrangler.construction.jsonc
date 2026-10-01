@@ -1,0 +1,22 @@
+{
+  // The under-construction placeholder: same Worker, same domains, only the
+  // placeholder files are uploaded. Chosen when site-mode says "construction".
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "specstride-site",
+  "compatibility_date": "2026-09-30",
+  "main": "worker/index.js",
+  "vars": { "SITE_MODE": "construction" },
+  "assets": {
+    "directory": "./dist-construction",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "not_found_handling": "none",
+    "html_handling": "auto-trailing-slash"
+  },
+  "routes": [
+    { "pattern": "specstride.ai", "custom_domain": true },
+    { "pattern": "www.specstride.ai", "custom_domain": true }
+  ],
+  "workers_dev": false,
+  "preview_urls": false
+}
