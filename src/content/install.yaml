@@ -1,6 +1,6 @@
 # Install paths. Rules: a step goes here only after it was run by hand, exactly as
 # written, and the date goes in `verified`. Paths that don't work yet have no
-# steps; they get a status and something to watch instead.
+# steps and a status other than `available`, which keeps them off the site.
 - id: git
   label: git clone
   status: available
@@ -64,4 +64,4 @@
   status: planned
   order: 6
   product: codex-plugin
-  summary: The same skills inside Codex. On the roadmap, not scheduled. Nothing to install yet.
+  summary: The same skills inside Codex. Not scheduled. Nothing to install yet.

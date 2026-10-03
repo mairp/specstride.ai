@@ -20,18 +20,11 @@ export const SITE = {
 export const NAV = [
   { href: '/install/', label: 'Install' },
   { href: '/ecosystem/', label: 'Ecosystem' },
-  { href: '/roadmap/', label: 'Roadmap' },
   { href: '/docs/', label: 'Docs' },
 ] as const;
 
 export type Status = 'available' | 'in-progress' | 'planned';
-export const STATUS_LABEL: Record<Status, string> = {
-  available: 'Available',
-  'in-progress': 'In progress',
-  planned: 'Planned',
-};
-export const STATUS_GLYPH: Record<Status, string> = {
-  available: '✓',
-  'in-progress': '▶',
-  planned: '◇',
-};
+
+/** The site shows only what ships today. Entries with another status stay in the
+ *  data and render nowhere; set `status: available` when one is released. */
+export const isAvailable = (e: { data: { status: Status } }) => e.data.status === 'available';

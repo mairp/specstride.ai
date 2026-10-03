@@ -3,7 +3,7 @@
 The website of [Specstride](https://github.com/mairp/specstride): spec-driven, gated, unattended
 coding. Live at **https://specstride.ai**.
 
-It is also a template. Products, hosts, harnesses, roadmap items, FAQ entries and install paths are
+It is also a template. Products, hosts, harnesses, FAQ entries and install paths are
 data in `src/content/`; pages render from them. Adding a product is one Markdown file. See
 [TEMPLATE.md](TEMPLATE.md).
 
@@ -65,11 +65,11 @@ so the token needs no zone permission. Without the secrets the job is skipped. S
 ## Layout
 
 ```
-src/content/        data: products/*.md, hosts, harnesses, roadmap, faq, install (YAML)
+src/content/        data: products/*.md, hosts, harnesses, faq, install (YAML)
 src/content.config.ts   the Zod schemas for all of it
-src/components/     Terminal, InstallTabs, AsciiArt, LoopDiagram, StatusChip, ProductCard, ...
-src/pages/          /, /install, /ecosystem, /roadmap, /docs, /products/[id], 404
-src/styles/tokens.css   every colour, size and status-chip colour, dark and light
+src/components/     Terminal, InstallTabs, AsciiArt, LoopDiagram, Glow, ProductCard, ...
+src/pages/          /, /install, /ecosystem, /docs, /products/[id], 404
+src/styles/tokens.css   every colour and size, dark and light
 scripts/            ASCII art, OG image and font generators; screenshot and a11y checks; deploy
 ```
 

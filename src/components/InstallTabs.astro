@@ -3,7 +3,6 @@
 // script turns them into an ARIA tab set (arrow keys, Home, End).
 import type { CollectionEntry } from 'astro:content';
 import CopyButton from './CopyButton.astro';
-import StatusChip from './StatusChip.astro';
 import Terminal from './Terminal.astro';
 import { inlineMd } from '../lib/inline-md';
 
@@ -18,7 +17,6 @@ const items = [...entries].sort((a, b) => a.data.order - b.data.order);
       <button type="button" role="tab" id={`${id}-tab-${e.id}`} aria-controls={`${id}-panel-${e.id}`}
         aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
         {e.data.label}
-        {e.data.status !== 'available' && <span class={`dot dot-${e.data.status}`} aria-hidden="true"></span>}
       </button>
     ))}
   </div>
@@ -26,10 +24,7 @@ const items = [...entries].sort((a, b) => a.data.order - b.data.order);
     const cmds = e.data.steps.map((s) => s.cmd).join('\n');
     return (
       <div class="panel" role="tabpanel" id={`${id}-panel-${e.id}`} aria-labelledby={`${id}-tab-${e.id}`} tabindex="0">
-        <div class="panel-head">
-          <H class="panel-title">{e.data.label}</H>
-          <StatusChip status={e.data.status} />
-        </div>
+        <H class="panel-title">{e.data.label}</H>
         <p class="summary" set:html={inlineMd(e.data.summary)} />
         {full && e.data.prereqs.length > 0 && (
           <div class="prereqs">
@@ -46,7 +41,6 @@ const items = [...entries].sort((a, b) => a.data.order - b.data.order);
           </Terminal>
         )}
         {e.data.after && <p class="after" set:html={inlineMd(e.data.after)} />}
-        {e.data.watch && <p><a class="btn" href={e.data.watch.href}>{e.data.watch.label} <span aria-hidden="true">→</span></a></p>}
         {full && e.data.verified && <p class="verified mono">Commands last run as shown: {e.data.verified}</p>}
       </div>
     );
@@ -77,15 +71,11 @@ const items = [...entries].sort((a, b) => a.data.order - b.data.order);
   }
   [role='tab']:hover { color: var(--fg-strong); }
   [role='tab'][aria-selected='true'] { color: var(--fg-strong); border-color: var(--border); background: var(--surface); }
-  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
-  .dot-in-progress { background: var(--warn); }
-  .dot-planned { background: var(--info); }
   .panel { min-width: 0; }
   .panel + .panel { margin-top: var(--space-6); }
   [data-enhanced] .panel + .panel { margin-top: 0; }
   .panel[hidden] { display: none; }
-  .panel-head { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2); }
-  .panel-title { margin: 0; font-size: var(--step-0); font-family: var(--font-mono); }
+  .panel-title { margin: 0 0 var(--space-2); font-size: var(--step-0); font-family: var(--font-mono); }
   [data-enhanced] .panel-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .summary { color: var(--muted); max-width: 48rem; }
   .note { color: var(--muted); }

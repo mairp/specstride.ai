@@ -57,10 +57,58 @@ Differences between the brief and the sources:
 
 openclaw.ai (the brief's model), bun.sh and opentofu.org. What was taken: openclaw's order (ASCII
 hero, the open-source promise in one line, install tabs up front, an integrations grid), bun's
-install block (tabs, copy button, a link to the full install page) and opentofu's plain FAQ and
-roadmap. What was left out on purpose: testimonials, press and "used by" logos (nothing real to show
+install block (tabs, copy button, a link to the full install page) and opentofu's plain FAQ.
+What was left out on purpose: testimonials, press and "used by" logos (nothing real to show
 yet, and the honesty rule forbids inventing them), benchmarks (none measured), and social links
 other than GitHub and its Discussions (the only community channels that exist).
+
+## Restyle after co3.ooo (2026-10-03)
+
+The owner asked for the look of https://www.co3.ooo/ and for the roadmap to go. What was taken from
+co3: a near-black canvas with a dot grid instead of grey bands and section rules; the accent used as
+light (a blurred orb with a bright core rising from the bottom edge of the hero, a ring around it,
+halos on cards); large geometric display type; a split hero; cards whose border is a gradient that
+fades out; a figure that stays pinned beside a column of cards; group titles hanging from a line
+with a glowing node; a light primary button with an arrow that straightens on hover; a closing call
+to action. What was kept: the pink accent, the status colours, JetBrains Mono for everything
+terminal, the copy and its order.
+
+- **Display face.** Poppins 500/600 (the face co3 uses), latin subset, self-hosted through
+  `@fontsource/poppins`, for `h1`–`h4` and FAQ questions. 16 KB for the two files; the 500 is
+  preloaded because the headline is the largest paint.
+- **The mark moved.** The hero is type and light only, as on co3. The ASCII mark is the pinned
+  figure of the "why" section, where co3 has its wireframe sphere.
+- **Install tabs** left the hero and are the first band under it, still at `#install`.
+- **Departures from co3, on purpose.** Its resting card text is `#666` on black, which fails
+  contrast; here text rests at `--muted` (AA in both themes) and only gets brighter on hover or
+  focus. It loads GSAP, Font Awesome and Google Fonts; here every effect is CSS (keyframes,
+  `position: sticky`, scroll-driven reveals behind `@supports`), nothing moves under
+  `prefers-reduced-motion`, and there is still no third-party request. co3 is dark only; the light
+  theme keeps the same layout with darker dots and a softer orb. The header keeps its navigation.
+- **No inline styles.** The CSP has no `'unsafe-inline'` for styles, which also blocks `style`
+  attributes, so the orb's variants are classes.
+- **Roadmap removed**: the page, its data file, the collection, the nav entry and the block on
+  product pages. Status chips and each product's `statusNote` carry the same facts. The site was
+  under construction, so `/roadmap/` needs no redirect.
+- **Under-construction placeholder**: same canvas and orb, nothing else changed.
+
+## Only what ships (2026-10-03)
+
+The owner's call before going public: no roadmap anywhere, and the site should read as a finished
+product. So the site now shows only entries whose status is `available`; everything in progress or
+planned stays in the data and renders nowhere. This supersedes the three-chip presentation described
+above, and it keeps the honesty rule: nothing is claimed that does not ship.
+
+- Status chips, the chip palette and the amber/blue tab dots are gone; with one state on screen they
+  were noise.
+- Home: the "why" cards describe what the CLI does today, in the product README's own words and with
+  its one measured example. The agents grid lists the three backends the CLI has. The "hosts and
+  plugins" band is hidden until a plugin is released. The release tag left the hero.
+- The star count is shown only from 100 up (`STAR_FLOOR` in `src/lib/github.ts`).
+- "Built by itself" stays: it is use of the released CLI on real work, not a promise. Its status
+  line and the "not public yet" note were removed.
+- `/ecosystem` lists released products and the agents; the hosts table appears once two hosts have
+  a product. Product pages exist for released products only.
 
 ## Information architecture
 
@@ -78,7 +126,7 @@ format instead of a screenshot.
 - **Plain CSS with tokens, not Tailwind.** One tokens file is easier to read and reuse than a utility
   config for a site of this size, and component styles are scoped by Astro.
 - **Content collections with Zod** for products (Markdown, so a product can carry prose), hosts,
-  harnesses, roadmap, FAQ and install (YAML).
+  harnesses, FAQ and install (YAML).
 - **No `'unsafe-inline'` in the CSP.** Styles are one external stylesheet for the whole site
   (`cssCodeSplit: false`; it is 27 KB, and one render-blocking request beat five on the home page).
   Component scripts are external files. The one inline script, the theme init that must run before

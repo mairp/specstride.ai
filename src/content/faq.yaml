@@ -5,7 +5,7 @@
 - id: agents
   order: 2
   q: Which agents and models can it use?
-  a: Today the CLI drives Claude, Codex or dsh, and the proposer and the critic are chosen independently, so a cheap model can write while a stronger one judges. The TypeScript core adds pi in its first wave, more adapters later, and discovers agents you already have installed.
+  a: The CLI drives Claude, Codex or dsh, and the proposer and the critic are chosen independently, so a cheap model can write while a stronger one judges.
 - id: rubber-stamp
   order: 3
   q: What stops the critic from waving work through?

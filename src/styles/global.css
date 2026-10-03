@@ -1,5 +1,12 @@
 @import './tokens.css';
 
+/* The lit share of a card's border: registered so it can be transitioned. */
+@property --edge {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 45%;
+}
+
 *,
 *::before,
 *::after { box-sizing: border-box; }
@@ -19,16 +26,17 @@ body {
 }
 
 h1, h2, h3, h4 {
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
   color: var(--fg-strong);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   margin: 0 0 var(--space-4);
-  font-weight: 700;
+  font-weight: 500;
+  text-wrap: balance;
 }
 h1 { font-size: var(--step-4); }
 h2 { font-size: var(--step-3); }
-h3 { font-size: var(--step-1); }
+h3, h4 { font-size: var(--step-1); font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
 p { margin: 0 0 var(--space-4); }
 ul, ol { margin: 0 0 var(--space-4); padding-left: 1.25rem; }
 
@@ -76,36 +84,91 @@ pre { margin: 0; }
 .lede { font-size: var(--step-1); color: var(--fg); max-width: 46rem; }
 .prompt::before { content: '$ '; color: var(--muted); user-select: none; }
 
+/* Secondary by default: dark, with an accent hairline that fades downwards.
+   Primary is the light one. Both turn accent on hover. */
 .btn {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-family: var(--font-mono);
-  font-size: var(--step--1);
-  padding: 0.55rem 0.95rem;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
   color: var(--fg-strong);
-  background: var(--surface);
+  background:
+    linear-gradient(var(--bg), var(--bg)) padding-box,
+    linear-gradient(to bottom, var(--accent), color-mix(in srgb, var(--border) 70%, transparent)) border-box;
   text-decoration: none;
   min-height: 44px;
+  transition: background-color 0.3s, color 0.3s;
 }
-.btn:hover { border-color: var(--accent); text-decoration: none; }
-.btn-primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
-.btn-primary:hover { filter: brightness(1.08); }
+.btn:hover { background: var(--accent); color: var(--accent-ink); text-decoration: none; }
+.btn:hover .muted { color: inherit; }
+.btn-primary { background: var(--fg-strong); color: var(--bg); }
+.btn .arrow { display: inline-block; rotate: -45deg; transition: rotate 0.2s; }
+.btn:hover .arrow { rotate: 0deg; }
+
+/* The dot grid, as a background layer. */
+.dots { background-image: radial-gradient(circle, var(--dot) 1px, transparent 1.5px); background-size: 12px 12px; }
 
 .grid { display: grid; gap: var(--space-4); }
 @media (min-width: 640px) { .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 900px) { .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
+/* Glow card: the border is a gradient that starts in the accent and fades out,
+   with a halo on the lit edge. Text rests at --muted (AA in both themes) and
+   comes up on hover or focus. --edge-dir and --halo turn it for top-lit cards. */
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  --card-bg: var(--card);
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(var(--edge-dir, to right), color-mix(in srgb, var(--accent) var(--edge), transparent), color-mix(in srgb, var(--border) 55%, transparent) 72%) border-box;
+  border: 1px solid transparent;
   border-radius: var(--radius);
+  box-shadow: var(--halo, -12px 0) 28px -16px color-mix(in srgb, var(--accent) var(--edge), transparent);
   padding: var(--space-5);
   min-width: 0;
+  color: var(--muted);
+  transition: --edge 0.6s, color 0.6s;
 }
-.card h3 { margin-bottom: var(--space-2); }
+.card:hover, .card:focus-within { --edge: 100%; color: var(--fg); }
+.card h3, .card h4 { margin-bottom: var(--space-2); transition: translate 0.6s; }
+.card:hover h3, .card:hover h4 { translate: 3px -2px; }
+.card-top { --edge-dir: to bottom; --halo: 0 -12px; }
+
+/* A group of cards hanging from a line that ends in a glowing node. */
+.bracket { position: relative; padding-left: var(--space-4); margin-top: var(--space-7); }
+.bracket::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0.8rem; bottom: 0;
+  width: var(--bracket, min(28%, 14rem));
+  border: solid var(--border);
+  border-width: 1px 0 0 1px;
+  border-radius: 10px 0 0;
+  mask-image: linear-gradient(to bottom, #000 40%, transparent);
+  pointer-events: none;
+}
+.bracket-title {
+  position: relative;
+  margin: 0 0 var(--space-5) calc(var(--bracket, min(28%, 14rem)) - var(--space-4));
+  padding-left: var(--space-5);
+  font-size: var(--step-2);
+  font-weight: 500;
+  line-height: 1.6rem;
+}
+.bracket-title::before {
+  content: '';
+  position: absolute;
+  left: -3px; top: calc(0.8rem - 3px);
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent), 0 0 14px 2px var(--accent);
+}
+@media (min-width: 768px) { .bracket { padding-left: var(--space-6); } .bracket-title { margin-left: calc(var(--bracket, min(28%, 14rem)) - var(--space-6)); } }
 
 .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
 table { border-collapse: collapse; width: 100%; font-size: var(--step--1); }
@@ -129,4 +192,31 @@ tr:last-child td { border-bottom: 0; }
   src: url('/fonts/jetbrains-mono-Bold.woff2') format('woff2');
 }
 .page { padding-bottom: var(--space-8); }
+
+/* Sub-pages: a quiet patch of the dot grid and the glow behind the page head. */
+main { position: relative; isolation: isolate; }
+main:has(> .page)::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 26rem;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 16rem at 20% 0, color-mix(in srgb, var(--orb-edge) 16%, transparent), transparent 70%),
+    radial-gradient(circle, var(--dot) 1px, transparent 1.5px) 0 0 / 12px 12px;
+  mask-image: linear-gradient(to bottom, #000, transparent);
+}
+
+/* Reveal on scroll, where scroll-driven animations exist; otherwise nothing moves. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 40%; }
+  }
+}
+@keyframes reveal { from { opacity: 0; translate: 0 2rem; } }
+@media (prefers-reduced-motion: reduce) {
+  .btn, .btn .arrow, .card, .card h3, .card h4 { transition: none; }
+  .card:hover h3, .card:hover h4 { translate: none; }
+}
 th[scope="row"] { white-space: nowrap; }

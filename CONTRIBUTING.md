@@ -6,8 +6,9 @@ product repository's [Discussions](https://github.com/mairp/specstride/discussio
 1. Branch from `main` and keep the change focused.
 2. `npm ci && npm run build && npm run check` must pass. For visual changes, run
    `node scripts/screens.mjs` against `npx wrangler dev --port 8788` and look at `.review/`.
-3. **Honesty rules for content.** Every availability claim is one of `available`, `in-progress` or
-   `planned`, and must match the product's sources. No invented numbers, users, logos, quotes or
+3. **Honesty rules for content.** The site shows only what ships today. Every entry carries a
+   `status` (`available`, `in-progress` or `planned`) that must match the product's sources, and
+   only `available` entries are rendered. No invented numbers, users, logos, quotes or
    benchmarks. A command goes into `src/content/install.yaml` only after you ran it exactly as
    written; update its `verified` date.
 4. Sign off your commits (`git commit -s`, [DCO](https://developercertificate.org/)).

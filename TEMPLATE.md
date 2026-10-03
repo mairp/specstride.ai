@@ -1,19 +1,16 @@
 # Using this site as a template
 
-The site is built so that a new product, host, harness or roadmap item is **data**, not design.
+The site is built so that a new product, host or harness is **data**, not design.
 Pages and components read the content collections in `src/content/`, validated by the Zod schemas
 in `src/content.config.ts`. A typo in a data file fails the build with the file and field named.
 
-## The three statuses
+## Status: only what ships is shown
 
-Every availability claim is one of three values, defined once in `src/content.config.ts` (`status`)
-and styled once in `src/styles/tokens.css` (`--chip-*`):
-
-| Value | Chip | Means |
-|---|---|---|
-| `available` | ✓ Available | Works today; anything installable has verified commands |
-| `in-progress` | ▶ In progress | Specified and being built |
-| `planned` | ◇ Planned | Decided, not started |
+Every product, harness and install path carries a `status`, defined once in `src/content.config.ts`:
+`available`, `in-progress` or `planned`. The site renders **only `available` entries**
+(`isAvailable` in `src/lib/site.ts`): the others stay in the data, get no card, tab, table row or
+page, and appear the day their status is changed. The home page's "hosts and plugins" band shows up
+with the first available plugin, and the sections renumber themselves.
 
 ## Recipes
 
@@ -45,8 +42,8 @@ cards and the hosts table), and gets its own page at `/products/<id>/`. The Code
 exactly this way: `src/content/products/codex-plugin.md`, nothing else.
 
 To give it an install tab, add an entry to `src/content/install.yaml` with the same status and, once
-it works, the `steps` you ran by hand and the date in `verified`. Planned entries stay off the home
-page's tabs and appear on `/install` with their status.
+it works, the `steps` you ran by hand and the date in `verified`. The tab appears when the status is
+`available`.
 
 ### Add a host
 
@@ -78,23 +75,6 @@ Append to `src/content/harnesses.yaml`:
 ```
 
 It appears in the home page grid and the `/ecosystem` table.
-
-### Add a roadmap item
-
-Append to `src/content/roadmap.yaml`:
-
-```yaml
-- id: my-item
-  title: What ships
-  product: specstride-core      # a product id
-  status: planned
-  stage: Wave 3                 # free text beside the chip
-  order: 40
-  summary: One or two sentences.
-  links: []                     # public pages only
-```
-
-`/roadmap` groups items by status; each product page lists its own items.
 
 ### Add a FAQ entry
 
@@ -128,8 +108,7 @@ Add it to `NAV` in `src/lib/site.ts` if it belongs in the header and footer. The
 | `CopyButton` | `text`, `label?` | Copies to the clipboard. Hidden when the Clipboard API is missing. |
 | `AsciiArt` | `label?` | The hero, from `src/generated/hero.json`. Gate posts light up in run order; static under reduced motion. Phones get the mark's own glyphs, set larger. |
 | `LoopDiagram` | none | The loop as an ASCII diagram plus a replay of a real presenter transcript (`src/data/demo-timeline.ts`). Diagram boxes are found by their corners, so editing the diagram text is enough. |
-| `StatusChip` | `status`, `label?` | The only way the site shows status. |
-| `ProductCard` | `product`, `showSkills?`, `headingLevel?` | A product with its host, status, note and skills; links to its page. |
+| `ProductCard` | `product`, `showSkills?`, `headingLevel?` | A product with its host, note and skills; links to its page. |
 | `HarnessGrid` | `compact?` | Every harness plus the "yours, discovered" tile. |
 | `Section` | `id`, `title`, `eyebrow?`, `intro?`, `tone?` | A home page section with an anchor; `tone="raised"` alternates the background. |
 | `FAQ` | none | `faq.yaml` as `<details>` elements. |
@@ -138,7 +117,7 @@ Add it to `NAV` in `src/lib/site.ts` if it belongs in the header and footer. The
 ## Design tokens
 
 `src/styles/tokens.css` holds every colour (dark first, a light set for `prefers-color-scheme: light`
-and for the toggle), the type scale, spacing and the status-chip palette. Components use only these
+and for the toggle), the type scale and spacing. Components use only these
 variables. Both themes meet WCAG AA; `scripts/a11y.mjs` checks it with axe-core.
 
 Fonts are self-hosted: Inter (variable, from `@fontsource-variable/inter`) for prose and a subset of

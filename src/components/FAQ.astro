@@ -20,14 +20,17 @@ const items = (await getCollection('faq')).sort((a, b) => a.data.order - b.data.
     cursor: pointer;
     list-style: none;
     padding: var(--space-4) 0;
-    font-family: var(--font-mono);
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: var(--step-1);
     color: var(--fg-strong);
     display: flex;
     gap: var(--space-3);
     min-height: 44px;
   }
   summary::-webkit-details-marker { display: none; }
-  summary::before { content: '+'; color: var(--accent); flex: none; width: 1ch; }
+  summary::before { content: '+'; color: var(--accent); flex: none; width: 1ch; font-family: var(--font-mono); }
+  details p { color: var(--muted); }
   details[open] summary::before { content: '−'; }
   details p { margin: 0 0 var(--space-4) calc(1ch + var(--space-3)); }
 </style>

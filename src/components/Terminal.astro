@@ -17,8 +17,9 @@ const { title = 'bash', label, class: cls } = Astro.props;
   .term {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
+    box-shadow: 0 24px 60px -40px color-mix(in srgb, var(--accent) 60%, transparent);
     min-width: 0;
   }
   .bar {

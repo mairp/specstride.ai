@@ -1,77 +1,60 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import StatusChip from '../components/StatusChip.astro';
 import HarnessGrid from '../components/HarnessGrid.astro';
 import ProductCard from '../components/ProductCard.astro';
+import { isAvailable } from '../lib/site';
 
-const products = (await getCollection('products')).sort((a, b) => a.data.order - b.data.order);
+const products = (await getCollection('products')).filter(isAvailable).sort((a, b) => a.data.order - b.data.order);
 const hosts = (await getCollection('hosts')).sort((a, b) => a.data.order - b.data.order);
-const harnesses = (await getCollection('harnesses')).sort((a, b) => a.data.order - b.data.order);
-const byHost = await Promise.all(hosts.map(async (h) => ({
-  host: h,
-  products: products.filter((p) => p.data.host?.id === h.id),
-})));
+const byHost = hosts
+  .map((h) => ({ host: h, products: products.filter((p) => p.data.host?.id === h.id) }))
+  .filter((h) => h.products.length > 0);
 const core = products.filter((p) => p.data.kind === 'core');
 const plugins = products.filter((p) => p.data.kind === 'plugin');
-const coreLink = await getEntry('products', 'specstride-core');
 ---
-<Base title="Ecosystem" description="Specstride's products, the hosts they run in and the agents they drive, each with an honest status: available, in progress or planned.">
+<Base title="Ecosystem" description="Specstride's products, where they run and the agents they drive.">
   <div class="wrap page">
     <p class="eyebrow mono">// ecosystem</p>
     <h1>Ecosystem</h1>
-    <p class="lede">Products, the hosts they run in, and the agents they drive. Generated from the site's data, so a new product or harness shows up here when its entry is added.</p>
+    <p class="lede">What Specstride ships, where it runs, and the agents it drives.</p>
 
     <h2>Products</h2>
-    <h3 class="sub">Engine</h3>
-    <div class="grid grid-2">{core.map((p) => <ProductCard product={p} headingLevel="h4" />)}</div>
-    <h3 class="sub">Plugins</h3>
-    <div class="grid grid-3">{plugins.map((p) => <ProductCard product={p} headingLevel="h4" />)}</div>
-
-    <h2 class="gap">Hosts</h2>
-    <div class="table-scroll">
-      <table>
-        <caption class="visually-hidden">Hosts and the Specstride products for each</caption>
-        <thead><tr><th scope="col">Host</th><th scope="col">Product</th><th scope="col">Status</th><th scope="col">Notes</th></tr></thead>
-        <tbody>
-          {byHost.map(({ host, products }) => (
-            products.length ? products.map((p, i) => (
-              <tr>
-                {i === 0 && <th scope="row" rowspan={products.length}>{host.data.url ? <a href={host.data.url}>{host.data.name}</a> : host.data.name}</th>}
-                <td><a href={`/products/${p.id}/`}>{p.data.name}</a></td>
-                <td><StatusChip status={p.data.status} /></td>
-                <td>{host.data.blurb}</td>
-              </tr>
-            )) : (
-              <tr><th scope="row">{host.data.name}</th><td class="muted">none yet</td><td></td><td>{host.data.blurb}</td></tr>
-            )
-          ))}
-        </tbody>
-      </table>
+    <div class="bracket">
+      <h3 class="bracket-title">Engine</h3>
+      <div class:list={['grid', { 'grid-2': core.length > 1 }]}>{core.map((p) => <ProductCard product={p} headingLevel="h4" />)}</div>
     </div>
+    {plugins.length > 0 && (
+      <div class="bracket">
+        <h3 class="bracket-title">Plugins</h3>
+        <div class="grid grid-3">{plugins.map((p) => <ProductCard product={p} headingLevel="h4" />)}</div>
+      </div>
+    )}
 
-    <h2 class="gap">Harnesses</h2>
-    <p class="muted">The proposer is the coding agent; the critic is the judge. They are picked independently. In the CLI today you name them with <code>SPECSTRIDE_PROPOSER</code> and <code>SPECSTRIDE_CRITIC</code>; the <a href={`/products/${coreLink?.id}/`}>TypeScript core</a> adds discovery and per-phase role resolution.</p>
-    <div class="table-scroll">
-      <table>
-        <caption class="visually-hidden">Harnesses, their roles and adapter status</caption>
-        <thead><tr><th scope="col">Harness</th><th scope="col">Proposer</th><th scope="col">Critic</th><th scope="col">Adapter</th><th scope="col">Tested in the CLI</th><th scope="col">Notes</th></tr></thead>
-        <tbody>
-          {harnesses.map((h) => (
-            <tr>
-              <th scope="row">{h.data.url ? <a href={h.data.url}>{h.data.name}</a> : h.data.name}</th>
-              <td>{h.data.roles.includes('proposer') ? <span aria-label="yes">✓</span> : <span class="muted" aria-label="no">—</span>}</td>
-              <td>{h.data.roles.includes('critic') ? <span aria-label="yes">✓</span> : <span class="muted" aria-label="no">—</span>}</td>
-              <td><StatusChip status={h.data.status} /></td>
-              <td>{h.data.testedToday ? 'yes' : <span class="muted">no</span>}</td>
-              <td>{h.data.note}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-    <h3 class="sub">At a glance</h3>
-    <HarnessGrid compact />
+    {byHost.length > 1 && (
+      <>
+        <h2 class="gap">Hosts</h2>
+        <div class="table-scroll">
+          <table>
+            <caption class="visually-hidden">Hosts and the Specstride products for each</caption>
+            <thead><tr><th scope="col">Host</th><th scope="col">Product</th><th scope="col">Notes</th></tr></thead>
+            <tbody>
+              {byHost.map(({ host, products }) => products.map((p, i) => (
+                <tr>
+                  {i === 0 && <th scope="row" rowspan={products.length}>{host.data.url ? <a href={host.data.url}>{host.data.name}</a> : host.data.name}</th>}
+                  <td><a href={`/products/${p.id}/`}>{p.data.name}</a></td>
+                  <td>{host.data.blurb}</td>
+                </tr>
+              )))}
+            </tbody>
+          </table>
+        </div>
+      </>
+    )}
+
+    <h2 class="gap">Agents</h2>
+    <p class="muted">The proposer is the coding agent; the critic is the judge. They are picked independently, with <code>SPECSTRIDE_PROPOSER</code> and <code>SPECSTRIDE_CRITIC</code>, so a cheap model can write while a stronger one judges.</p>
+    <HarnessGrid />
   </div>
 </Base>
 
@@ -79,7 +62,5 @@ const coreLink = await getEntry('products', 'specstride-core');
   .page { padding-top: var(--space-7); }
   .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-2); }
   .lede { margin-bottom: var(--space-6); color: var(--muted); }
-  .sub { margin: var(--space-5) 0 var(--space-3); color: var(--muted); font-size: var(--step-0); }
   .gap { margin-top: var(--space-8); }
-  td :global(.chip) { white-space: nowrap; }
 </style>

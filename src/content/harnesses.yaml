@@ -1,6 +1,7 @@
 # Harnesses: agents Specstride can drive as proposer (the coding agent) or use as
-# critic (the judge). `status` is the adapter's status; `testedToday` is true only
-# when the shipped CLI (mairp/specstride) has a tested backend for it.
+# critic (the judge). `status` is the adapter's status; only `available` ones are
+# shown. `testedToday` is true only when the shipped CLI (mairp/specstride) has a
+# tested backend for it.
 - id: claude
   name: Claude
   url: https://docs.anthropic.com/en/docs/claude-code/overview
@@ -8,7 +9,7 @@
   roles: [proposer, critic]
   status: available
   testedToday: true
-  note: Backend in the CLI today. Default proposer and critic of the TypeScript core.
+  note: Proposer through the Claude Code CLI. Critic through the API, with your ANTHROPIC_API_KEY.
 - id: codex
   name: Codex
   url: https://github.com/openai/codex
@@ -16,14 +17,14 @@
   roles: [proposer, critic]
   status: available
   testedToday: true
-  note: Backend in the CLI today. TypeScript adapter in the first wave.
+  note: Proposer or critic. The critic takes your OPENAI_API_KEY.
 - id: dsh
   name: dsh
   order: 3
   roles: [proposer, critic]
   status: available
   testedToday: true
-  note: Backend in the CLI today, with an optional provider/model qualifier.
+  note: Proposer or critic, with an optional provider/model qualifier.
 - id: pi
   name: pi
   order: 4

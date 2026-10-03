@@ -3,7 +3,7 @@ name: Specstride CLI
 kind: core
 status: available
 order: 1
-summary: The gated loop as it ships today. Bash and Python, standard library only. Drives Claude, Codex or dsh through a Spec Kit feature, phase by phase, behind the critic gate.
+summary: The gated loop. Bash and Python, standard library only. Drives Claude, Codex or dsh through a Spec Kit feature, phase by phase, behind the critic gate.
 statusNote: Released as v0.1.0. Runs on Linux with Python 3.13 and Bash.
 host: shell
 repo: https://github.com/mairp/specstride

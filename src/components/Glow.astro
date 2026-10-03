@@ -1,0 +1,40 @@
+---
+// The accent used as light: a blurred orb with a bright core rising from the
+// bottom edge of its section, a thin ring around it, and the dot grid behind.
+// Decorative. The parent needs position: relative and isolation: isolate.
+interface Props { low?: boolean }
+const { low = false } = Astro.props;
+---
+<div class:list={['glow', { low }]} aria-hidden="true">
+  <span class="grid dots"></span>
+  <span class="orb"></span>
+  <span class="ring"></span>
+</div>
+
+<style>
+  .glow { --cap: 7rem; position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  .low { --cap: 5rem; }
+  .grid { position: absolute; inset: 0; mask-image: radial-gradient(120% 90% at 50% 40%, #000 35%, transparent 90%); }
+  .orb, .ring {
+    position: absolute;
+    left: 50%;
+    width: min(80%, 68rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    translate: -50% 0;
+    transform-origin: 50% 0;
+  }
+  .orb {
+    top: calc(100% - var(--cap));
+    background: radial-gradient(circle at 50% 13%, var(--orb-core) 3%, var(--orb-edge) 24%);
+    filter: blur(40px);
+  }
+  .ring { top: calc(100% - var(--cap) - 2.25rem); border: 3px solid var(--ring); }
+  @media (prefers-reduced-motion: no-preference) {
+    .orb { animation: breathe 5s ease-in-out infinite alternate; }
+  }
+  @keyframes breathe {
+    from { transform: translateY(3rem) scale(0.9); }
+    to { transform: translateY(0) scale(1.04); }
+  }
+</style>

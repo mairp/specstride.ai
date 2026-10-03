@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Builds the under-construction placeholder into dist-construction/: one page
-// with the mark and a single line, plus the font and icons it needs. Nothing
+// with the mark and a single line on the site's canvas (dot grid and orb), plus the font and icons it needs. Nothing
 // from the full site (pages, data, social card) is copied, so none of it is
 // deployed while site-mode says "construction".
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -44,12 +44,15 @@ writeFileSync(join(out, 'index.html'), `<!doctype html>
 `);
 
 writeFileSync(join(out, 'construction.css'), `@font-face { font-family: 'JetBrains Mono'; font-weight: 700; font-display: swap; src: url('/fonts/jetbrains-mono-Bold.woff2') format('woff2'); }
-:root { --bg: #141414; --fg: #ffffff; --muted: #9aa2b2; --ok: #4ade80; --accent: #f07cc0; color-scheme: dark; }
-@media (prefers-color-scheme: light) { :root { --bg: #fafaf7; --fg: #000000; --muted: #575c66; --ok: #0e6a2f; --accent: #b0136e; color-scheme: light; } }
+:root { --bg: #141414; --fg: #ffffff; --muted: #9aa2b2; --ok: #4ade80; --accent: #f07cc0; --dot: rgb(255 255 255 / 0.1); --orb-core: #ffffff; --orb-edge: #f056b0; --ring: rgb(216 223 230 / 0.3); color-scheme: dark; }
+@media (prefers-color-scheme: light) { :root { --bg: #fafaf7; --fg: #000000; --muted: #575c66; --ok: #0e6a2f; --accent: #b0136e; --dot: rgb(0 0 0 / 0.14); --orb-core: #ffe3f3; --orb-edge: #e04aa2; --ring: rgb(176 19 110 / 0.3); color-scheme: light; } }
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
 body { background: var(--bg); color: var(--fg); font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; }
-main { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem; padding: 2rem 16px; }
+main { position: relative; isolation: isolate; overflow: hidden; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem; padding: 2rem 16px 9rem; background: radial-gradient(circle, var(--dot) 1px, transparent 1.5px) 0 0 / 12px 12px; }
+main::before, main::after { content: ''; position: absolute; z-index: -1; left: 50%; width: min(80%, 68rem); aspect-ratio: 1; border-radius: 50%; translate: -50% 0; }
+main::before { top: calc(100% - 7rem); background: radial-gradient(circle at 50% 13%, var(--orb-core) 3%, var(--orb-edge) 24%); filter: blur(40px); }
+main::after { top: calc(100% - 9.25rem); border: 3px solid var(--ring); }
 .art { margin: 0; font-weight: 700; line-height: 1.1; white-space: pre; text-align: left; font-variant-ligatures: none; user-select: none; max-width: 100%; }
 .art-desktop { display: none; font-size: clamp(8px, 1.1vw, 15px); }
 .art-phone { font-size: clamp(22px, 7.4vw, 34px); line-height: 1.02; }

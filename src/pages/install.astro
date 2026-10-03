@@ -2,13 +2,14 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import InstallTabs from '../components/InstallTabs.astro';
-const entries = await getCollection('install');
+import { isAvailable } from '../lib/site';
+const entries = (await getCollection('install')).filter(isAvailable);
 ---
-<Base title="Install" description="Every way to install Specstride that works today, with prerequisites, each run by hand as shown. Plugins that are in progress or planned are listed with their status.">
+<Base title="Install" description="Every way to install Specstride, with prerequisites. Each command was run by hand, exactly as shown.">
   <div class="wrap page">
     <p class="eyebrow mono">// install</p>
     <h1>Install</h1>
-    <p class="lede">Only what works today has commands. Every command below was run by hand, exactly as written, on the date shown under it. Plugins that aren't out yet say so.</p>
+    <p class="lede">Every command below was run by hand, exactly as written, on the date shown under it.</p>
     <InstallTabs entries={entries} full id="install-page" headingLevel="h2" />
     <h2 class="next">After the first run</h2>
     <ul>

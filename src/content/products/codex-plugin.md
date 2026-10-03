@@ -4,7 +4,7 @@ kind: plugin
 status: planned
 order: 5
 summary: The same two skills inside Codex. Codex can already be the proposer or the critic; this puts Specstride behind a Codex prompt too.
-statusNote: On the roadmap. No code yet.
+statusNote: Not scheduled. No code yet.
 host: codex
 skills:
   - name: specstride-run

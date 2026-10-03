@@ -1,4 +1,4 @@
-// Content collections: every product, host, harness, roadmap item, FAQ entry and
+// Content collections: every product, host, harness, FAQ entry and
 // install path on the site is data here. Pages render from these; see TEMPLATE.md.
 import { defineCollection, reference } from 'astro:content';
 import { file, glob } from 'astro/loaders';
@@ -55,19 +55,6 @@ const harnesses = defineCollection({
   }),
 });
 
-const roadmap = defineCollection({
-  loader: file('src/content/roadmap.yaml'),
-  schema: z.object({
-    title: z.string(),
-    product: reference('products'),
-    status,
-    stage: z.string(),
-    order: z.number(),
-    summary: z.string(),
-    links: z.array(link).default([]),
-  }),
-});
-
 const faq = defineCollection({
   loader: file('src/content/faq.yaml'),
   schema: z.object({ q: z.string(), a: z.string(), order: z.number() }),
@@ -91,4 +78,4 @@ const install = defineCollection({
   }),
 });
 
-export const collections = { products, hosts, harnesses, roadmap, faq, install };
+export const collections = { products, hosts, harnesses, faq, install };

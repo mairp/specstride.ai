@@ -1,7 +1,6 @@
 ---
-// A product (core or plugin) as a card: status, host, summary, skills, links.
+// A product (core or plugin) as a card: host, summary, note, skills.
 import { getEntry, type CollectionEntry } from 'astro:content';
-import StatusChip from './StatusChip.astro';
 import { inlineMd } from '../lib/inline-md';
 
 interface Props { product: CollectionEntry<'products'>; showSkills?: boolean; headingLevel?: 'h3' | 'h4' }
@@ -10,11 +9,8 @@ const d = product.data;
 const host = d.host ? await getEntry(d.host) : undefined;
 const H = headingLevel;
 ---
-<article class="card product">
-  <div class="top">
-    <StatusChip status={d.status} />
-    {host && <span class="host mono">{d.kind === 'plugin' ? `for ${host.data.name}` : host.id === 'shell' ? 'CLI' : host.data.name}</span>}
-  </div>
+<article class="card card-top product">
+  {host && <p class="host mono">{d.kind === 'plugin' ? `for ${host.data.name}` : host.id === 'shell' ? 'CLI' : host.data.name}</p>}
   <H class="name"><a href={`/products/${product.id}/`}>{d.name}</a></H>
   <p class="summary">{d.summary}</p>
   <p class="note mono"><span aria-hidden="true">» </span>{d.statusNote}</p>
@@ -27,9 +23,8 @@ const H = headingLevel;
 
 <style>
   .product { display: flex; flex-direction: column; gap: var(--space-2); }
-  .top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
-  .host { font-size: 0.75rem; color: var(--muted); }
-  .name { margin: var(--space-2) 0 0; font-size: var(--step-1); }
+  .host { font-size: 0.75rem; color: var(--accent); margin: 0; }
+  .name { margin: 0; font-size: var(--step-1); }
   .name a { color: var(--fg-strong); text-decoration: none; }
   .name a:hover { color: var(--accent); text-decoration: underline; }
   .summary { margin: 0; }
