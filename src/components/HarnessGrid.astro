@@ -1,8 +1,11 @@
 ---
-// The agents Specstride drives (proposer) or uses as judge (critic): the ones
-// the shipped CLI has a backend for.
+// The agents Specstride runs: the implementer (the coding agent) and the
+// reviewer (the judge), chosen independently. The data's internal role enum is
+// the product's own (`proposer`/`critic`); the words on the page are
+// implementer and reviewer.
 import { getCollection } from 'astro:content';
 import { isAvailable } from '../lib/site';
+const ROLE = { proposer: 'implementer', critic: 'reviewer' } as const;
 interface Props { compact?: boolean }
 const { compact = false } = Astro.props;
 const harnesses = (await getCollection('harnesses')).filter(isAvailable).sort((a, b) => a.data.order - b.data.order);
@@ -11,7 +14,7 @@ const harnesses = (await getCollection('harnesses')).filter(isAvailable).sort((a
   {harnesses.map((h) => (
     <li class="tile card card-top">
       <p class="hname">{h.data.url ? <a href={h.data.url}>{h.data.name}</a> : h.data.name}</p>
-      <p class="roles mono">{h.data.roles.join(' · ')}</p>
+      <p class="roles mono">{h.data.roles.map((r) => ROLE[r]).join(' · ')}</p>
       {!compact && <p class="hnote">{h.data.note}</p>}
     </li>
   ))}

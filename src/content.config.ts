@@ -45,12 +45,11 @@ const harnesses = defineCollection({
     name: z.string(),
     url: z.url().optional(),
     order: z.number(),
-    /** Roles it can play: the coding agent (proposer) and/or the judge (critic). */
+    /** Roles it can play: the coding agent (implementer) and/or the judge (reviewer).
+     *  The enum stays `proposer`/`critic` after the product's own variables; the site
+     *  renders the role words "implementer" and "reviewer" (see HarnessGrid). */
     roles: z.array(z.enum(['proposer', 'critic'])),
-    /** Status of its adapter: in the shipped CLI today, else in the TypeScript core. */
     status,
-    /** True only when the shipped CLI has a tested backend for it. */
-    testedToday: z.boolean().default(false),
     note: z.string(),
   }),
 });

@@ -1,67 +1,28 @@
 # Install paths. Rules: a step goes here only after it was run by hand, exactly as
 # written, and the date goes in `verified`. Paths that don't work yet have no
 # steps and a status other than `available`, which keeps them off the site.
-- id: git
-  label: git clone
+# `PENDING` means the steps are awaiting that by-hand verification pass.
+- id: claude-code
+  label: Claude Code
   status: available
   order: 1
-  product: specstride-cli
-  summary: Clone the CLI and run the bundled three-phase Spec Kit example end to end. Claude writes the code; a critic signs off each phase.
-  prereqs:
-    - Linux, Bash, git and Python 3.13 (the CLI uses the standard library only)
-    - The [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) CLI, logged in, for the proposer
-    - "`ANTHROPIC_API_KEY` in the environment for the `claude` critic, which calls the API directly (or set `SPECSTRIDE_CRITIC` to `codex` with `OPENAI_API_KEY`, or to `dsh`)"
-  steps:
-    - cmd: git clone https://github.com/mairp/specstride && cd specstride
-    - cmd: mkdir -p /tmp/demo/specs/001-greeting && cp examples/speckit-tasks.example.md /tmp/demo/specs/001-greeting/tasks.md
-    - cmd: SPECSTRIDE_PROPOSER=claude SPECSTRIDE_CRITIC=claude ./specstride run -w /tmp/demo --verification off
-  after: Follow it from a second terminal with `./specstride watch -w /tmp/demo`. `--verification off` skips the test-plan gate, which wants a test command the empty demo directory doesn't have yet; leave it on in a real project.
-  verified: '2026-10-01'
-- id: shell
-  label: shell function
-  status: available
-  order: 2
-  product: specstride-cli
-  summary: Keep one checkout and get a `specstride` command everywhere. The script owns its routing, so the function is only a pointer. Add these two lines to `~/.bashrc` or `~/.zshrc`.
-  prereqs:
-    - A clone of the repository (the previous tab), here at `~/specstride`
-  steps:
-    - cmd: export SPECSTRIDE_HOME="$HOME/specstride"
-    - cmd: specstride() { "$SPECSTRIDE_HOME/specstride" "$@"; }
-    - note: then, from any directory
-      cmd: specstride status -w /tmp/demo
-  after: "`specstride run`, `watch`, `events`, `verdicts`, `stop` and `resume` all go through the same command."
-  verified: '2026-10-01'
-- id: reverse
-  label: reverse a codebase
-  status: available
-  order: 3
-  product: specstride-cli
-  summary: No spec yet? Inventory a codebase and see the five gated phases that would write its as-is Spec Kit feature. The dry run makes no model call and changes nothing.
-  prereqs:
-    - A clone of the repository, as in the first tab
-  steps:
-    - cmd: ./specstride reverse ~/projects/foo --dry-run
-  after: Drop `--dry-run` to write `specs/NNN-as-is-foo/` through the gated loop. It reads your source and never changes it.
-  verified: '2026-10-01'
-- id: claude-code
-  label: Claude Code plugin
-  status: in-progress
-  order: 4
   product: claude-code-plugin
-  summary: "`specstride-run` and `specstride-reverse` as Claude Code skills. Specified, and built after the TypeScript core it sits on. There is nothing to install yet."
-  watch:
-    label: Watch the repository on GitHub
-    href: https://github.com/mairp/specstride
-- id: dsh
-  label: dsh plugin
-  status: planned
-  order: 5
-  product: dsh-plugin
-  summary: The same skills on dsh, in the second wave. Nothing to install yet.
-- id: codex
-  label: Codex plugin
-  status: planned
-  order: 6
-  product: codex-plugin
-  summary: The same skills inside Codex. Not scheduled. Nothing to install yet.
+  summary: Install the plugin in Claude Code, then take the ready-made example feature through its first run before pointing it at your own repository.
+  prereqs:
+    - Linux. macOS is not verified: no Mac has run it.
+    - Node 22+, git and Claude Code
+    - A Spec Kit feature: a `specs/NAME/` directory with a `tasks.md`, in a git repository (optionally with `spec.md` and `plan.md` beside it)
+    - A `test` script in `package.json`
+    - Your own subscription or API key for the models you choose
+  steps:
+    - note: in Claude Code
+      cmd: /plugin marketplace add mairp/specstride-plugin
+    - cmd: /plugin install specstride@specstride-marketplace
+    - note: to try it on a ready-made feature first
+      cmd: git clone https://github.com/mairp/specstride-example
+    - cmd: cd specstride-example
+    - cmd: claude
+    - note: then say
+      cmd: Run Specstride on the feature in this repo.
+  after: On your own repository — any git repo with a `specs/NAME/tasks.md` and a `test` script in `package.json` — say the same sentence. Each approved phase becomes its own commit.
+  verified: 'PENDING'

@@ -1,32 +1,36 @@
 - id: spec-kit
   order: 1
   q: Do I need Spec Kit?
-  a: The CLI reads a [Spec Kit](https://github.com/github/spec-kit) feature's `tasks.md`, an OpenSpec change, or its own plain format; the feature's `spec.md`, `plan.md` and contracts ride along as read-only context. No spec yet? `specstride reverse` writes an as-is feature from an existing codebase.
-- id: agents
+  a: You need the format, not its tooling. A feature is a `specs/NAME/` directory with a `tasks.md`: `## Phase N: Title` headings and `- [ ] T001 …` tasks are what [Spec Kit](https://github.com/github/spec-kit) writes, and you can write them by hand. `spec.md` and `plan.md` beside the tasks ride along as read-only context for the implementer and the reviewer.
+- id: models
   order: 2
-  q: Which agents and models can it use?
-  a: The CLI drives Claude, Codex or dsh, and the proposer and the critic are chosen independently, so a cheap model can write while a stronger one judges.
+  q: Which models can it use?
+  a: Any you trust. Specstride is an orchestrator and does not rank models. The implementer and the reviewer are chosen independently: by default both are separate Claude sessions through your Claude Code login, and either can instead be any provider and model your DeepSeek Harness (`dsh`) reaches.
 - id: rubber-stamp
   order: 3
-  q: What stops the critic from waving work through?
-  a: The critic never takes the agent's word. It reads the phase's acceptance criteria and the evidence, then reads the files the evidence cites in a read-only grounding pass before it answers. A reply it can't parse counts as a rejection. The self-tuning loop can't change anything the critic reads, and a test locks that.
+  q: What stops the reviewer waving work through?
+  a: The reviewer is a separate session with no tools. It reads the actual change against the phase's tasks — not a summary it is handed — and it must answer with a one-time nonce, so planted text cannot pass for its verdict. The engine runs the tests itself, so the claim it reads was checked against a real run. Credentials are redacted from what it reads.
 - id: stuck
   order: 4
-  q: What happens when a phase gets stuck?
-  a: When a rejection names new unmet criteria, the diagnostician reads the whole rejection history and the full files and says whether the critic couldn't see the proof or the gap is real. The accelerator then fixes only those criteria. After a bounded number of rejections the run halts with exit code 2 and leaves everything on disk for you.
+  q: What happens when a phase keeps failing?
+  a: A rejected phase goes back to the implementer with the reviewer's reasons, for up to 3 attempts. After the third rejection the run stops with exit 2. The reasons are in the output: fix the spec or the work and run again — a run resumes from the phases that were already approved.
 - id: local
   order: 5
-  q: Does anything leave my machine?
-  a: Specstride runs where you run it. It calls the agents and providers you configure, with your keys, and nothing else. Telemetry is off until you point it at your own collector, and every record is redacted before it is shown or written.
+  q: What leaves my machine?
+  a: Nothing is sent to Specstride's authors; there is no service of its own. What you choose goes to your model providers — the implementer reads the feature's spec, plan, tasks and the reviewer's feedback; the reviewer reads the tasks, the test output and the change. Each provider's own data policy applies. Run records, approvals and logs stay in `~/.specstride/` on your machine, and telemetry export is off by default.
 - id: cost
   order: 6
   q: What does it cost?
-  a: Specstride is free and open source. You pay your model providers as usual; the live view prints the cost, tokens and duration of every pass, so the spend is visible while the run is going.
-- id: typescript
+  a: Nothing for Specstride itself — it is free and open source under Apache-2.0. Each phase makes at least two model calls on your own subscription or API key, so a run costs more than a single session would.
+- id: macos
   order: 7
-  q: Will I have to migrate to the TypeScript version?
-  a: It takes the same Spec Kit features. It is held to a parity suite that replays today's CLI behaviour, and it is not released until every parity test passes.
-- id: contribute
+  q: Does it run on macOS?
+  a: macOS is not verified — no Mac has run it. Linux is what it runs on today.
+- id: anthropic
   order: 8
+  q: Is it from Anthropic?
+  a: No. Specstride is not affiliated with Anthropic.
+- id: contribute
+  order: 9
   q: How do I contribute?
-  a: Issues, Discussions and pull requests on [GitHub](https://github.com/mairp/specstride). Sign off your commits (`git commit -s`); there is no CLA.
+  a: Issues and pull requests on [the plugin repository](https://github.com/mairp/specstride-plugin), following [CONTRIBUTING.md](https://github.com/mairp/specstride-plugin/blob/main/CONTRIBUTING.md) — add a test with each change, keep the import boundaries, and run the formatter before you push. Good first issues are labelled `good first issue`. Questions and bugs go to [issues](https://github.com/mairp/specstride-plugin/issues); Discussions are off on the repository.
