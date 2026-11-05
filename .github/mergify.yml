@@ -1,0 +1,23 @@
+# A green pull request merges when the maintainer approves it, or by the label
+# `automerge`. Dependabot's patch and minor updates need only the green checks.
+# Branches are deleted after the merge by the repository setting.
+queue_rules:
+  - name: default
+    merge_method: squash
+    queue_conditions:
+      - "check-success=build"
+      - "#changes-requested-reviews-by=0"
+      - -draft
+      - or:
+          - "#approved-reviews-by>=1"
+          - label=automerge
+          - and:
+              - author=dependabot[bot]
+              - dependabot-update-type!=version-update:semver-major
+
+pull_request_rules:
+  - name: Queue a pull request that is ready
+    conditions: []
+    actions:
+      queue:
+        name: default
