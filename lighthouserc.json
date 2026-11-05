@@ -7,7 +7,7 @@
         "http://localhost/install/",
         "http://localhost/products/claude-code-plugin/"
       ],
-      "numberOfRuns": 1,
+      "numberOfRuns": 3,
       "settings": {
         "chromeFlags": "--no-sandbox"
       }
