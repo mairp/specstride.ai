@@ -3,9 +3,9 @@ import Base from '../layouts/Base.astro';
 ---
 <Base title="Not found" description="This page does not exist." noindex>
   <div class="wrap page">
-    <pre class="term mono" aria-hidden="true"><span class="muted">$</span> specstride status --page {'\n'}  state: <span class="err">HALTED</span> — no such page{'\n'}  <span class="err">✗</span> 404   evidence missing{'\n'}  next: go back to the start of the track</pre>
-    <h1>404: no evidence for this page</h1>
-    <p class="lede">The gate held: nothing lives at this address.</p>
+    <pre class="term mono" aria-hidden="true"><span class="muted">$</span> cd /this/page{'\n'}  error: nothing lives at this address{'\n'}  next: back to the start of the track</pre>
+    <h1>404: nothing at this address</h1>
+    <p class="lede">The gate held: no page here.</p>
     <p class="ctas"><a class="btn btn-primary" href="/">Back to the start</a> <a class="btn" href="/docs/">Docs</a></p>
   </div>
 </Base>

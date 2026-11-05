@@ -5,7 +5,7 @@
       "url": [
         "http://localhost/",
         "http://localhost/install/",
-        "http://localhost/ecosystem/"
+        "http://localhost/products/claude-code-plugin/"
       ],
       "numberOfRuns": 1,
       "settings": {

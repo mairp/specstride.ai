@@ -2,20 +2,21 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import InstallTabs from '../components/InstallTabs.astro';
-import { isAvailable } from '../lib/site';
-const entries = (await getCollection('install')).filter(isAvailable);
+import { SITE } from '../lib/site';
+const entries = (await getCollection('install'));
 ---
-<Base title="Install" description="Every way to install Specstride, with prerequisites. Each command was run by hand, exactly as shown.">
+<Base title="Install" description="Install the Specstride plugin in Claude Code, with its prerequisites, and run it on a ready-made example first.">
   <div class="wrap page">
     <p class="eyebrow mono">// install</p>
     <h1>Install</h1>
-    <p class="lede">Every command below was run by hand, exactly as written, on the date shown under it.</p>
+    <p class="lede">Commands are run by hand, exactly as written; the date under the path says when it was last verified that way.</p>
     <InstallTabs entries={entries} full id="install-page" headingLevel="h2" />
     <h2 class="next">After the first run</h2>
     <ul>
-      <li>Point it at a real Spec Kit feature: <code>specstride run -w ~/projects/foo</code> discovers the feature when there is one, or pass <code>-s specs/002-billing/tasks.md</code>.</li>
-      <li>Inspect a run from its files: <code>specstride status</code>, <code>events</code>, <code>verdicts</code>, <code>feedback 3</code>.</li>
-      <li>Configuration, exit codes and hardening are in the <a href="https://github.com/mairp/specstride/tree/main/wiki">wiki</a>.</li>
+      <li>Something look off? The <code>specstride-doctor</code> skill checks this machine: it runs the doctor, lists each finding with its fix, and installs nothing.</li>
+      <li>To end a run cleanly, use the <code>stop</code> verb of the <code>specstride</code> CLI that the plugin bundles: the run ends at the next safe boundary, the record closes whole, no survivor.</li>
+      <li>Settings live in your user configuration, <code>~/.config/specstride/config.yaml</code> — parallel units are turned on there, and with several features in <code>specs/</code> you set <code>SPECSTRIDE_FEATURE</code> to the directory name.</li>
+      <li>Every error a run can print, with its fix, is in the wiki's <a href={`${SITE.repoUrl}/blob/main/wiki/Troubleshooting.md`}>Troubleshooting</a> page.</li>
     </ul>
   </div>
 </Base>

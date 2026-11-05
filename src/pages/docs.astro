@@ -1,21 +1,21 @@
 ---
 import Base from '../layouts/Base.astro';
-const W = 'https://github.com/mairp/specstride/blob/main/wiki';
+import { SITE } from '../lib/site';
+const W = `${SITE.repoUrl}/blob/main/wiki`;
 const docs = [
-  { href: 'https://github.com/mairp/specstride#readme', title: 'README', body: 'The whole picture: the three loops, the quick start, the CLI and the on-disk contract.' },
-  { href: `${W}/Getting-Started.md`, title: 'Getting started', body: 'From a clone to a first gated run.' },
-  { href: `${W}/Architecture.md`, title: 'Architecture', body: 'Proposer, critic, diagnostician and accelerator, and the files between them.' },
-  { href: `${W}/CLI-Reference.md`, title: 'CLI reference', body: 'Every verb and flag of the single front-door command.' },
-  { href: `${W}/Spec-Formats.md`, title: 'Spec formats', body: 'Spec Kit tasks, OpenSpec changes and the native format.' },
-  { href: `${W}/Configuration.md`, title: 'Configuration', body: 'Backends per role, budgets, timeouts and the privacy controls.' },
-  { href: `${W}/On-Disk-Contract.md`, title: 'On-disk contract', body: 'What a run writes under .specstride/, and the event stream.' },
-  { href: `${W}/Learning.md`, title: 'Learning', body: 'The self-tuning loop: observe, suggest, apply, evaluate, roll back.' },
-  { href: `${W}/Reverse-Engineering.md`, title: 'Reverse engineering', body: 'Turning a codebase into an as-is Spec Kit feature.' },
-  { href: `${W}/Telemetry.md`, title: 'Telemetry', body: 'Loki, OpenTelemetry and the bundled dashboard.' },
-  { href: `${W}/Hardening.md`, title: 'Hardening', body: 'Breakers, watchdogs and how a run fails safely.' },
+  { href: `${SITE.repoUrl}#readme`, title: 'README', body: 'Install, how it works, parallel units, requirements and costs.' },
+  { href: `${W}/Home.md`, title: 'Wiki home', body: 'The index of the wiki: getting started, how it works, costs and limits, troubleshooting, FAQ.' },
+  { href: `${W}/Getting-Started.md`, title: 'Getting started', body: 'Install, the shape of a feature, and the sentence that starts a run.' },
+  { href: `${W}/How-It-Works.md`, title: 'How it works', body: 'What happens in each phase — the implementer, the engine\'s verification, the reviewer, the approval and the rejection — plus the parallel-units layer.' },
+  { href: `${W}/Costs-And-Limits.md`, title: 'Costs and limits', body: 'The model and parallel-units variables with their defaults, and what each attempt costs.' },
+  { href: `${W}/Troubleshooting.md`, title: 'Troubleshooting', body: 'Every error a run can print, with its fix. Start with the specstride-doctor skill.' },
+  { href: `${W}/FAQ.md`, title: 'FAQ', body: 'Which model to use, whether your code goes anywhere new, keys, and who makes it.' },
+  { href: SITE.exampleUrl, title: 'Example repository', body: 'A tiny Node project with one three-phase Spec Kit feature to try Specstride on, with a demo of a real run.' },
+  { href: `${SITE.repoUrl}/blob/main/SECURITY.md`, title: 'Security', body: 'Report vulnerabilities privately, and read the known limits: the implementer runs with your permissions.' },
+  { href: SITE.contributingUrl, title: 'Contributing', body: 'Build, typecheck, test, and an end-to-end run that needs no account; add a test with each change.' },
 ];
 ---
-<Base title="Docs" description="Specstride documentation lives with the code on GitHub. This page links to the README and every wiki page.">
+<Base title="Docs" description="Specstride documentation lives with the plugin on GitHub: the README, the wiki, the example repository, security and contributing.">
   <div class="wrap page">
     <p class="eyebrow mono">// docs</p>
     <h1>Docs</h1>
@@ -25,7 +25,7 @@ const docs = [
         <li class="card"><h2 class="t"><a href={d.href}>{d.title}</a></h2><p>{d.body}</p></li>
       ))}
     </ul>
-    <p class="muted">Questions go to <a href="https://github.com/mairp/specstride/discussions">GitHub Discussions</a>; bugs to <a href="https://github.com/mairp/specstride/issues">issues</a>.</p>
+    <p class="muted">Questions and bugs go to <a href={SITE.issuesUrl}>issues</a> — Discussions are off on the repository.</p>
   </div>
 </Base>
 
