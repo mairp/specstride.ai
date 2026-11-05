@@ -1,17 +1,18 @@
 ---
 name: Claude Code plugin
 kind: plugin
-status: in-progress
-order: 3
-summary: Specstride inside Claude Code. Two skills hand specified work to the detached engine and report back in a few lines, so the host keeps its context for judgment.
-statusNote: Specified in the first wave. Built after the core it sits on.
+status: available
+order: 1
+summary: Specstride inside Claude Code. Two skills run a Spec Kit feature through the gated loop and report back in a few lines, so your session keeps its context.
+statusNote: Version 0.1.0. Runs on Linux; macOS is not verified.
 host: claude-code
+repo: https://github.com/mairp/specstride-plugin
+install: claude-code
 skills:
   - name: specstride-run
-    does: Take Spec Kit features that already exist, derive and validate a launch contract, launch the gated loop detached, supervise it and report the digest.
-  - name: specstride-reverse
-    does: Reverse-engineer a codebase into an as-is Spec Kit feature through the gated loop, with lint and guard checks.
-links:
-  - label: Watch the repo for releases
-    href: https://github.com/mairp/specstride
+    does: Run Specstride on the finished features of this repository — derive and judge the launch contract, validate, promote, render, launch, and supervise the run. Invoking the skill is the consent to launch; the mode `dry-run` stops after the plan.
+  - name: specstride-doctor
+    does: Check this machine for Specstride — run the doctor, list each finding with its fix, and print the command to run when the CLI is missing or its protocol does not match. It installs and updates nothing.
 ---
+
+The engine that runs the loop is bundled inside the plugin.

@@ -1,5 +1,8 @@
 // Worker in front of the static assets.
 // - www.specstride.ai answers with a 301 to the apex, keeping path and query.
+// - /ecosystem/ moved home: with the plugin release there is one product and one
+//   host, which the home page already shows, so the page redirects to its
+//   agents section.
 // - With SITE_MODE "construction" (wrangler.construction.jsonc), every request
 //   that isn't one of the placeholder's own files gets the placeholder page
 //   with 503 + Retry-After, so search engines treat the outage as temporary.
@@ -9,6 +12,12 @@ export default {
     if (url.hostname === 'www.specstride.ai') {
       url.hostname = 'specstride.ai';
       url.protocol = 'https:';
+      return Response.redirect(url.toString(), 301);
+    }
+    if (/^\/ecosystem\/?$/.test(url.pathname)) {
+      url.pathname = '/';
+      url.search = '';
+      url.hash = 'agents';
       return Response.redirect(url.toString(), 301);
     }
     if (env.SITE_MODE !== 'construction') return env.ASSETS.fetch(request);

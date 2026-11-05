@@ -9,37 +9,35 @@ in `src/content.config.ts`. A typo in a data file fails the build with the file 
 Every product, harness and install path carries a `status`, defined once in `src/content.config.ts`:
 `available`, `in-progress` or `planned`. The site renders **only `available` entries**
 (`isAvailable` in `src/lib/site.ts`): the others stay in the data, get no card, tab, table row or
-page, and appear the day their status is changed. The home page's "hosts and plugins" band shows up
-with the first available plugin, and the sections renumber themselves.
+page, and appear the day their status is changed.
 
 ## Recipes
 
-### Add a product (for example a new host plugin)
+### Add a product
 
 Create **one file**, `src/content/products/<id>.md`:
 
 ```markdown
 ---
-name: Codex plugin
+name: My host plugin
 kind: plugin              # core | plugin
 status: planned           # available | in-progress | planned
 order: 5                  # position in lists
 summary: One or two sentences.
 statusNote: What the status means for this product, honestly.
-host: codex               # an id from src/content/hosts.yaml (optional)
+host: my-host             # an id from src/content/hosts.yaml (optional)
 skills:                   # optional
   - name: specstride-run
     does: What it does.
 links: []                 # optional [{ label, href }]
-install: codex            # optional: an id from install.yaml
+install: my-host          # optional: an id from install.yaml
 ---
 
 Optional Markdown body: extra prose on /products/<id>/.
 ```
 
-That is all. The product appears on the home page (engine or plugin row), on `/ecosystem` (product
-cards and the hosts table), and gets its own page at `/products/<id>/`. The Codex plugin was added
-exactly this way: `src/content/products/codex-plugin.md`, nothing else.
+That is all. The product gets its own page at `/products/<id>/`, and the home page and the
+products listings pick it up from the same data.
 
 To give it an install tab, add an entry to `src/content/install.yaml` with the same status and, once
 it works, the `steps` you ran by hand and the date in `verified`. The tab appears when the status is
@@ -53,7 +51,7 @@ Append to `src/content/hosts.yaml`:
 - id: my-host
   name: My Host
   url: https://example.com      # optional
-  order: 4
+  order: 2
   blurb: One line about what a plugin there exposes.
 ```
 
@@ -67,14 +65,15 @@ Append to `src/content/harnesses.yaml`:
 - id: my-agent
   name: My Agent
   url: https://example.com      # optional
-  order: 10
-  roles: [proposer, critic]     # what it can be
+  order: 3
+  roles: [proposer, critic]     # the internal enum; the page says implementer and reviewer
   status: planned
-  testedToday: false            # true only if the shipped CLI has a tested backend for it
   note: One line.
 ```
 
-It appears in the home page grid and the `/ecosystem` table.
+It appears in the home page's models section. The role words on the page are
+**implementer** (the coding agent) and **reviewer** (the judge); `proposer`/`critic` are the
+product's own variable names and stay in the data.
 
 ### Add a FAQ entry
 
@@ -107,9 +106,9 @@ Add it to `NAV` in `src/lib/site.ts` if it belongs in the header and footer. The
 | `InstallTabs` | `entries`, `full?`, `id?`, `headingLevel?` | Install paths as ARIA tabs (arrow keys, Home, End). Without JavaScript every panel is shown. `full` adds prerequisites and the verification date. |
 | `CopyButton` | `text`, `label?` | Copies to the clipboard. Hidden when the Clipboard API is missing. |
 | `AsciiArt` | `label?` | The hero, from `src/generated/hero.json`. Gate posts light up in run order; static under reduced motion. Phones get the mark's own glyphs, set larger. |
-| `LoopDiagram` | none | The loop as an ASCII diagram plus a replay of a real presenter transcript (`src/data/demo-timeline.ts`). Diagram boxes are found by their corners, so editing the diagram text is enough. |
+| `LoopDiagram` | none | The loop as an ASCII diagram plus a replay of a real run log (`src/data/demo-timeline.ts`). Diagram boxes are found by their corners, so editing the diagram text is enough. |
 | `ProductCard` | `product`, `showSkills?`, `headingLevel?` | A product with its host, note and skills; links to its page. |
-| `HarnessGrid` | `compact?` | Every harness plus the "yours, discovered" tile. |
+| `HarnessGrid` | `compact?` | The implementer and reviewer harnesses. |
 | `Section` | `id`, `title`, `eyebrow?`, `intro?`, `tone?` | A home page section with an anchor; `tone="raised"` alternates the background. |
 | `FAQ` | none | `faq.yaml` as `<details>` elements. |
 | `Header`, `Footer`, `ThemeToggle` | none | Navigation from `NAV`; GitHub stars from the build-time API call. |
@@ -128,8 +127,8 @@ subsets drop. `scripts/subset-fonts.sh` regenerates it.
 
 `npm run build` runs `npm run gen` first:
 
-- `scripts/gen-ascii.mjs`: reads the mark (`scripts/mark.mjs`, copied from `lib/banner.py` in the
-  product repo) and writes `src/generated/hero.json`, `hero.txt` and `public/favicon.svg`.
+- `scripts/gen-ascii.mjs`: reads the mark (`scripts/mark.mjs`) and writes `src/generated/hero.json`,
+  `hero.txt` and `public/favicon.svg`.
 - `scripts/gen-og.mjs`: draws `public/og.png` (1200×630), `apple-touch-icon.png` and `favicon.ico`
   from the same geometry with resvg.
 

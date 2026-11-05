@@ -1,9 +1,6 @@
 ---
 // Every page: meta and social cards, JSON-LD, skip link, header, footer.
-import '@fontsource-variable/inter/wght.css';
-import '@fontsource/poppins/latin-500.css';
-import '@fontsource/poppins/latin-600.css';
-import display from '@fontsource/poppins/files/poppins-latin-500-normal.woff2?url';
+// The @font-face rules live in global.css (font-display: optional, see there).
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -25,7 +22,6 @@ const jsonLd = {
   url: SITE.url,
   codeRepository: SITE.repoUrl,
   license: 'https://www.apache.org/licenses/LICENSE-2.0',
-  programmingLanguage: ['Bash', 'Python', 'TypeScript'],
   runtimePlatform: 'Linux',
   author: { '@type': 'Person', name: SITE.copyright },
   ...(facts.release ? { version: facts.release.tag.replace(/^v/, '') } : {}),
@@ -48,8 +44,10 @@ const jsonLd = {
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/poppins-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/jetbrains-mono-Regular.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={display} as="font" type="font/woff2" crossorigin />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={fullTitle} />
@@ -58,7 +56,7 @@ const jsonLd = {
     <meta property="og:image" content={og} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Specstride: from specs to tested code. Every step, signed off." />
+    <meta property="og:image:alt" content="Specstride: development governance for coding agents. Every phase reviewed, signed and committed." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />

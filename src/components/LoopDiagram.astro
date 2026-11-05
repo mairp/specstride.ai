@@ -1,39 +1,58 @@
 ---
-// The gated loop as an ASCII diagram beside a replay of a real run. The replay
-// steps through the presenter transcript in src/data/demo-timeline.ts and lights
-// up the part of the diagram each line belongs to. Under prefers-reduced-motion,
-// or without JavaScript, the whole transcript is shown and nothing moves.
+// The loop of the product README as an ASCII diagram beside a replay of a real
+// run. The replay steps through the stored log in src/data/demo-timeline.ts and
+// lights up the part of the diagram each line belongs to. Under
+// prefers-reduced-motion, or without JavaScript, the whole log is shown and
+// nothing moves.
 import Terminal from './Terminal.astro';
 import { TIMELINE } from '../data/demo-timeline';
 
 // Boxes are found by their corners; the word inside names the node. Edge labels
 // are matched by word. Both become spans the script can light up.
 const WIDE = [
-  '┌──────────┐ evidence ┌────────┐ approved ┌────────────┐',
-  '│ proposer │ ───────▶ │ critic │ ───────▶ │ checkpoint │ ─▶ next phase',
-  '└──────────┘          └───┬────┘          └────────────┘',
-  '      ▲                   │ rejected',
-  '      │ retry             ▼',
-  '┌─────┴───────┐ hint ┌───────────────┐',
-  '│ accelerator │ ◀─── │ diagnostician │',
-  '└─────────────┘      └───────────────┘',
+  '┌─────────────┐ the change ┌──────────────┐ test output ┌──────────┐ approved ┌──────────┐',
+  '│ implementer │ ─────────▶ │ verification │ ──────────▶ │ reviewer │ ───────▶ │ approval │ ─▶ next phase',
+  '└───▲─────▲───┘            └──────────────┘             └────┬─────┘          └──────────┘',
+  '    │     │                                                  │ rejected · up to 3 attempts',
+  '    │     │ narrowed retry    ┌─────────────┐  hint  ┌───────▼───────┐',
+  '    │     └───────────────────│ accelerator │ ◀───── │ diagnostician │  new unmet tasks',
+  '    │                         └─────────────┘        └───────┬───────┘',
+  '    └────────────────────────────────────────────────────────┘ already diagnosed: back with the reasons',
 ];
 const NARROW = [
+  '┌─────────────┐',
+  '│ implementer │ ◀────────────┐',
+  '└──────┬──────┘              │ narrowed',
+  '       │ the change          │ retry',
+  '       ▼                     │',
+  '┌──────────────┐      ┌──────┴──────┐',
+  '│ verification │      │ accelerator │',
+  '└──────┬───────┘      └──────▲──────┘',
+  '       │ test output         │ hint',
+  '       ▼                     │',
+  '┌──────────┐ rejected ┌──────┴────────┐',
+  '│ reviewer │ ───────▶ │ diagnostician │',
+  '└────┬─────┘          └───────────────┘',
+  '     │ approved',
+  '     ▼',
   '┌──────────┐',
-  '│ proposer │ ◀──────────┐',
-  '└────┬─────┘            │ retry',
-  '     │ evidence  ┌──────┴──────┐',
-  '┌────▼───┐       │ accelerator │',
-  '│ critic │       └──────▲──────┘',
-  '└────┬───┘              │ hint',
-  '     ├── rejected ─▶ ┌──┴────────────┐',
-  '     │               │ diagnostician │',
-  '     │ approved      └───────────────┘',
-  '┌────▼───────┐',
-  '│ checkpoint │ ─▶ next phase',
-  '└────────────┘',
+  '│ approval │ ─▶ next phase',
+  '└──────────┘',
 ];
-const EDGES: Record<string, string> = { evidence: 'evidence', approved: 'approve', rejected: 'reject', hint: 'diagnostician', retry: 'accelerator' };
+const EDGES: Record<string, string> = {
+  'the change': 'implementer',
+  'test output': 'verification',
+  'approved': 'approval',
+  'next phase': 'approval',
+  'rejected': 'reject',
+  'up to 3 attempts': 'reject',
+  'already diagnosed': 'reject',
+  'back with the reasons': 'reject',
+  'new unmet tasks': 'diagnostician',
+  'hint': 'diagnostician',
+  'narrowed': 'accelerator',
+  'retry': 'accelerator',
+};
 
 type Run = { t: string; n?: string };
 function annotate(lines: string[]): Run[][] {
@@ -67,33 +86,32 @@ const wide = annotate(WIDE);
 const narrow = annotate(NARROW);
 ---
 <div class="loop" data-loop>
-  <figure class="diagram" aria-label="The loop: the proposer writes evidence; the critic approves it, which checkpoints the phase, or rejects it, which sends the rejection to the diagnostician, whose hint drives a narrowed retry by the accelerator.">
+  <figure class="diagram" aria-label="The loop: the implementer works through the phase's tasks; the engine runs the tests itself; the reviewer, a separate session with no tools, reads the actual change against the tasks. Approved: tasks ticked, one commit, a signed record, then the next phase. Rejected, up to 3 attempts: when the rejection names unmet tasks not diagnosed yet, the diagnostician writes a hint and the accelerator runs a narrowed retry; otherwise the phase goes back to the implementer with the reasons.">
     <pre class="d-wide" aria-hidden="true">{wide.map((row) => (<>{row.map((r) => (r.n ? <span data-node={r.n}>{r.t}</span> : r.t))}{'\n'}</>))}</pre>
     <pre class="d-narrow" aria-hidden="true">{narrow.map((row) => (<>{row.map((r) => (r.n ? <span data-node={r.n}>{r.t}</span> : r.t))}{'\n'}</>))}</pre>
   </figure>
 
-  <Terminal title="specstride run · recorded demo, replayed" label="Replay of a recorded Specstride run">
+  <Terminal title="specstride · a real run (2026-11-04)" label="The log of a real run, from the product README">
     <button slot="actions" type="button" class="replay" data-replay hidden>Replay</button>
     <pre class="timeline" aria-live="off">{TIMELINE.map((l, i) => (
       <span class={`tl tone-${l.tone}`} data-step={i} data-node={l.node ?? ''}>{l.text}{'\n'}</span>
     ))}</pre>
   </Terminal>
-  <p class="caption muted">A recorded run (the one the project README replays), rendered by the shipped presenter. Phase 3 is rejected, diagnosed, accelerated and approved.</p>
+  <p class="caption muted">The engine's own output, trimmed, from a stored log: the phase's tests passed, the reviewer still said no, the rejection was diagnosed, and the narrowed second attempt was approved.</p>
 </div>
 
 <style>
   .loop { display: grid; gap: var(--space-5); min-width: 0; }
-  .diagram { margin: 0; min-width: 0; }
+  .diagram { margin: 0; min-width: 0; overflow-x: auto; }
   .diagram pre { font-family: var(--font-mono); color: var(--muted); line-height: 1.3; margin: 0; font-variant-ligatures: none; }
-  .d-wide { display: none; font-size: clamp(9px, 1.45vw, 15px); }
+  .d-wide { display: none; font-size: clamp(9px, 1.35vw, 15px); }
   .d-narrow { font-size: clamp(11px, 3.6vw, 15px); }
-  @media (min-width: 720px) { .d-wide { display: block; } .d-narrow { display: none; } }
+  @media (min-width: 760px) { .d-wide { display: block; } .d-narrow { display: none; } }
   [data-node] { transition: color 0.25s, text-shadow 0.25s; }
   .diagram [data-node] { color: var(--fg); }
   .diagram [data-node].lit { color: var(--accent); font-weight: 700; }
-  .diagram [data-node='approve'].lit, .diagram [data-node='checkpoint'].lit { color: var(--ok); }
+  .diagram [data-node='approval'].lit { color: var(--ok); }
   .diagram [data-node='reject'].lit { color: var(--err); }
-  .diagram [data-node='diagnostician'].lit { color: var(--warn); }
   .timeline { font-size: 0.78rem; }
   .tl { display: inline; }
   .tone-muted { color: var(--muted); }

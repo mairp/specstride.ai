@@ -12,7 +12,7 @@ WEB="U+0020-007E,U+00A0-00FF,U+2010-2027,U+2030-205E,U+2190-21FF,U+2212,U+2500-2
 OG="U+0020-007E,U+00A0-00FF,U+2010-2027,U+2190-21FF,U+2500-257F,U+2580-259F,U+25A0-25FF,U+2713,U+2717"
 for w in Regular Bold; do
   # decompress first: subsetting straight from WOFF2 gives a TTF that resvg can't read
-  python3 -c "from fontTools.ttLib import TTFont; f=TTFont('$SRC/fonts/webfonts/JetBrainsMonoNL-$w.woff2'); f.flavor=None; f.save('$TMP/$w.ttf')"
+  fonttools ttLib.woff2 decompress "$SRC/fonts/webfonts/JetBrainsMonoNL-$w.woff2" -o "$TMP/$w.ttf"
   pyftsubset "$TMP/$w.ttf" --unicodes="$WEB" --flavor=woff2 --layout-features='*' \
     --output-file="$ROOT/public/fonts/jetbrains-mono-$w.woff2"
   # TTF copy for the build-time OG image renderer (resvg reads TTF, not WOFF2)

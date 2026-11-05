@@ -238,3 +238,73 @@ private until relaunch.
   `Retry-After: 86400`, `X-Robots-Tag: noindex, nofollow` and `Cache-Control: no-store`, so search
   engines treat it as temporary and drop the old pages without penalising the domain.
 - **Relaunch:** set `site-mode` to `live`, run `npm run deploy`, make the repo public again.
+
+## The plugin release (2026-11-05)
+
+Specstride now ships as one thing: a Claude Code plugin
+([mairp/specstride-plugin](https://github.com/mairp/specstride-plugin), Apache-2.0). Everything the
+site used to say about the older CLI engines, the TypeScript core, the dsh and Codex plugins, the
+self-tuning loop and how the tool was built is gone. What the site sells is the plugin's story: a
+run takes a Spec Kit feature to done phase by phase, and a separate reviewer has to approve each
+phase before it is committed.
+
+- **Positioning** is the plugin README's first line: development governance for coding agents. The
+  tagline ("Development governance for coding agents.") and caption ("Every phase reviewed, signed
+  and committed.") come from it.
+- **Truth sources** were only the plugin repository's README, its six wiki pages, the two skill
+  descriptions, SECURITY.md, CONTRIBUTING.md, the Apache-2.0 licence and the example repository's
+  README. Anything not said there is not said here.
+- **Removed from the site:** the products specstride-cli, specstride-core, the dsh plugin and the
+  Codex plugin (one product now: the Claude Code plugin); the whole observability story; the
+  "built by itself" section; every mention of how the tool was developed, how many tasks, phases or
+  tests it ran, and every model name or count that was ever a development detail. The only numbers
+  left are the ones the README itself states: up to 3 attempts, exit 1, exit 2, Node 22+, version
+  0.1.0. The only external repositories linked are the plugin, its wiki, and the example.
+- **Install paths:** only the two `/plugin` commands the README gives, then the example repository
+  as the first run. The install tab carries the note that commands are run by hand exactly as
+  written. Verified by hand on 2026-11-05: the two `/plugin` commands in a clean Claude Code 2.1.318
+  configuration (plugin 0.1.0 installed and enabled), the example clone, and the bundled doctor in it
+  (node, git, claude, git repository, `specs/` all ok). The first run itself is the recorded one the
+  demo video shows, on the same example, the same day.
+- **/ecosystem is gone.** With one product and one host the page repeated the home page, so the
+  Worker answers `/ecosystem/` with a 301 to `/#agents`, and it left the navigation with the site.
+- **The demo** is the example repository's GIF, converted to self-hosted video: WebM first (100 KB)
+  with the H.264 MP4 (294 KB) behind it, a poster frame, `preload="none"`, and no autoplay under
+  prefers-reduced-motion. The example README's own caption — the phase 3 merge-check catch —
+  stays with it.
+- **The loop diagram** was redrawn for what the plugin actually does: implementer → verification →
+  reviewer → approval, with the rejected path going back to the implementer (up to 3 attempts).
+  Beside it a terminal replays the README's stored run log line by line and lights the part of the
+  diagram each line belongs to.
+- **The run log is quoted verbatim**, including its two `proposer started` lines: it is the engine's
+  own output, labelled as such, and a quote is not rewritten to match the site's role words.
+- **Stuck phases (owner, same day).** The plugin's engine ships the diagnostician and the accelerated
+  attempt, on by default, and its README and wiki now document them ("When a phase is stuck"). The
+  site shows them: the loop diagram's rejected path, the two lines of the stored run log that the
+  README had trimmed, a card and the FAQ answer. Plain agent loops get stuck easily; the site says so
+  in words and shows the mechanism, with no figures from internal runs.
+- **Words.** The visible pages say implementer and reviewer; proposer/critic survive only where the
+  product itself names them (below). The site's own README and TEMPLATE were rewritten for the
+  template's new shape; the harnesses page maps the internal role enum to the two visible words.
+- **Checks (2026-11-05, on the final build):** `astro check` 0 errors; screenshots at 390/768/1440
+  in both themes with no overflow and no console errors; axe clean on all five pages in both
+  themes; linkinator 39 links OK; Lighthouse desktop and mobile on /, /install/ and
+  /products/claude-code-plugin/ — performance 0.98–1.0, accessibility/best-practices/seo 1.0, all
+  above the 0.95 gate. The one failure found and fixed along the way: the plugin page carried a
+  0.159 layout shift from font swapping; all faces are now self-declared with
+  `font-display: optional`, CLS 0.
+
+### Kept sweep hits (internal only, no visitor sees them)
+
+The release sweep greps the tree for the old product's vocabulary; every visible hit was fixed.
+These remain, each internal to the product's own names or to build tooling:
+
+- `SPECSTRIDE_PROPOSER` / `SPECSTRIDE_CRITIC` (home page env block) — the product's own documented
+  environment variables; the README's install and docs say exactly this.
+- `proposer started` in the replayed run log — the engine's own output, quoted verbatim.
+- `roles: [proposer, critic]` and its comment (harnesses.yaml, content.config.ts, HarnessGrid, the
+  TEMPLATE recipe) — the content schema's internal enum behind the product's variable names; the
+  rendered page says implementer and reviewer.
+- `.digest(` in scripts/csp-hash.mjs — Node's crypto API, nothing to do with the old digest feature.
+- `best-practice` in scripts/a11y.mjs — axe-core's rule-category name.
+- `#!/usr/bin/env bash` (deploy.sh, subset-fonts.sh) — the interpreter line of two build scripts.

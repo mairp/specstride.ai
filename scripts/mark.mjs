@@ -1,6 +1,6 @@
-// The folded-track mark, copied verbatim from lib/banner.py (MARK_FULL) in
-// mairp/specstride, which is its single source. Each box-drawing character is a
-// track segment; ┿ is a gate post on the track.
+// The folded-track mark, the product's own artwork and this file its single
+// source. Each box-drawing character is a track segment; ┿ is a gate post on
+// the track.
 export const MARK = [
   '┏━━━━┿━━━━┿━━━━╸',
   '┃',

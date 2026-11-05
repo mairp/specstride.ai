@@ -6,33 +6,39 @@ import InstallTabs from '../components/InstallTabs.astro';
 import LoopDiagram from '../components/LoopDiagram.astro';
 import Section from '../components/Section.astro';
 import HarnessGrid from '../components/HarnessGrid.astro';
-import ProductCard from '../components/ProductCard.astro';
 import Terminal from '../components/Terminal.astro';
 import FAQ from '../components/FAQ.astro';
 import Glow from '../components/Glow.astro';
-import { SITE, isAvailable } from '../lib/site';
+import { inlineMd } from '../lib/inline-md';
+import { SITE } from '../lib/site';
 import { repoFacts } from '../lib/github';
-import { SAMPLE_EVENT } from '../data/demo-timeline';
 
 const facts = await repoFacts();
-const install = (await getCollection('install')).filter(isAvailable);
-const products = (await getCollection('products')).filter(isAvailable).sort((a, b) => a.data.order - b.data.order);
-const engines = products.filter((p) => p.data.kind === 'core');
-const plugins = products.filter((p) => p.data.kind === 'plugin');
+const install = await getCollection('install');
 
-// What the loop adds to a plain retry loop, as the product README describes it.
-const why = [
-  { title: 'Fresh context, every pass', body: 'Each pass is a new, stateless session that works until the phase\'s evidence file exists. Only what is on disk carries over.' },
-  { title: 'A critic that reads the code', body: 'The critic checks the evidence against the acceptance criteria, then reads the files it cites in a read-only pass. A reply it can\'t parse counts as a rejection.' },
-  { title: 'Diagnose, then fix only what failed', body: 'The diagnostician reads the whole rejection history and says whether the gap is real. The accelerator fixes those criteria and leaves approved work untouched.' },
-  { title: 'Self-tuning, with rollback', body: 'Per-phase budgets learned from telemetry, judged against their baseline after every approved phase, and reverted automatically when a guardrail breaks.' },
-  { title: 'Halts safely, resumes from files', body: 'After a bounded number of rejections the run stops with exit code 2 and leaves everything on disk, readable and resumable from the files alone.' },
+// The README's four steps, one phase of a Spec Kit feature at a time.
+const steps = [
+  'The implementer works through the phase\'s tasks.',
+  'The engine runs the tests itself.',
+  'The reviewer — a separate session, with no tools — reads the actual change against the tasks and answers with a one-time nonce.',
+  'Approved: tasks ticked, one commit, signed record. Rejected: back to the implementer with the reasons, up to 3 attempts. A rejection that names new unmet tasks is diagnosed first, and the next attempt is narrowed to them.',
 ];
 
-// Sections are numbered in the order they render; the plugins band appears with
-// the first released plugin.
-const order = ['loop', 'why', 'agents', ...(plugins.length > 0 ? ['plugins'] : []), 'observability', 'built-by-itself', 'open-source', 'faq'];
+// The README's five bullets under "Built for unattended work".
+const why = [
+  { title: 'Kill the engine mid-run, nothing survives', body: 'SIGKILL the engine in the middle of a phase and no engine process is left running. Start it again and the run picks up where it stopped.' },
+  { title: 'Stuck phases get unstuck', body: 'Agent loops get stuck easily: a plain retry starts the rejected phase again and makes the same mistake. Here a rejection that names new unmet tasks goes to a diagnostician, a separate session that reads the phase from the outside and writes a hint. The next attempt is narrowed to those tasks with the hint as its first instruction, and the reviewer judges it like any other.' },
+  { title: 'Approved means committed', body: 'Every approved phase becomes its own commit. If a commit is blocked, the run never reports success: the engine exits 1 and says so.' },
+  { title: 'A clean stop', body: 'The `stop` verb of the `specstride` CLI that the plugin bundles ends the run at the next safe boundary: the workers finish their pass, the merge check runs, the record closes whole, no survivor.' },
+  { title: 'A reviewer from any provider', body: 'The reviewer can come from any provider your DeepSeek Harness (`dsh`) reaches.' },
+  { title: 'Secrets held back', body: 'Credentials are redacted from what the reviewer reads, and a credential in the change blocks the commit.' },
+];
+
+// Sections are numbered in the order they render.
+const order = ['loop', 'why', 'demo', 'agents', 'units', 'open-source', 'faq'];
 const no = (id: string) => String(order.indexOf(id) + 1).padStart(2, '0');
+const heroLede =
+  'An agent that grades its own work says "done" when it isn\'t. Specstride is a Claude Code plugin that takes a Spec Kit feature to done, phase by phase, unattended: implement, verify, review, commit, resume. A separate reviewer must approve each phase before the run moves on, and every approval leaves a signed record and its own commit.';
 ---
 <Base>
   <section class="hero" aria-labelledby="hero-title">
@@ -43,7 +49,7 @@ const no = (id: string) => String(order.indexOf(id) + 1).padStart(2, '0');
         <h1 id="hero-title"><span class="line">{SITE.tagline}</span> <span class="line caption">{SITE.caption}</span></h1>
       </div>
       <div class="hero-body">
-        <p class="lede">Specstride drives your coding agent through a Spec Kit feature, phase by phase. Nothing advances until a critic approves it on cited evidence. When a phase is stuck, a diagnostician finds out why and an accelerator fixes only what failed.</p>
+        <p class="lede">{heroLede}</p>
         <p class="ctas">
           <a class="btn" href={SITE.repoUrl}>GitHub{facts.stars !== null && <span class="muted"> ★ {facts.stars}</span>}</a>
           <a class="btn btn-primary" href="#install">Install <span class="arrow" aria-hidden="true">→</span></a>
@@ -56,101 +62,78 @@ const no = (id: string) => String(order.indexOf(id) + 1).padStart(2, '0');
     <div class="wrap install-wrap">
       <h2 id="install-title" class="visually-hidden">Install</h2>
       <InstallTabs entries={install} id="home-install" />
-      <p class="more mono"><a href="/install/">Prerequisites and every install path →</a></p>
+      <p class="more mono"><a href="/install/">Prerequisites and the first run →</a></p>
     </div>
   </section>
 
-  <Section id="loop" eyebrow={`${no('loop')} · the loop`} title="A gate on every phase" intro="The proposer works in fresh, stateless passes until the phase's evidence file exists. The critic reads the acceptance criteria, the evidence and the files it cites, then approves or rejects. A rejection with new unmet criteria goes to the diagnostician; its hint drives a narrowed retry that touches only what failed.">
+  <Section id="loop" eyebrow={`${no('loop')} · how it works`} title="How it works" intro="For each phase of a Spec Kit feature, the same gate:">
+    <ol class="steps">
+      {steps.map((s) => <li class="reveal" set:html={inlineMd(s)} />)}
+    </ol>
     <LoopDiagram />
   </Section>
 
-  <Section id="why" eyebrow={`${no('why')} · why`} title="What it adds to a plain agent loop" tone="raised">
-    <p class="lede evidence">A plain retry loop starts a rejected phase again from scratch, so a stuck phase can burn pass after pass and learn nothing new. On one real 12-task phase, a full retry had spent 16 minutes re-deriving what turned out to be a two-file fix.</p>
+  <Section id="why" eyebrow={`${no('why')} · unattended`} title="Built for unattended work" tone="raised" intro="For people who leave agents running on real work and need to trust the result when they come back.">
     <div class="pin">
       <div class="pin-figure"><AsciiArt /></div>
       <div class="pin-cards why">
         {why.map((w) => (
           <div class="card reveal">
             <h3>{w.title}</h3>
-            <p>{w.body}</p>
+            <p set:html={inlineMd(w.body)} />
           </div>
         ))}
       </div>
     </div>
   </Section>
 
-  <Section id="agents" eyebrow={`${no('agents')} · bring your own agents`} title="Any agent writes, any agent judges" intro="The proposer and the critic are chosen independently, so a cheap model can write while a stronger one judges.">
+  <Section id="demo" eyebrow={`${no('demo')} · see it run`} title="See it run" intro="The example repository is a tiny Node project with one Spec Kit feature, in three phases, nothing implemented yet — Specstride does that, one reviewed and committed phase at a time.">
+    <figure class="demo">
+      <video data-demo autoplay muted loop playsinline preload="none" poster="/media/demo-poster.png" width="1010" height="692" aria-label="A Specstride run on the example repository: three phases implemented, tested, reviewed and committed">
+        <source src="/media/demo.webm" type="video/webm" />
+        <source src="/media/demo.mp4" type="video/mp4" />
+      </video>
+      <figcaption class="muted">
+        A real run on <a href={SITE.exampleUrl}>the example repository</a>, sped up (waits capped at 1.5&nbsp;s, paths shortened). In phase 3 the two <code>[P]</code> tasks ran as a parallel group; the merge check caught a test one worker wrote for a framework the project does not use, so the engine redid both tasks in order before the reviewer saw the phase.
+      </figcaption>
+    </figure>
+  </Section>
+
+  <Section id="agents" eyebrow={`${no('agents')} · your models, your keys`} title="Your models, your keys" intro="Choose the implementer and the reviewer independently, on any provider and model your DeepSeek Harness (dsh) reaches. By default both are separate Claude sessions.">
     <HarnessGrid />
-    <p class="more mono"><a href="/ecosystem/">Roles in detail →</a></p>
+    <Terminal title="either role, on any provider dsh reaches" label="The environment variables that pick the implementer and the reviewer" class="env">
+      <pre><span class="muted"># any provider and model your dsh reaches, either role</span>{'\n'}SPECSTRIDE_PROPOSER=dsh:&lt;provider&gt;/&lt;model&gt;{'\n'}SPECSTRIDE_CRITIC=dsh:&lt;provider&gt;/&lt;model&gt;</pre>
+    </Terminal>
+    <p class="afternote muted">The loop stays the same whichever you choose: same gates, same records, same commits.</p>
   </Section>
 
-  {plugins.length > 0 && (
-    <Section id="plugins" eyebrow={`${no('plugins')} · hosts and plugins`} title="One engine, several front doors" intro="The engine runs detached. Hosts reach it through one CLI protocol, so a plugin is a thin layer of skills over it." tone="raised">
-      <div class="bracket">
-        <h3 class="bracket-title">Engine</h3>
-        <div class:list={['grid', 'products', { 'grid-2': engines.length > 1 }]}>
-          {engines.map((p) => <ProductCard product={p} showSkills={false} headingLevel="h4" />)}
-        </div>
-      </div>
-      <div class="bracket">
-        <h3 class="bracket-title">Plugins</h3>
-        <div class="grid grid-3 products">
-          {plugins.map((p) => <ProductCard product={p} headingLevel="h4" />)}
-        </div>
-      </div>
-    </Section>
-  )}
-
-  <Section id="observability" eyebrow={`${no('observability')} · observability`} title="Every step is an event" intro="A run is a stream of structured events in .specstride/events.jsonl. The live presenter renders it in your terminal; the same stream ships to Loki or over OTLP to an OpenTelemetry collector, with cost, tokens and duration as metrics.">
-    <div class="grid grid-2 obs">
-      <Terminal title="events.jsonl · one record from the recorded run" label="An event record">
-        <pre class="wrap-pre">{SAMPLE_EVENT}</pre>
-      </Terminal>
-      <Terminal title="mixture-of-loops · the last line of a run" label="The digest line">
-        <pre class="wrap-pre"><span class="muted"># format, as printed by the launcher</span>{'\n'}[DIGEST] state=completed exit=0 last-stage=&lt;stage&gt; evidence=&lt;run dir&gt;</pre>
-      </Terminal>
-    </div>
-    <ul class="obs-list">
-      <li><code>--otel --otel-url http://localhost:4318</code> ships OTLP/HTTP with no SDK; <code>--telemetry</code> ships to Loki. Off by default.</li>
-      <li><code>[DIGEST]</code> is the one line a supervising agent reads at the end of a run: state, exit code, last stage, evidence. Today it comes from the <a href="https://github.com/mairp/mixture-of-loops">mixture-of-loops</a> launcher.</li>
-    </ul>
+  <Section id="units" eyebrow={`${no('units')} · parallel units, opt-in`} title="Parallel units, opt-in" tone="raised" intro="Mark tasks [P] in your Spec Kit tasks.md and turn the layer on. Tasks whose files are disjoint run at once, each in its own worker tree, and the project's files are untouched while they run. The engine merges their work and runs the phase's checks before the reviewer sees the phase; tasks whose files overlap are refused, with the reason printed, and run in order.">
+    <Terminal title="~/.config/specstride/config.yaml" label="The user configuration that turns parallel units on">
+      <pre><span class="muted"># your user configuration, read from this file only</span>{'\n'}loop:{'\n'}  parallel:{'\n'}    units: on{'\n'}    allow_detect: on</pre>
+    </Terminal>
+    <p class="afternote muted">Groups run only when the implementer runs on dsh, the one harness whose concurrent sessions are tested; with any other harness the layer stays off and the run continues in order.</p>
   </Section>
 
-  <Section id="built-by-itself" eyebrow={`${no('built-by-itself')} · built by itself`} title="It is building its own next version" tone="raised">
-    <div class="grid grid-2 self">
-      <div>
-        <p>Specstride's TypeScript core was specified first: 41 Spec Kit features, 1,643 functional requirements, 2,983 tasks, and a parity suite the port has to pass against today's CLI.</p>
-        <p>Since 30 September 2026 the CLI has been implementing those features unattended, one at a time, each phase held at the gate until its critic approved it. A human reads the result and arbitrates only what the machines can't settle.</p>
-      </div>
-      <Terminal title="git log --oneline · the TypeScript core, 1 Oct 2026" label="Recent commits in the TypeScript core">
-        <pre class="wrap-pre">specstride: phase 7 approved — User Story 5 - A consumer invokes a host skill
-specstride: phase 6 approved — User Story 4 - An author describes a harness as data
-specstride: phase 5 approved — User Story 3 - An author adds an implementation without touching the core
-specstride: phase 4 approved — User Story 2 - An operator reads an exit code and a stop reason</pre>
-      </Terminal>
-    </div>
-  </Section>
-
-  <Section id="open-source" eyebrow={`${no('open-source')} · open source`} title="Yours to run, read and change">
+  <Section id="open-source" eyebrow={`${no('open-source')} · open source`} title="Where your code goes">
     <div class="grid grid-3">
       <div class="card card-top">
         <h3>Apache-2.0</h3>
-        <p>The whole product. A patent grant from every contributor, contributions taken under the same licence with no CLA, and the Specstride name kept for the project.</p>
+        <p>The whole product, free and open source under the Apache licence.</p>
         <p><a href={SITE.licenseUrl}>Read the licence</a></p>
       </div>
       <div class="card card-top">
         <h3>Runs on your machine</h3>
-        <p>No service in the middle. Runs, state and logs live under <code>.specstride/</code> in your project, readable and resumable from the files alone.</p>
+        <p>No service of its own: nothing is sent to Specstride's authors. Run records, approvals and logs stay in <code>~/.specstride/</code> on your machine, and telemetry export is off by default.</p>
       </div>
       <div class="card card-top">
         <h3>Your models, your keys</h3>
-        <p>It calls the agents and providers you configure, with your credentials, and nothing else. Telemetry stays off until you point it at your own collector.</p>
+        <p>The implementer and the reviewer go through your Claude Code login by default, or through the provider you set with dsh. Each provider's own data policy applies.</p>
       </div>
     </div>
     <p class="ctas">
       <a class="btn" href={SITE.repoUrl}>Star or fork on GitHub</a>
-      <a class="btn" href={SITE.discussionsUrl}>Discussions</a>
-      <a class="btn" href="https://github.com/mairp/specstride/blob/main/CONTRIBUTING.md">Contributing</a>
+      <a class="btn" href={SITE.exampleUrl}>Example</a>
+      <a class="btn" href={SITE.contributingUrl}>Contributing</a>
     </p>
   </Section>
 
@@ -208,8 +191,12 @@ specstride: phase 4 approved — User Story 2 - An operator reads an exit code a
   .install-wrap { max-width: 60rem; }
   .more { font-size: var(--step--1); margin-top: var(--space-4); }
 
+  /* The four steps of a phase. */
+  .steps { margin: 0 0 var(--space-7); padding: 0; list-style: none; display: grid; gap: var(--space-3); max-width: 52rem; counter-reset: step; }
+  .steps li { counter-increment: step; display: flex; gap: var(--space-4); align-items: baseline; }
+  .steps li::before { content: counter(step, decimal-leading-zero); font-family: var(--font-mono); color: var(--accent); flex: none; }
+
   /* Why: the mark stays put on the left while the cards scroll past. */
-  .evidence { margin-bottom: var(--space-7); max-width: 52rem; }
   .pin { display: grid; gap: var(--space-7); }
   .pin-figure { position: relative; isolation: isolate; justify-self: center; --art-size: clamp(7px, 0.82vw, 11px); --art-phone-size: clamp(16px, 5vw, 22px); }
   .pin-figure::before {
@@ -235,14 +222,35 @@ specstride: phase 4 approved — User Story 2 - An operator reads an exit code a
     .pin-figure { position: sticky; top: 22vh; justify-self: start; margin: var(--space-6) 0 var(--space-6) var(--space-5); }
   }
 
-  .products { align-items: stretch; }
-  .obs { margin-bottom: var(--space-5); }
-  .wrap-pre { white-space: pre-wrap !important; overflow-wrap: anywhere; }
-  .obs-list { display: grid; gap: var(--space-3); color: var(--muted); max-width: 56rem; }
-  .obs-list li::marker { color: var(--accent); }
-  .self { align-items: start; }
+  /* See it run: the demo of the example repository. */
+  .demo { margin: 0; display: grid; gap: var(--space-4); }
+  .demo video { width: 100%; height: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  .demo figcaption { font-size: 0.9375rem; max-width: 56rem; }
+  @media (prefers-reduced-motion: reduce) { .demo video { animation: none; } }
+
+  .env { max-width: 44rem; }
+  .afternote { font-size: 0.9375rem; max-width: 52rem; margin: var(--space-4) 0 0; }
 
   .closing { position: relative; isolation: isolate; text-align: center; padding: var(--space-9) 0 13rem; }
   .closing h2 { font-size: var(--step-5); letter-spacing: -0.03em; }
   .closing .lede { margin: 0 auto; color: var(--muted); }
 </style>
+
+<script>
+  // The demo plays on its own; under prefers-reduced-motion it never starts
+  // without a click, and it yields when off screen.
+  for (const video of document.querySelectorAll<HTMLVideoElement>('video[data-demo]')) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      video.removeAttribute('autoplay');
+      video.pause();
+      continue;
+    }
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) video.play().catch(() => {});
+        else video.pause();
+      }
+    }, { threshold: 0.3 });
+    io.observe(video);
+  }
+</script>

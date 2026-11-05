@@ -2,16 +2,18 @@
 export const SITE = {
   name: 'Specstride',
   url: 'https://specstride.ai',
-  title: 'Specstride: from specs to tested code',
+  title: 'Specstride: development governance for coding agents',
   description:
-    'Specstride drives your coding agent through a Spec Kit feature phase by phase. Nothing advances until a critic approves it on cited evidence. Open source, runs on your machine, your models.',
-  tagline: 'From specs to tested code.',
-  caption: 'Every step, signed off.',
-  repo: 'mairp/specstride',
-  repoUrl: 'https://github.com/mairp/specstride',
+    'Specstride is a Claude Code plugin that takes a Spec Kit feature to done, phase by phase, unattended: implement, verify, review, commit, resume. Provider-agnostic and open source: it runs on your machine, with your models and your keys.',
+  tagline: 'Development governance for coding agents.',
+  caption: 'Every phase reviewed, signed and committed.',
+  repo: 'mairp/specstride-plugin',
+  repoUrl: 'https://github.com/mairp/specstride-plugin',
+  issuesUrl: 'https://github.com/mairp/specstride-plugin/issues',
   siteRepoUrl: 'https://github.com/mairp/specstride.ai',
-  licenseUrl: 'https://github.com/mairp/specstride/blob/main/LICENSE',
-  discussionsUrl: 'https://github.com/mairp/specstride/discussions',
+  licenseUrl: 'https://github.com/mairp/specstride-plugin/blob/main/LICENSE',
+  contributingUrl: 'https://github.com/mairp/specstride-plugin/blob/main/CONTRIBUTING.md',
+  exampleUrl: 'https://github.com/mairp/specstride-example',
   copyright: 'Marlon De Paz',
   productLicense: 'Apache-2.0',
   siteLicense: 'MIT',
@@ -19,7 +21,6 @@ export const SITE = {
 
 export const NAV = [
   { href: '/install/', label: 'Install' },
-  { href: '/ecosystem/', label: 'Ecosystem' },
   { href: '/docs/', label: 'Docs' },
 ] as const;
 
