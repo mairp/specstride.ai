@@ -25,7 +25,6 @@ const jsonLd = {
   url: SITE.url,
   codeRepository: SITE.repoUrl,
   license: 'https://www.apache.org/licenses/LICENSE-2.0',
-  programmingLanguage: ['Bash', 'Python', 'TypeScript'],
   runtimePlatform: 'Linux',
   author: { '@type': 'Person', name: SITE.copyright },
   ...(facts.release ? { version: facts.release.tag.replace(/^v/, '') } : {}),
@@ -58,7 +57,7 @@ const jsonLd = {
     <meta property="og:image" content={og} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Specstride: from specs to tested code. Every step, signed off." />
+    <meta property="og:image:alt" content="Specstride: development governance for coding agents. Every phase reviewed, signed and committed." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />

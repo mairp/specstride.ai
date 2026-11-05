@@ -54,11 +54,11 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" vi
   <rect width="1200" height="630" fill="${C.bg}" />
   <rect x="24" y="24" width="1152" height="582" rx="14" fill="none" stroke="${C.border}" stroke-width="2" />
   <g font-family="JetBrains Mono NL">
-    <text x="80" y="104" font-size="24" fill="${C.accent}">open source · runs on your machine · your models</text>
+    <text x="80" y="104" font-size="24" fill="${C.accent}">open source · runs on your machine · your models, your keys</text>
     ${markShapes(80, 160, unit)}
-    <text x="560" y="214" font-size="64" font-weight="700" fill="${C.fg}">specstride</text>
-    <text x="560" y="276" font-size="32" fill="${C.text}">From specs to tested code.</text>
-    <text x="560" y="322" font-size="32" fill="${C.muted}">Every step, signed off.</text>
+    <text x="540" y="214" font-size="64" font-weight="700" fill="${C.fg}">specstride</text>
+    <text x="540" y="272" font-size="24" fill="${C.text}">Development governance for coding agents.</text>
+    <text x="540" y="312" font-size="24" fill="${C.muted}">Every phase reviewed, signed and committed.</text>
     <text x="80" y="488" font-size="26" fill="${C.text}" xml:space="preserve">━━━━┿━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━┿╍╍╍╍╍╍╍╍╍┿╍╍╍╍</text>
     <text x="80" y="526" font-size="26" xml:space="preserve"><tspan fill="${C.ok}">    ✓ 1       ✓ 2       ✓ 3       </tspan><tspan fill="${C.accent}">• 4       </tspan><tspan fill="${C.muted}">· 5</tspan></text>
     <text x="1120" y="566" font-size="24" fill="${C.muted}" text-anchor="end">specstride.ai</text>
