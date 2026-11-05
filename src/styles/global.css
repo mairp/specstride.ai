@@ -176,19 +176,47 @@ th, td { text-align: left; padding: var(--space-3) var(--space-4); border-bottom
 th { font-family: var(--font-mono); color: var(--fg-strong); background: var(--surface); font-weight: 700; }
 tr:last-child td { border-bottom: 0; }
 
+/* Fonts, all self-hosted. font-display is `optional`, never `swap`: a swap
+   re-lays-out every line when the real face lands, which is the one layout
+   shift Lighthouse was still counting. `optional` gives the face one short
+   window to arrive (the files are preloaded, so on a warm or fast connection
+   it always does) and otherwise keeps the fallback for that page view —
+   either way the text never moves. */
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: optional;
+  src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-display: optional;
+  src: url('/fonts/poppins-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: optional;
+  src: url('/fonts/poppins-latin-600-normal.woff2') format('woff2');
+}
+
 /* JetBrains Mono, subset with box drawing and block glyphs (scripts/subset-fonts.sh) */
 @font-face {
   font-family: 'JetBrains Mono';
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: optional;
   src: url('/fonts/jetbrains-mono-Regular.woff2') format('woff2');
 }
 @font-face {
   font-family: 'JetBrains Mono';
   font-style: normal;
   font-weight: 700;
-  font-display: swap;
+  font-display: optional;
   src: url('/fonts/jetbrains-mono-Bold.woff2') format('woff2');
 }
 .page { padding-bottom: var(--space-8); }

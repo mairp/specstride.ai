@@ -9,9 +9,9 @@
   product: claude-code-plugin
   summary: Install the plugin in Claude Code, then take the ready-made example feature through its first run before pointing it at your own repository.
   prereqs:
-    - Linux. macOS is not verified: no Mac has run it.
+    - 'Linux. macOS is not verified: no Mac has run it.'
     - Node 22+, git and Claude Code
-    - A Spec Kit feature: a `specs/NAME/` directory with a `tasks.md`, in a git repository (optionally with `spec.md` and `plan.md` beside it)
+    - 'A Spec Kit feature: a `specs/NAME/` directory with a `tasks.md`, in a git repository (optionally with `spec.md` and `plan.md` beside it)'
     - A `test` script in `package.json`
     - Your own subscription or API key for the models you choose
   steps:

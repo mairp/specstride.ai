@@ -15,7 +15,10 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
     if (/^\/ecosystem\/?$/.test(url.pathname)) {
-      return Response.redirect(`${url.protocol}//specstride.ai/#agents`, 301);
+      url.pathname = '/';
+      url.search = '';
+      url.hash = 'agents';
+      return Response.redirect(url.toString(), 301);
     }
     if (env.SITE_MODE !== 'construction') return env.ASSETS.fetch(request);
 

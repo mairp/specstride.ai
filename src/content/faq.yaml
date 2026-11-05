@@ -1,11 +1,11 @@
 - id: spec-kit
   order: 1
   q: Do I need Spec Kit?
-  a: You need the format, not its tooling. A feature is a `specs/NAME/` directory with a `tasks.md`: `## Phase N: Title` headings and `- [ ] T001 …` tasks are what [Spec Kit](https://github.com/github/spec-kit) writes, and you can write them by hand. `spec.md` and `plan.md` beside the tasks ride along as read-only context for the implementer and the reviewer.
+  a: 'You need the format, not its tooling. A feature is a `specs/NAME/` directory with a `tasks.md`: `## Phase N: Title` headings and `- [ ] T001 …` tasks are what [Spec Kit](https://github.com/github/spec-kit) writes, and you can write them by hand. `spec.md` and `plan.md` beside the tasks ride along as read-only context for the implementer and the reviewer.'
 - id: models
   order: 2
   q: Which models can it use?
-  a: Any you trust. Specstride is an orchestrator and does not rank models. The implementer and the reviewer are chosen independently: by default both are separate Claude sessions through your Claude Code login, and either can instead be any provider and model your DeepSeek Harness (`dsh`) reaches.
+  a: 'Any you trust. Specstride is an orchestrator and does not rank models. The implementer and the reviewer are chosen independently: by default both are separate Claude sessions through your Claude Code login, and either can instead be any provider and model your DeepSeek Harness (`dsh`) reaches.'
 - id: rubber-stamp
   order: 3
   q: What stops the reviewer waving work through?
@@ -13,7 +13,7 @@
 - id: stuck
   order: 4
   q: What happens when a phase keeps failing?
-  a: A rejected phase goes back to the implementer with the reviewer's reasons, for up to 3 attempts. After the third rejection the run stops with exit 2. The reasons are in the output: fix the spec or the work and run again — a run resumes from the phases that were already approved.
+  a: "A rejected phase goes back to the implementer with the reviewer's reasons, for up to 3 attempts. After the third rejection the run stops with exit 2. The reasons are in the output: fix the spec or the work and run again — a run resumes from the phases that were already approved."
 - id: local
   order: 5
   q: What leaves my machine?

@@ -9,6 +9,7 @@ import HarnessGrid from '../components/HarnessGrid.astro';
 import Terminal from '../components/Terminal.astro';
 import FAQ from '../components/FAQ.astro';
 import Glow from '../components/Glow.astro';
+import { inlineMd } from '../lib/inline-md';
 import { SITE } from '../lib/site';
 import { repoFacts } from '../lib/github';
 
@@ -17,19 +18,19 @@ const install = await getCollection('install');
 
 // The README's four steps, one phase of a Spec Kit feature at a time.
 const steps = [
-  <>The implementer works through the phase's tasks.</>,
-  <>The engine runs the tests itself.</>,
-  <>The reviewer — a separate session, with no tools — reads the actual change against the tasks and answers with a one-time nonce.</>,
-  <>Approved: tasks ticked, one commit, signed record. Rejected: back to the implementer with the reasons, up to 3 attempts.</>,
+  'The implementer works through the phase\'s tasks.',
+  'The engine runs the tests itself.',
+  'The reviewer — a separate session, with no tools — reads the actual change against the tasks and answers with a one-time nonce.',
+  'Approved: tasks ticked, one commit, signed record. Rejected: back to the implementer with the reasons, up to 3 attempts.',
 ];
 
 // The README's five bullets under "Built for unattended work".
 const why = [
-  { title: 'Kill the engine mid-run, nothing survives', body: <>SIGKILL the engine in the middle of a phase and no engine process is left running. Start it again and the run picks up where it stopped.</> },
-  { title: 'Approved means committed', body: <>Every approved phase becomes its own commit. If a commit is blocked, the run never reports success: the engine exits 1 and says so.</> },
-  { title: 'A clean stop', body: <>The <code>stop</code> verb of the <code>specstride</code> CLI that the plugin bundles ends the run at the next safe boundary: the workers finish their pass, the merge check runs, the record closes whole, no survivor.</> },
-  { title: 'A reviewer from any provider', body: <>The reviewer can come from any provider your DeepSeek Harness (<code>dsh</code>) reaches.</> },
-  { title: 'Secrets held back', body: <>Credentials are redacted from what the reviewer reads, and a credential in the change blocks the commit.</> },
+  { title: 'Kill the engine mid-run, nothing survives', body: 'SIGKILL the engine in the middle of a phase and no engine process is left running. Start it again and the run picks up where it stopped.' },
+  { title: 'Approved means committed', body: 'Every approved phase becomes its own commit. If a commit is blocked, the run never reports success: the engine exits 1 and says so.' },
+  { title: 'A clean stop', body: 'The `stop` verb of the `specstride` CLI that the plugin bundles ends the run at the next safe boundary: the workers finish their pass, the merge check runs, the record closes whole, no survivor.' },
+  { title: 'A reviewer from any provider', body: 'The reviewer can come from any provider your DeepSeek Harness (`dsh`) reaches.' },
+  { title: 'Secrets held back', body: 'Credentials are redacted from what the reviewer reads, and a credential in the change blocks the commit.' },
 ];
 
 // Sections are numbered in the order they render.
@@ -66,7 +67,7 @@ const heroLede =
 
   <Section id="loop" eyebrow={`${no('loop')} · how it works`} title="How it works" intro="For each phase of a Spec Kit feature, the same gate:">
     <ol class="steps">
-      {steps.map((s) => <li class="reveal">{s}</li>)}
+      {steps.map((s) => <li class="reveal" set:html={inlineMd(s)} />)}
     </ol>
     <LoopDiagram />
   </Section>
@@ -78,7 +79,7 @@ const heroLede =
         {why.map((w) => (
           <div class="card reveal">
             <h3>{w.title}</h3>
-            <p>{w.body}</p>
+            <p set:html={inlineMd(w.body)} />
           </div>
         ))}
       </div>
