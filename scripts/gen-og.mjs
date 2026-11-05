@@ -29,7 +29,7 @@ function markShapes(x0, y0, unit, { gates = true, lit = 3 } = {}) {
   const rows = [...new Set(g.gates.map(([, y]) => y))].sort((a, b) => a - b);
   const ordered = rows.flatMap((y, i) => {
     const row = g.gates.filter(([, gy]) => gy === y).sort((a, b) => a[0] - b[0]);
-    return i % 2 === 0 ? row.reverse() : row;
+    return i % 2 === 0 ? row.toReversed() : row;
   });
   const posts = gates
     ? ordered.map(([x, y], i) => {

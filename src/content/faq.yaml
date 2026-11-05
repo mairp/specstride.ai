@@ -33,4 +33,4 @@
 - id: contribute
   order: 9
   q: How do I contribute?
-  a: Issues and pull requests on [the plugin repository](https://github.com/mairp/specstride-plugin), following [CONTRIBUTING.md](https://github.com/mairp/specstride-plugin/blob/main/CONTRIBUTING.md) — add a test with each change, keep the import boundaries, and run the formatter before you push. Good first issues are labelled `good first issue`. Questions and bugs go to [issues](https://github.com/mairp/specstride-plugin/issues); Discussions are off on the repository.
+  a: Issues and pull requests on [the plugin repository](https://github.com/mairp/specstride-plugin), following [CONTRIBUTING.md](https://github.com/mairp/specstride-plugin/blob/main/CONTRIBUTING.md) — add a test with each change, keep the import boundaries, and run the formatter before you push. Good first issues are labelled `good first issue`. Questions and bugs go to [issues](https://github.com/mairp/specstride-plugin/issues).

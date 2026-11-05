@@ -48,7 +48,7 @@ function gateOrder() {
   const ordered = [];
   rows.forEach((y, i) => {
     const row = g.gates.filter(([, gy]) => gy === y).sort((a, b) => a[0] - b[0]);
-    ordered.push(...(i % 2 === 0 ? row.reverse() : row));
+    ordered.push(...(i % 2 === 0 ? row.toReversed() : row));
   });
   return ordered;
 }

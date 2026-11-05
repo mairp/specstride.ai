@@ -33,7 +33,7 @@ const why = [
 ];
 
 // Sections are numbered in the order they render.
-const order = ['loop', 'why', 'demo', 'agents', 'parallel', 'open-source', 'faq'];
+const order = ['loop', 'why', 'demo', 'agents', 'units', 'open-source', 'faq'];
 const no = (id: string) => String(order.indexOf(id) + 1).padStart(2, '0');
 const heroLede =
   'An agent that grades its own work says "done" when it isn\'t. Specstride is a Claude Code plugin that takes a Spec Kit feature to done, phase by phase, unattended: implement, verify, review, commit, resume. A separate reviewer must approve each phase before the run moves on, and every approval leaves a signed record and its own commit.';
@@ -105,7 +105,7 @@ const heroLede =
     <p class="afternote muted">The loop stays the same whichever you choose: same gates, same records, same commits.</p>
   </Section>
 
-  <Section id="parallel" eyebrow={`${no('parallel')} · parallel units, opt-in`} title="Parallel units, opt-in" tone="raised" intro="Mark tasks [P] in your Spec Kit tasks.md and turn the layer on. Tasks whose files are disjoint run at once, each in its own worker tree, and the project's files are untouched while they run. The engine merges their work and runs the phase's checks before the reviewer sees the phase; tasks whose files overlap are refused, with the reason printed, and run in order.">
+  <Section id="units" eyebrow={`${no('units')} · parallel units, opt-in`} title="Parallel units, opt-in" tone="raised" intro="Mark tasks [P] in your Spec Kit tasks.md and turn the layer on. Tasks whose files are disjoint run at once, each in its own worker tree, and the project's files are untouched while they run. The engine merges their work and runs the phase's checks before the reviewer sees the phase; tasks whose files overlap are refused, with the reason printed, and run in order.">
     <Terminal title="~/.config/specstride/config.yaml" label="The user configuration that turns parallel units on">
       <pre><span class="muted"># your user configuration, read from this file only</span>{'\n'}loop:{'\n'}  parallel:{'\n'}    units: on{'\n'}    allow_detect: on</pre>
     </Terminal>
