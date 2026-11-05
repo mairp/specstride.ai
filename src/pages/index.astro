@@ -21,12 +21,13 @@ const steps = [
   'The implementer works through the phase\'s tasks.',
   'The engine runs the tests itself.',
   'The reviewer — a separate session, with no tools — reads the actual change against the tasks and answers with a one-time nonce.',
-  'Approved: tasks ticked, one commit, signed record. Rejected: back to the implementer with the reasons, up to 3 attempts.',
+  'Approved: tasks ticked, one commit, signed record. Rejected: back to the implementer with the reasons, up to 3 attempts. A rejection that names new unmet tasks is diagnosed first, and the next attempt is narrowed to them.',
 ];
 
 // The README's five bullets under "Built for unattended work".
 const why = [
   { title: 'Kill the engine mid-run, nothing survives', body: 'SIGKILL the engine in the middle of a phase and no engine process is left running. Start it again and the run picks up where it stopped.' },
+  { title: 'Stuck phases get unstuck', body: 'Agent loops get stuck easily: a plain retry starts the rejected phase again and makes the same mistake. Here a rejection that names new unmet tasks goes to a diagnostician, a separate session that reads the phase from the outside and writes a hint. The next attempt is narrowed to those tasks with the hint as its first instruction, and the reviewer judges it like any other.' },
   { title: 'Approved means committed', body: 'Every approved phase becomes its own commit. If a commit is blocked, the run never reports success: the engine exits 1 and says so.' },
   { title: 'A clean stop', body: 'The `stop` verb of the `specstride` CLI that the plugin bundles ends the run at the next safe boundary: the workers finish their pass, the merge check runs, the record closes whole, no survivor.' },
   { title: 'A reviewer from any provider', body: 'The reviewer can come from any provider your DeepSeek Harness (`dsh`) reaches.' },

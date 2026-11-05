@@ -1,7 +1,7 @@
 // The "A real run" log from the product README, verbatim, with its date —
 // the engine's own output, trimmed, from a stored log (2026-11-04). `node`
 // says which part of the loop diagram a line belongs to.
-export type LoopNode = 'implementer' | 'verification' | 'reviewer' | 'approval' | 'reject' | null;
+export type LoopNode = 'implementer' | 'verification' | 'reviewer' | 'approval' | 'reject' | 'diagnostician' | 'accelerator' | null;
 export type Tone = 'muted' | 'accent' | 'ok' | 'err' | 'warn' | 'info' | 'plain' | 'rail';
 
 export const TIMELINE: { text: string; node: LoopNode; tone: Tone }[] = [
@@ -10,7 +10,9 @@ export const TIMELINE: { text: string; node: LoopNode; tone: Tone }[] = [
   { text: '[001-par-overlap] verification: npm test -> passed', node: 'verification', tone: 'ok' },
   { text: '[001-par-overlap] phase 1 attempt 1: rejected', node: 'reject', tone: 'err' },
   { text: '----- phase 1 REJECTED on attempt 1/3 -----', node: 'reject', tone: 'err' },
+  { text: '----- diagnostician: phase 1 attempt 1 (unmet set changed) -----', node: 'diagnostician', tone: 'warn' },
   { text: '[001-par-overlap] phase 1 attempt 2: proposer started', node: 'implementer', tone: 'plain' },
+  { text: '----- accelerator: phase 1 attempt 2/3 (dsh) — acting on the hint for T002,T003 -----', node: 'accelerator', tone: 'info' },
   { text: '[001-par-overlap] verification: npm test -> passed', node: 'verification', tone: 'ok' },
   { text: '[001-par-overlap] phase 1 attempt 2: approved', node: 'approval', tone: 'ok' },
   { text: '===== PHASE 1 APPROVED (attempt 2) =====', node: 'approval', tone: 'ok' },

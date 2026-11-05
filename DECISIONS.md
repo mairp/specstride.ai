@@ -278,6 +278,11 @@ phase before it is committed.
   diagram each line belongs to.
 - **The run log is quoted verbatim**, including its two `proposer started` lines: it is the engine's
   own output, labelled as such, and a quote is not rewritten to match the site's role words.
+- **Stuck phases (owner, same day).** The plugin's engine ships the diagnostician and the accelerated
+  attempt, on by default, and its README and wiki now document them ("When a phase is stuck"). The
+  site shows them: the loop diagram's rejected path, the two lines of the stored run log that the
+  README had trimmed, a card and the FAQ answer. Plain agent loops get stuck easily; the site says so
+  in words and shows the mechanism, with no figures from internal runs.
 - **Words.** The visible pages say implementer and reviewer; proposer/critic survive only where the
   product itself names them (below). The site's own README and TEMPLATE were rewritten for the
   template's new shape; the harnesses page maps the internal role enum to the two visible words.

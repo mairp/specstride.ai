@@ -13,7 +13,7 @@
 - id: stuck
   order: 4
   q: What happens when a phase keeps failing?
-  a: "A rejected phase goes back to the implementer with the reviewer's reasons, for up to 3 attempts. After the third rejection the run stops with exit 2. The reasons are in the output: fix the spec or the work and run again — a run resumes from the phases that were already approved."
+  a: "It is not just started again. When the reviewer's rejection names unmet tasks the phase has not been diagnosed for yet, a diagnostician — a fresh session, never the implementer's — reads the phase and writes a hint, and the next attempt is narrowed to those tasks with the hint as its first instruction. Both are on by default (`SPECSTRIDE_DIAGNOSTICIAN=false` or `SPECSTRIDE_ACCELERATOR=false` turns one off). A phase gets up to 3 attempts; after the third rejection the run stops with exit 2, the reasons are in the output, and a new run resumes from the phases already approved."
 - id: local
   order: 5
   q: What leaves my machine?

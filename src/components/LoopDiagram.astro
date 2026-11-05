@@ -12,26 +12,29 @@ import { TIMELINE } from '../data/demo-timeline';
 const WIDE = [
   '┌─────────────┐ the change ┌──────────────┐ test output ┌──────────┐ approved ┌──────────┐',
   '│ implementer │ ─────────▶ │ verification │ ──────────▶ │ reviewer │ ───────▶ │ approval │ ─▶ next phase',
-  '└─────────────┘            └──────────────┘             └────┬─────┘          └──────────┘',
-  '       ▲                                                     │ rejected',
-  '       └─────────────────────────────────────────────────────┘ back with the reasons · up to 3 attempts',
+  '└───▲─────▲───┘            └──────────────┘             └────┬─────┘          └──────────┘',
+  '    │     │                                                  │ rejected · up to 3 attempts',
+  '    │     │ narrowed retry    ┌─────────────┐  hint  ┌───────▼───────┐',
+  '    │     └───────────────────│ accelerator │ ◀───── │ diagnostician │  new unmet tasks',
+  '    │                         └─────────────┘        └───────┬───────┘',
+  '    └────────────────────────────────────────────────────────┘ already diagnosed: back with the reasons',
 ];
 const NARROW = [
   '┌─────────────┐',
-  '│ implementer │ ◀────────────────┐',
-  '└──────┬──────┘                  │ rejected,',
-  '       │ the change              │ up to 3',
-  '       ▼                         │ attempts',
-  '┌──────────────┐                 │',
-  '│ verification │                 │',
-  '└──────┬───────┘                 │',
-  '       │ test output             │',
-  '       ▼                         │',
-  '┌──────────┐                     │',
-  '│ reviewer │ ────────────────────┘',
-  '└──────┬───┘',
-  '       │ approved',
-  '       ▼',
+  '│ implementer │ ◀────────────┐',
+  '└──────┬──────┘              │ narrowed',
+  '       │ the change          │ retry',
+  '       ▼                     │',
+  '┌──────────────┐      ┌──────┴──────┐',
+  '│ verification │      │ accelerator │',
+  '└──────┬───────┘      └──────▲──────┘',
+  '       │ test output         │ hint',
+  '       ▼                     │',
+  '┌──────────┐ rejected ┌──────┴────────┐',
+  '│ reviewer │ ───────▶ │ diagnostician │',
+  '└────┬─────┘          └───────────────┘',
+  '     │ approved',
+  '     ▼',
   '┌──────────┐',
   '│ approval │ ─▶ next phase',
   '└──────────┘',
@@ -42,10 +45,13 @@ const EDGES: Record<string, string> = {
   'approved': 'approval',
   'next phase': 'approval',
   'rejected': 'reject',
-  'reasons': 'reject',
   'up to 3 attempts': 'reject',
-  'up to 3': 'reject',
-  'attempts': 'reject',
+  'already diagnosed': 'reject',
+  'back with the reasons': 'reject',
+  'new unmet tasks': 'diagnostician',
+  'hint': 'diagnostician',
+  'narrowed': 'accelerator',
+  'retry': 'accelerator',
 };
 
 type Run = { t: string; n?: string };
@@ -80,7 +86,7 @@ const wide = annotate(WIDE);
 const narrow = annotate(NARROW);
 ---
 <div class="loop" data-loop>
-  <figure class="diagram" aria-label="The loop: the implementer works through the phase's tasks; the engine runs the tests itself; the reviewer, a separate session with no tools, reads the actual change against the tasks. Approved: tasks ticked, one commit, a signed record, then the next phase. Rejected: back to the implementer with the reasons, up to 3 attempts.">
+  <figure class="diagram" aria-label="The loop: the implementer works through the phase's tasks; the engine runs the tests itself; the reviewer, a separate session with no tools, reads the actual change against the tasks. Approved: tasks ticked, one commit, a signed record, then the next phase. Rejected, up to 3 attempts: when the rejection names unmet tasks not diagnosed yet, the diagnostician writes a hint and the accelerator runs a narrowed retry; otherwise the phase goes back to the implementer with the reasons.">
     <pre class="d-wide" aria-hidden="true">{wide.map((row) => (<>{row.map((r) => (r.n ? <span data-node={r.n}>{r.t}</span> : r.t))}{'\n'}</>))}</pre>
     <pre class="d-narrow" aria-hidden="true">{narrow.map((row) => (<>{row.map((r) => (r.n ? <span data-node={r.n}>{r.t}</span> : r.t))}{'\n'}</>))}</pre>
   </figure>
@@ -91,7 +97,7 @@ const narrow = annotate(NARROW);
       <span class={`tl tone-${l.tone}`} data-step={i} data-node={l.node ?? ''}>{l.text}{'\n'}</span>
     ))}</pre>
   </Terminal>
-  <p class="caption muted">The engine's own output, trimmed, from a stored log: the phase's tests passed, the reviewer still said no, and the run came back and finished.</p>
+  <p class="caption muted">The engine's own output, trimmed, from a stored log: the phase's tests passed, the reviewer still said no, the rejection was diagnosed, and the narrowed second attempt was approved.</p>
 </div>
 
 <style>
