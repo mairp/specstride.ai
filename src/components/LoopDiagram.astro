@@ -19,9 +19,9 @@ const WIDE = [
 const NARROW = [
   '┌─────────────┐',
   '│ implementer │ ◀────────────────┐',
-  '└──────┬──────┘                  │ rejected',
-  '       │ the change              │ up to 3 attempts',
-  '       ▼                         │',
+  '└──────┬──────┘                  │ rejected,',
+  '       │ the change              │ up to 3',
+  '       ▼                         │ attempts',
   '┌──────────────┐                 │',
   '│ verification │                 │',
   '└──────┬───────┘                 │',
@@ -44,6 +44,8 @@ const EDGES: Record<string, string> = {
   'rejected': 'reject',
   'reasons': 'reject',
   'up to 3 attempts': 'reject',
+  'up to 3': 'reject',
+  'attempts': 'reject',
 };
 
 type Run = { t: string; n?: string };

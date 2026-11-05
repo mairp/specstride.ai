@@ -1,7 +1,7 @@
 - id: spec-kit
   order: 1
   q: Do I need Spec Kit?
-  a: 'You need the format, not its tooling. A feature is a `specs/NAME/` directory with a `tasks.md`: `## Phase N: Title` headings and `- [ ] T001 …` tasks are what [Spec Kit](https://github.com/github/spec-kit) writes, and you can write them by hand. `spec.md` and `plan.md` beside the tasks ride along as read-only context for the implementer and the reviewer.'
+  a: 'You need the format, not its tooling. A feature is a `specs/NAME/` directory with a `tasks.md`: `## Phase N: Title` headings and `- [ ] T001 …` tasks are what [Spec Kit](https://github.com/github/spec-kit) writes, and you can write them by hand. `spec.md` and `plan.md` beside the tasks, if you have them, go to the implementer with the tasks.'
 - id: models
   order: 2
   q: Which models can it use?

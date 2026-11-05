@@ -1,7 +1,6 @@
 # Install paths. Rules: a step goes here only after it was run by hand, exactly as
 # written, and the date goes in `verified`. Paths that don't work yet have no
 # steps and a status other than `available`, which keeps them off the site.
-# `PENDING` means the steps are awaiting that by-hand verification pass.
 - id: claude-code
   label: Claude Code
   status: available
@@ -25,4 +24,4 @@
     - note: then say
       cmd: Run Specstride on the feature in this repo.
   after: On your own repository — any git repo with a `specs/NAME/tasks.md` and a `test` script in `package.json` — say the same sentence. Each approved phase becomes its own commit.
-  verified: 'PENDING'
+  verified: '2026-11-05'

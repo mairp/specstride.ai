@@ -262,7 +262,10 @@ phase before it is committed.
   0.1.0. The only external repositories linked are the plugin, its wiki, and the example.
 - **Install paths:** only the two `/plugin` commands the README gives, then the example repository
   as the first run. The install tab carries the note that commands are run by hand exactly as
-  written and a `verified: PENDING` date, which the owner fills in after the by-hand pass.
+  written. Verified by hand on 2026-11-05: the two `/plugin` commands in a clean Claude Code 2.1.318
+  configuration (plugin 0.1.0 installed and enabled), the example clone, and the bundled doctor in it
+  (node, git, claude, git repository, `specs/` all ok). The first run itself is the recorded one the
+  demo video shows, on the same example, the same day.
 - **/ecosystem is gone.** With one product and one host the page repeated the home page, so the
   Worker answers `/ecosystem/` with a 301 to `/#agents`, and it left the navigation with the site.
 - **The demo** is the example repository's GIF, converted to self-hosted video: WebM first (100 KB)
@@ -273,11 +276,8 @@ phase before it is committed.
   reviewer → approval, with the rejected path going back to the implementer (up to 3 attempts).
   Beside it a terminal replays the README's stored run log line by line and lights the part of the
   diagram each line belongs to.
-- **Judgement call — two log lines dropped.** The README's real-run log is quoted verbatim except
-  for its two `proposer started` lines: the product's internal role words must not appear on the
-  site, and the log reads whole without them (it is the engine's output, trimmed and labelled as
-  such). The diagram's edge labels, the replay mapping and the caption were written to match what
-  remains.
+- **The run log is quoted verbatim**, including its two `proposer started` lines: it is the engine's
+  own output, labelled as such, and a quote is not rewritten to match the site's role words.
 - **Words.** The visible pages say implementer and reviewer; proposer/critic survive only where the
   product itself names them (below). The site's own README and TEMPLATE were rewritten for the
   template's new shape; the harnesses page maps the internal role enum to the two visible words.
@@ -296,6 +296,7 @@ These remain, each internal to the product's own names or to build tooling:
 
 - `SPECSTRIDE_PROPOSER` / `SPECSTRIDE_CRITIC` (home page env block) — the product's own documented
   environment variables; the README's install and docs say exactly this.
+- `proposer started` in the replayed run log — the engine's own output, quoted verbatim.
 - `roles: [proposer, critic]` and its comment (harnesses.yaml, content.config.ts, HarnessGrid, the
   TEMPLATE recipe) — the content schema's internal enum behind the product's variable names; the
   rendered page says implementer and reviewer.
