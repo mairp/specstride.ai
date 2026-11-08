@@ -4,7 +4,7 @@ export const SITE = {
   url: 'https://specstride.ai',
   title: 'Specstride: development governance for coding agents',
   description:
-    'Specstride is a Claude Code plugin that takes a Spec Kit feature to done, phase by phase, unattended: implement, verify, review, commit, resume. Provider-agnostic and open source: it runs on your machine, with your models and your keys.',
+    'Specstride is loop engineering and governance for coding agents: a Claude Code plugin, also on dsh, that takes a Spec Kit feature to done, phase by phase, unattended. Every loop has an end, deterministic checks come before the reviewer, and every approved phase is a signed record and its own commit. Open source, on your machine, with your models and your keys.',
   tagline: 'Development governance for coding agents.',
   caption: 'Every phase reviewed, signed and committed.',
   repo: 'mairp/specstride-plugin',

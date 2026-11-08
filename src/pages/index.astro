@@ -10,6 +10,7 @@ import Terminal from '../components/Terminal.astro';
 import FAQ from '../components/FAQ.astro';
 import Glow from '../components/Glow.astro';
 import ProductCard from '../components/ProductCard.astro';
+import LoopNest from '../components/LoopNest.astro';
 import { inlineMd } from '../lib/inline-md';
 import { SITE, isAvailable } from '../lib/site';
 import { repoFacts } from '../lib/github';
@@ -29,15 +30,48 @@ const steps = [
 // The README's five bullets under "Built for unattended work".
 const why = [
   { title: 'Kill the engine mid-run, nothing survives', body: 'SIGKILL the engine in the middle of a phase and no engine process is left running. Start it again and the run picks up where it stopped.' },
-  { title: 'Stuck phases get unstuck', body: 'Agent loops get stuck easily: a plain retry starts the rejected phase again and makes the same mistake. Here a rejection that names new unmet tasks goes to a diagnostician, a separate session that reads the phase from the outside and writes a hint. The next attempt is narrowed to those tasks with the hint as its first instruction, and the reviewer judges it like any other.' },
   { title: 'Approved means committed', body: 'Every approved phase becomes its own commit. If a commit is blocked, the run never reports success: the engine exits 1 and says so.' },
   { title: 'A clean stop', body: 'The `stop` verb of the `specstride` CLI that the plugin bundles ends the run at the next safe boundary: the workers finish their pass, the merge check runs, the record closes whole, no survivor.' },
   { title: 'A reviewer from any provider', body: 'The reviewer can come from any provider your DeepSeek Harness (`dsh`) reaches.' },
   { title: 'Secrets held back', body: 'Credentials are redacted from what the reviewer reads, and a credential in the change blocks the commit.' },
 ];
 
+// Loop engineering: the principles of the core README's "Why loop engineering"
+// that the unattended cards above do not already cover.
+const principles = [
+  { title: 'Every loop has an end', body: 'Attempts per phase are capped, passes have watchdogs and breakers, and every way a run can stop is a named stop reason with a fixed exit code. Long jobs run detached while the pass yields, and a wait that can no longer complete ends early instead of burning its timer. Nothing ends with "it went quiet".' },
+  { title: 'Deterministic checks before any opinion', body: 'Each phase has a frozen check manifest. The verification gate runs those commands, with a fixed argument list and no shell, before the reviewer sees anything. A phase whose tests fail never reaches review.' },
+  { title: 'Stuck phases get unstuck, not retried blindly', body: 'A plain retry makes the same mistake again. When a rejection names new unmet tasks, a diagnostician reads the phase from the outside first, in a separate session. The next attempt is narrowed to those tasks, with the diagnosis as its first instruction, and the reviewer judges it like any other attempt.' },
+  { title: 'A router with no I/O', body: 'Check order, which loop layer to use, and escalation to the next model tier of the same harness come from a pure function over versioned rule tables. Every decision records its rule id and table version, so a run can be explained after the fact.' },
+  { title: 'Loop layers you can stack', body: '`none` is the classic loop. `micro` adds inner checks that end in keep, repair or unresolved at a checkpoint. `parallel`, opt-in, runs tasks with disjoint files at once and runs the full gate on the merged tree before review.' },
+  { title: 'It learns, with guardrails', body: 'The learning layer reads the run\'s own telemetry, suggests per-phase settings, evaluates each change against a baseline and reverts any that make things worse. It has its own writer and its own file, and it is off unless you turn it on.' },
+];
+
+// The core README's "Benefits at a glance".
+const benefits = [
+  { get: '"Done" that means done', because: 'Tests run before review, an independent reviewer approves, and the commit happens or the run fails.' },
+  { get: 'Unattended runs you can walk away from', because: 'A detached runtime, capped loops, a clean stop, and resume after a crash or a kill.' },
+  { get: 'Fewer wasted attempts', because: 'Diagnosis narrows each retry to the unmet tasks, and the router escalates model tiers by rule.' },
+  { get: 'Your models, your keys', because: 'The implementer and the reviewer are resolved independently. The engine has Claude, dsh, Codex, pi and prime adapters and a generic descriptor (`cli`, `openai-chat`, `anthropic-messages`). The hosts ship Claude and dsh today.' },
+  { get: 'An audit trail', because: 'Approval records, one commit per phase, rule ids on every decision, OTLP and Loki telemetry.' },
+  { get: 'Safe parallelism', because: 'Fenced worker trees, audited deltas, and the full gate on the merged tree.' },
+  { get: 'Extensible without forks', because: '19 versioned extension points (`specstride.<name>/<major>`), each with a conformance suite in `@specstride/testkit`.' },
+  { get: 'Nothing leaves your machine', because: 'Specstride runs no service of its own, so nothing is sent to its authors.' },
+];
+
+// The core README's "Why governance": controls an agent cannot talk its way past.
+const controls = [
+  { title: 'Separation of roles', body: 'The implementer and the reviewer are separate sessions, chosen independently. A phase is never approved without a reviewer.' },
+  { title: 'Verdicts that can\'t be forged', body: 'The verdict is bound to a one-time nonce for that attempt, so an implementer that prints "APPROVED" achieves nothing.' },
+  { title: 'Approval is a record', body: 'Approvals live outside the implementer\'s write scope and are verified again on resume. A forged or missing approval stops the run.' },
+  { title: 'Configuration narrows, never widens', body: 'Project configuration can only restrict a run. Anything that widens capability comes from user scope, the environment or flags.' },
+  { title: 'Containment by default', body: 'Adapters declare containment levels C0 to C3. The strongest one available is the default, and C0 is an explicit opt-in.' },
+  { title: 'Integrity tripwires', body: 'Fingerprints before and after every check, protected paths and pinned toolchains catch an implementer that edits what it must not. A tripwire stops the run until a human clears it.' },
+  { title: 'Everything observable', body: 'One primary event writer per run and a read model for status. Every decision carries its rule id, so an audit can follow a run from launch to the last commit.' },
+];
+
 // Sections are numbered in the order they render.
-const order = ['loop', 'ways', 'why', 'demo', 'agents', 'units', 'open-source', 'faq'];
+const order = ['loop', 'engineering', 'ways', 'why', 'demo', 'benefits', 'governance', 'agents', 'units', 'open-source', 'faq'];
 const no = (id: string) => String(order.indexOf(id) + 1).padStart(2, '0');
 const heroLede =
   'An agent that grades its own work says "done" when it isn\'t. Specstride is a Claude Code plugin that takes a Spec Kit feature to done, phase by phase, unattended: implement, verify, review, commit, resume. A separate reviewer must approve each phase before the run moves on, and every approval leaves a signed record and its own commit.';
@@ -47,7 +81,7 @@ const heroLede =
     <Glow />
     <div class="wrap hero-grid">
       <div class="hero-head">
-        <p class="oss mono">Open source <span aria-hidden="true">·</span> Runs on your machine <span aria-hidden="true">·</span> Your models, your keys</p>
+        <p class="oss mono">Loop engineering <span aria-hidden="true">·</span> Open source <span aria-hidden="true">·</span> Runs on your machine <span aria-hidden="true">·</span> Your models, your keys</p>
         <h1 id="hero-title"><span class="line">{SITE.tagline}</span> <span class="line caption">{SITE.caption}</span></h1>
       </div>
       <div class="hero-body">
@@ -73,6 +107,21 @@ const heroLede =
       {steps.map((s) => <li class="reveal" set:html={inlineMd(s)} />)}
     </ol>
     <LoopDiagram />
+  </Section>
+
+  <Section id="engineering" eyebrow={`${no('engineering')} · loop engineering`} title="Loop engineering" tone="raised" intro="A single agent session is one loop with no brakes. Specstride treats the loop itself as the thing to engineer: which loops exist, what ends each of them, what may cross between them, and what happens when one gets stuck.">
+    <div class="eng">
+      <div class="eng-figure reveal"><LoopNest /></div>
+      <div class="eng-cards">
+        {principles.map((p) => (
+          <div class="card reveal">
+            <h3>{p.title}</h3>
+            <p set:html={inlineMd(p.body)} />
+          </div>
+        ))}
+      </div>
+    </div>
+    <p class="more-link mono"><a href="/products/specstride-core/">The engine, layer by layer →</a></p>
   </Section>
 
   <Section id="ways" eyebrow={`${no('ways')} · plugin, dsh, core`} title="Three ways to run it" intro="One engine, two hosts on top of it. Pick the one that matches the agent you already use. The loop, the gates, the records and the commits are the same in all three.">
@@ -107,6 +156,28 @@ const heroLede =
         A real run on <a href={SITE.exampleUrl}>the example repository</a>, sped up (waits capped at 1.5&nbsp;s, paths shortened). In phase 3 the two <code>[P]</code> tasks ran as a parallel group; the merge check caught a test one worker wrote for a framework the project does not use, so the engine redid both tasks in order before the reviewer saw the phase.
       </figcaption>
     </figure>
+  </Section>
+
+  <Section id="benefits" eyebrow={`${no('benefits')} · what you get`} title="What you get" intro="Each benefit comes from a specific part of how the loop is built.">
+    <dl class="benefits">
+      {benefits.map((b) => (
+        <div class="benefit reveal">
+          <dt>{b.get}</dt>
+          <dd><span class="because mono">because</span> <span set:html={inlineMd(b.because)} /></dd>
+        </div>
+      ))}
+    </dl>
+  </Section>
+
+  <Section id="governance" eyebrow={`${no('governance')} · governance`} title="Controls an agent can't talk its way past" tone="raised" intro="Autonomy is useful only when you can trust what it reports. These controls are in the engine, so every host gets them.">
+    <div class="grid grid-2 grid-3 controls">
+      {controls.map((c) => (
+        <div class="card card-top reveal">
+          <h3>{c.title}</h3>
+          <p set:html={inlineMd(c.body)} />
+        </div>
+      ))}
+    </div>
   </Section>
 
   <Section id="agents" eyebrow={`${no('agents')} · your models, your keys`} title="Your models, your keys" intro="Choose the implementer and the reviewer independently, on any provider and model your DeepSeek Harness (dsh) reaches. By default both are separate Claude sessions.">
@@ -246,6 +317,27 @@ const heroLede =
   @media (min-width: 900px) {
     .ways { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); }
   }
+
+  /* Loop engineering: the nested loops beside the principles. */
+  .eng { display: grid; gap: var(--space-6); }
+  .eng-cards { display: grid; gap: var(--space-4); }
+  .eng-cards p, .controls p { margin: 0; }
+  /* seven controls: the last one takes the whole row instead of sitting alone */
+  .controls > :last-child { grid-column: 1 / -1; }
+  @media (min-width: 640px) { .eng-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1100px) {
+    .eng { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); align-items: start; }
+    .eng-figure { position: sticky; top: 14vh; }
+  }
+  .more-link { font-size: var(--step--1); margin: var(--space-6) 0 0; }
+
+  /* What you get: benefit, then the reason. */
+  .benefits { margin: 0; display: grid; gap: 0; border-top: 1px solid var(--border); max-width: 60rem; }
+  .benefit { display: grid; gap: var(--space-2); padding: var(--space-4) 0; border-bottom: 1px solid var(--border); }
+  .benefit dt { color: var(--fg-strong); font-family: var(--font-display); font-weight: 500; font-size: var(--step-1); }
+  .benefit dd { margin: 0; color: var(--muted); }
+  .because { color: var(--accent); font-size: 0.75rem; margin-right: var(--space-1); }
+  @media (min-width: 760px) { .benefit { grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); gap: var(--space-6); align-items: baseline; } }
 
   .env { max-width: 44rem; }
   .afternote { font-size: 0.9375rem; max-width: 52rem; margin: var(--space-4) 0 0; }

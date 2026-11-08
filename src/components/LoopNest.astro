@@ -1,0 +1,50 @@
+---
+// The nested loops of the engine, from the outside in, each labelled with what
+// ends it. Source: the core README, "Why loop engineering". Plain HTML and
+// classes only (no inline styles: the CSP has no 'unsafe-inline').
+const levels = [
+  { name: 'pipeline stages', ends: 'Each stage has its preconditions. A run ends only on a named stop reason with a fixed exit code.' },
+  { name: 'phases of a run', ends: 'A phase ends when the reviewer approves it: tasks ticked, one commit, a signed record.' },
+  { name: 'phase attempts', ends: 'Capped at 3 per phase. The third rejection ends the run with exit 2.' },
+  { name: 'passes', ends: 'Watchdogs and breakers end a pass. A long job yields instead of waiting.' },
+  { name: 'micro-loop cycles', ends: 'Inner checks end at a checkpoint: keep, repair or unresolved (the micro layer).' },
+];
+---
+<figure class="nest" aria-label="The loops of a Specstride run, from the outside in: pipeline stages, phases of a run, phase attempts, passes and micro-loop cycles. Each has an end.">
+  <div class="nest-root">
+    {levels.reduceRight((inner: any, l, i) => (
+      <div class:list={['ring', `ring-${i}`]}>
+        <p class="ring-head mono"><span class="ring-no">{String(i + 1).padStart(2, '0')}</span> {l.name}</p>
+        <p class="ring-ends"><span class="ring-label mono">ends:</span> {l.ends}</p>
+        {inner}
+      </div>
+    ), null)}
+  </div>
+  <figcaption class="muted mono">outside in · every loop has an end</figcaption>
+</figure>
+
+<style>
+  .nest { margin: 0; }
+  .ring {
+    border: 1px solid color-mix(in srgb, var(--accent) var(--a, 30%), var(--border));
+    border-radius: 12px;
+    padding: var(--space-4) var(--space-4) var(--space-4);
+    background: color-mix(in srgb, var(--accent) var(--fill, 2%), var(--card));
+    min-width: 0;
+  }
+  .ring .ring { margin-top: var(--space-4); }
+  .ring-0 { --a: 18%; --fill: 1%; }
+  .ring-1 { --a: 30%; --fill: 3%; }
+  .ring-2 { --a: 45%; --fill: 5%; }
+  .ring-3 { --a: 62%; --fill: 7%; }
+  .ring-4 { --a: 85%; --fill: 10%; box-shadow: 0 0 40px -12px color-mix(in srgb, var(--accent) 60%, transparent); }
+  .ring-head { margin: 0; color: var(--fg-strong); font-size: var(--step--1); letter-spacing: 0.02em; }
+  .ring-no { color: var(--accent); margin-right: var(--space-2); }
+  .ring-ends { margin: var(--space-1) 0 0; color: var(--muted); font-size: 0.875rem; max-width: 40rem; }
+  .ring-label { color: var(--accent); font-size: 0.75rem; margin-right: var(--space-1); }
+  figcaption { font-size: 0.75rem; margin-top: var(--space-3); }
+  @media (max-width: 480px) {
+    .ring { padding: var(--space-3) var(--space-3) var(--space-3); }
+    .ring .ring { margin-top: var(--space-3); }
+  }
+</style>
