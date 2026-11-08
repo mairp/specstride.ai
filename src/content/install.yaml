@@ -30,7 +30,7 @@
   status: available
   order: 2
   product: specstride-dsh
-  summary: Build the dsh host from a clone, install the engine's CLI from the tarball it pins, then put the three skills into your dsh home. Nothing is on npm yet.
+  summary: Build the dsh host from a clone, install it with the engine's CLI from the tarball it pins, then put the three skills into your repository. Nothing is on npm yet.
   prereqs:
     - 'Linux. macOS is not verified.'
     - Node 22+ and git
@@ -43,13 +43,12 @@
       cmd: npm install
     - note: renders the skills and the shim, runs every build gate
       cmd: npm run build
-    - note: the specstride CLI, from the tarball this repository pins
-      cmd: npm install -g vendor/core/specstride-0.1.0.tgz
-    - note: dsh's home; the skills go into $DSH_HOME/skills
-      cmd: export DSH_HOME="$HOME/.dsh"
-    - cmd: node bin/specstride-host-dsh.mjs install
+    - note: specstride-host-dsh and the specstride CLI this repository pins
+      cmd: npm install -g . vendor/core/specstride-0.1.0.tgz
+    - note: in your repository; the skills go into .dsh/skills/
+      cmd: specstride-host-dsh install --project
     - note: six findings, one line each
-      cmd: node bin/specstride-host-dsh.mjs doctor
+      cmd: specstride-host-dsh doctor
   after: 'Then, in a dsh session in your repository, say "run the specstride-run skill in dry-run on the feature". It plans and validates and launches nothing. Drop "in dry-run" to run the feature for real.'
   verified: '2026-11-08'
 - id: core
