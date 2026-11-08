@@ -2,6 +2,10 @@
   order: 0
   q: Which one do I want — the plugin, dsh or core?
   a: 'The one that matches the agent you already use. In Claude Code, the [plugin](/products/claude-code-plugin/), installed with two `/plugin` commands. In the DeepSeek Harness, the [dsh host](/products/specstride-dsh/). The [core](/products/specstride-core/) is for running the `specstride` CLI from a shell, or for building a host for another agent. Both hosts bundle or pin the same core, so the loop, the gates, the records and the commits are the same whichever you pick.'
+- id: loop-engineering
+  order: 0.5
+  q: What is loop engineering?
+  a: 'An agent session is a loop with no brakes. Loop engineering designs the loops around it instead: pipeline stages, phases, attempts, passes and micro cycles, each with a defined end, deterministic checks before any reviewer opinion, and a rule-driven router that decides what happens when a loop gets stuck. The [core page](/products/specstride-core/) shows the engine layer by layer.'
 - id: spec-kit
   order: 1
   q: Do I need Spec Kit?

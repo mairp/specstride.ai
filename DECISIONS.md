@@ -357,3 +357,25 @@ writes token colours as inline `style` attributes, which the CSP blocks; the cor
 was the first fenced block in a product body. Product summaries now go through `inlineMd`, so
 `code` renders. Product prose `pre` scrolls inside its box instead of widening the page at 390 px.
 The a11y and screenshot scripts cover the two new pages.
+
+## Loop engineering at the centre (2026-11-08)
+
+The site explained a single phase and listed features, but it never stated the idea behind them, which the core README
+calls loop engineering. Changes:
+
+- **New section 02, "Loop engineering"**, right after "How it works". It holds a figure of the nested loops (pipeline
+  stages ▸ phases ▸ attempts ▸ passes ▸ micro cycles), each labelled with what ends it, and six principle cards from the
+  core README: every loop has an end (yields merged into it), deterministic checks before any opinion, stuck phases,
+  a router with no I/O, stackable loop layers, and learning with guardrails. The figure is HTML and CSS with no inline styles,
+  and its rings are numbered 01–05, not L1–L5, so they don't clash with the engine's L0–L7 architecture layers.
+- **"Stuck phases get unstuck" moved** from "Built for unattended work" to the loop section, so it appears only once.
+- **New "What you get" section**: the core's "Benefits at a glance", read as benefit *because* reason. The models row adds
+  "The hosts ship Claude and dsh today", because the engine has the Codex, pi and prime adapters but the plugin's roadmap
+  still lists native Codex and Pi roles.
+- **New governance section**, "Controls an agent can't talk its way past": seven controls from "Why governance". The
+  seventh card spans the row instead of sitting alone.
+- **Wording:** "Loop engineering" opens the hero's small line, `SITE.description` names loop engineering and
+  governance, and a new FAQ entry, "What is loop engineering?", links to the core page.
+
+The source for every claim is the core README on `main` (sections "Why loop engineering", "Why governance" and "Benefits at
+a glance"). The plugin's How-It-Works wiki is the source for the cap of 3 attempts and exit 2.
