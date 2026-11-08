@@ -336,7 +336,12 @@ prefixes, a clean environment):
   `node bin/specstride-host-dsh.mjs install` installed the three skills. A second run printed
   "already installed, unchanged", and `doctor` was ok on every check (exit 0).
 
-**What the site deliberately does not show, and why** (reported upstream as open items):
+**Update, same day.** Bugs 1 and 2 below were fixed in specstride-dsh PR #2 (merged as `32d62c3`). The dsh
+tab now uses the short path, run by hand from a fresh clone of that commit with a clean home:
+`npm install -g . vendor/core/specstride-0.1.0.tgz`, then, in a clone of specstride-example,
+`specstride-host-dsh install --project` and `specstride-host-dsh doctor` (every check ok, exit 0).
+
+**What the site first worked around, and why:**
 
 - `specstride-host-dsh` through an npm bin symlink (`npm install -g .`, `npx`) does nothing and exits
   0. The entry guard compares `process.argv[1]` with the module path, and a symlink never matches.
