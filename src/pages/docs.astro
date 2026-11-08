@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import { SITE } from '../lib/site';
 const W = `${SITE.repoUrl}/blob/main/wiki`;
 const docs = [
-  { href: `${SITE.repoUrl}#readme`, title: 'README', body: 'Install, how it works, parallel units, requirements and costs.' },
+  { href: `${SITE.repoUrl}#readme`, title: 'Plugin README', body: 'Install, how it works, parallel units, requirements and costs.' },
   { href: `${W}/Home.md`, title: 'Wiki home', body: 'The index of the wiki: getting started, how it works, costs and limits, troubleshooting, FAQ.' },
   { href: `${W}/Getting-Started.md`, title: 'Getting started', body: 'Install, the shape of a feature, and the sentence that starts a run.' },
   { href: `${W}/How-It-Works.md`, title: 'How it works', body: 'What happens in each phase — the implementer, the engine\'s verification, the reviewer, the approval and the rejection — plus the parallel-units layer.' },
@@ -12,10 +12,13 @@ const docs = [
   { href: `${W}/FAQ.md`, title: 'FAQ', body: 'Which model to use, whether your code goes anywhere new, keys, and who makes it.' },
   { href: SITE.exampleUrl, title: 'Example repository', body: 'A tiny Node project with one three-phase Spec Kit feature to try Specstride on, with a demo of a real run.' },
   { href: `${SITE.repoUrl}/blob/main/SECURITY.md`, title: 'Security', body: 'Report vulnerabilities privately, and read the known limits: the implementer runs with your permissions.' },
+  { href: 'https://github.com/mairp/specstride-dsh#readme', title: 'dsh host README', body: 'Install, the doctor\'s six findings, a walkthrough from dry run to supervised run, what the host writes and where, and troubleshooting.' },
+  { href: 'https://github.com/mairp/specstride-core#readme', title: 'Core README', body: 'Loop engineering and governance, the L0–L7 layering, the packages, and how to build and test the engine.' },
+  { href: 'https://github.com/mairp/specstride-core/blob/main/docs/PUBLISHING.md', title: 'Publishing the core', body: 'How the four release packages are packed and versioned, and how a host pins a core release by its tarballs and sha256.' },
   { href: SITE.contributingUrl, title: 'Contributing', body: 'Build, typecheck, test, and an end-to-end run that needs no account; add a test with each change.' },
 ];
 ---
-<Base title="Docs" description="Specstride documentation lives with the plugin on GitHub: the README, the wiki, the example repository, security and contributing.">
+<Base title="Docs" description="Specstride documentation lives next to the code on GitHub: the plugin README and wiki, the dsh host and core READMEs, the example repository, security and contributing.">
   <div class="wrap page">
     <p class="eyebrow mono">// docs</p>
     <h1>Docs</h1>

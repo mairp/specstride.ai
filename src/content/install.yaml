@@ -25,3 +25,52 @@
       cmd: Run Specstride on the feature in this repo.
   after: On your own repository — any git repo with a `specs/NAME/tasks.md` and a `test` script in `package.json` — say the same sentence. Each approved phase becomes its own commit.
   verified: '2026-11-05'
+- id: dsh
+  label: dsh
+  status: available
+  order: 2
+  product: specstride-dsh
+  summary: Build the dsh host from a clone, install the engine's CLI from the tarball it pins, then put the three skills into your dsh home. Nothing is on npm yet.
+  prereqs:
+    - 'Linux. macOS is not verified.'
+    - Node 22+ and git
+    - '`dsh` 0.1.0-rc.8 on the search path'
+    - 'A Spec Kit feature in a git repository'
+  steps:
+    - cmd: git clone https://github.com/mairp/specstride-dsh
+    - cmd: cd specstride-dsh
+    - note: resolves the pinned engine tarballs; nothing compiles
+      cmd: npm install
+    - note: renders the skills and the shim, runs every build gate
+      cmd: npm run build
+    - note: the specstride CLI, from the tarball this repository pins
+      cmd: npm install -g vendor/core/specstride-0.1.0.tgz
+    - note: dsh's home; the skills go into $DSH_HOME/skills
+      cmd: export DSH_HOME="$HOME/.dsh"
+    - cmd: node bin/specstride-host-dsh.mjs install
+    - note: six findings, one line each
+      cmd: node bin/specstride-host-dsh.mjs doctor
+  after: 'Then, in a dsh session in your repository, say "run the specstride-run skill in dry-run on the feature". It plans and validates and launches nothing. Drop "in dry-run" to run the feature for real.'
+  verified: '2026-11-08'
+- id: core
+  label: Core (CLI)
+  status: available
+  order: 3
+  product: specstride-core
+  summary: Build the engine from a clone and pack its release. Install the `specstride` CLI on its own, to run it from a shell or to build a host on it. Nothing is on npm yet.
+  prereqs:
+    - 'Linux. macOS is not verified.'
+    - Node 22+ and git
+  steps:
+    - cmd: git clone https://github.com/mairp/specstride-core
+    - cmd: cd specstride-core
+    - cmd: npm ci
+    - note: packs the four release tarballs into .build/release/
+      cmd: node scripts/pack-release.mjs
+    - cmd: npm install -g .build/release/specstride-0.1.0.tgz
+    - note: prints the CLI protocol, 1
+      cmd: specstride --protocol
+    - note: in your repository
+      cmd: specstride doctor
+  after: '`specstride --help` lists every verb. Each verb takes `--json`, `--verbose` and `-h`. To build a host, start from `@specstride/host-kit` and pass the conformance suite in `@specstride/testkit`. See the core README.'
+  verified: '2026-11-08'

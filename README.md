@@ -1,15 +1,16 @@
 # specstride.ai
 
-The website of Specstride — the Claude Code plugin at
-[mairp/specstride-plugin](https://github.com/mairp/specstride-plugin), development governance for
-coding agents. Live at **https://specstride.ai**.
+The website of Specstride, development governance for coding agents. It covers three repositories:
+the Claude Code plugin [mairp/specstride-plugin](https://github.com/mairp/specstride-plugin) (the lead
+product), the dsh host [mairp/specstride-dsh](https://github.com/mairp/specstride-dsh) and the engine
+[mairp/specstride-core](https://github.com/mairp/specstride-core). Live at **https://specstride.ai**.
 
 It is also a template. Products, hosts, harnesses, FAQ entries and install paths are
 data in `src/content/`; pages render from them. Adding a product is one Markdown file. See
 [TEMPLATE.md](TEMPLATE.md).
 
 > The **website and template** in this repository are MIT-licensed. **Specstride itself** (the
-> plugin, with the engine it bundles) is licensed under
+> plugin, the dsh host and the core) is licensed under
 > [Apache-2.0](https://github.com/mairp/specstride-plugin/blob/main/LICENSE).
 
 ## Run it locally

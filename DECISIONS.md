@@ -308,3 +308,47 @@ These remain, each internal to the product's own names or to build tooling:
 - `.digest(` in scripts/csp-hash.mjs — Node's crypto API, nothing to do with the old digest feature.
 - `best-practice` in scripts/a11y.mjs — axe-core's rule-category name.
 - `#!/usr/bin/env bash` (deploy.sh, subset-fonts.sh) — the interpreter line of two build scripts.
+
+## Three variants (2026-11-08)
+
+The owner asked for the site to cover all three public repositories: specstride-plugin,
+specstride-dsh and specstride-core. Three decisions, taken on 2026-11-08:
+
+- **Plugin first, plus two.** The hero, the description and the home page story stay on the
+  Claude Code plugin. A new home section, "Three ways to run it" (02), renders the available products
+  from the collection. The plugin card comes first and is wider and lit. Each variant has a
+  `/products/<id>/` page (`specstride-dsh`, `specstride-core`) and an install tab. Two hosts now
+  have a product, but the hosts table stays off: the cards already name the host, and a table would
+  repeat them.
+- **Available from source.** Neither `specstride`, `@specstride/*` nor `@specstride/host-dsh` is on
+  npm, so the install paths build from a clone. The status notes say so. They also say that Linux is
+  verified and macOS is not, and, for dsh, that the paid live probe (F120-FR-030) has not run.
+- **Ship all the way:** PR, merge, deploy, and the repo homepages point here.
+
+**Install steps as run by hand on 2026-11-08** (fresh clones in a scratch directory, isolated npm
+prefixes, a clean environment):
+
+- core at `f9d0044`: `npm ci`, `npm run typecheck:src` and `node scripts/pack-release.mjs` (all four
+  tarballs) passed. `npm install -g .build/release/specstride-0.1.0.tgz` worked, `specstride
+  --protocol` printed `1`, and `specstride doctor` in a clone of specstride-example was all `ok`.
+- dsh at `17c970b`: `npm install` and `npm run build` passed (3 skills, shim, every gate).
+  `npm install -g vendor/core/specstride-0.1.0.tgz` worked, and with `DSH_HOME` set,
+  `node bin/specstride-host-dsh.mjs install` installed the three skills. A second run printed
+  "already installed, unchanged", and `doctor` was ok on every check (exit 0).
+
+**What the site deliberately does not show, and why** (reported upstream as open items):
+
+- `specstride-host-dsh` through an npm bin symlink (`npm install -g .`, `npx`) does nothing and exits
+  0. The entry guard compares `process.argv[1]` with the module path, and a symlink never matches.
+  The site therefore runs `node bin/specstride-host-dsh.mjs`.
+- `install --project` installs the skills, but the doctor checks only the user scope
+  (`$DSH_HOME/skills`), so a project install fails `host.skills-installed`. The site uses the
+  user-scope install, which needs `DSH_HOME`.
+- `npm test` in a fresh dsh clone fails 1 of its tests: a dsh-kanban test cannot resolve
+  `@specstride/host-dsh` without the CI peer stub. It is not part of the install, so it is not a step.
+
+**Build changes.** Markdown syntax highlighting is off (`markdown.syntaxHighlight: false`). Shiki
+writes token colours as inline `style` attributes, which the CSP blocks; the core page's layer diagram
+was the first fenced block in a product body. Product summaries now go through `inlineMd`, so
+`code` renders. Product prose `pre` scrolls inside its box instead of widening the page at 390 px.
+The a11y and screenshot scripts cover the two new pages.

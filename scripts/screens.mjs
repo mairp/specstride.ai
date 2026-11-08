@@ -6,7 +6,7 @@ import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
 
 const base = process.argv[2] ?? 'http://localhost:4321';
-const pages = (process.env.PAGES ?? '/,/install/,/docs/,/products/claude-code-plugin/,/nope/').split(',');
+const pages = (process.env.PAGES ?? '/,/install/,/docs/,/products/claude-code-plugin/,/products/specstride-dsh/,/products/specstride-core/,/nope/').split(',');
 const widths = [390, 768, 1440];
 const themes = ['dark', 'light'];
 mkdirSync('.review', { recursive: true });

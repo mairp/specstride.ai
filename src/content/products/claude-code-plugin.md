@@ -15,4 +15,4 @@ skills:
     does: Check this machine for Specstride — run the doctor, list each finding with its fix, and print the command to run when the CLI is missing or its protocol does not match. It installs and updates nothing.
 ---
 
-The engine that runs the loop is bundled inside the plugin.
+The engine that runs the loop, [Specstride core](/products/specstride-core/), is bundled inside the plugin. Using dsh instead of Claude Code? The [dsh host](/products/specstride-dsh/) runs the same engine there.

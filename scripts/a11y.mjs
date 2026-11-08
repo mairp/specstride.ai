@@ -6,7 +6,7 @@ import { createRequire } from 'node:module';
 import { chromium } from 'playwright';
 const axe = readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
 const base = process.argv[2] ?? 'http://localhost:4321';
-const pages = ['/', '/install/', '/docs/', '/products/claude-code-plugin/', '/nope/'];
+const pages = ['/', '/install/', '/docs/', '/products/claude-code-plugin/', '/products/specstride-dsh/', '/products/specstride-core/', '/nope/'];
 const browser = await chromium.launch();
 let bad = 0;
 for (const theme of ['dark', 'light']) {
