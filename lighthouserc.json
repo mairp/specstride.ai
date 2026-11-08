@@ -5,7 +5,9 @@
       "url": [
         "http://localhost/",
         "http://localhost/install/",
-        "http://localhost/products/claude-code-plugin/"
+        "http://localhost/products/claude-code-plugin/",
+        "http://localhost/products/specstride-dsh/",
+        "http://localhost/products/specstride-core/"
       ],
       "numberOfRuns": 3,
       "settings": {

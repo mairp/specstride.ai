@@ -10,9 +10,10 @@ const host = d.host ? await getEntry(d.host) : undefined;
 const H = headingLevel;
 ---
 <article class="card card-top product">
-  {host && <p class="host mono">{d.kind === 'plugin' ? `for ${host.data.name}` : host.id === 'shell' ? 'CLI' : host.data.name}</p>}
+  {host ? <p class="host mono">{d.kind === 'plugin' ? `for ${host.data.name}` : host.id === 'shell' ? 'CLI' : host.data.name}</p>
+        : d.kind === 'core' && <p class="host mono">the engine</p>}
   <H class="name"><a href={`/products/${product.id}/`}>{d.name}</a></H>
-  <p class="summary">{d.summary}</p>
+  <p class="summary" set:html={inlineMd(d.summary)} />
   <p class="note mono"><span aria-hidden="true">» </span>{d.statusNote}</p>
   {showSkills && d.skills.length > 0 && (
     <ul class="skills">

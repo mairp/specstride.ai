@@ -9,12 +9,14 @@ import HarnessGrid from '../components/HarnessGrid.astro';
 import Terminal from '../components/Terminal.astro';
 import FAQ from '../components/FAQ.astro';
 import Glow from '../components/Glow.astro';
+import ProductCard from '../components/ProductCard.astro';
 import { inlineMd } from '../lib/inline-md';
-import { SITE } from '../lib/site';
+import { SITE, isAvailable } from '../lib/site';
 import { repoFacts } from '../lib/github';
 
 const facts = await repoFacts();
 const install = await getCollection('install');
+const products = (await getCollection('products')).filter(isAvailable).sort((a, b) => a.data.order - b.data.order);
 
 // The README's four steps, one phase of a Spec Kit feature at a time.
 const steps = [
@@ -35,7 +37,7 @@ const why = [
 ];
 
 // Sections are numbered in the order they render.
-const order = ['loop', 'why', 'demo', 'agents', 'units', 'open-source', 'faq'];
+const order = ['loop', 'ways', 'why', 'demo', 'agents', 'units', 'open-source', 'faq'];
 const no = (id: string) => String(order.indexOf(id) + 1).padStart(2, '0');
 const heroLede =
   'An agent that grades its own work says "done" when it isn\'t. Specstride is a Claude Code plugin that takes a Spec Kit feature to done, phase by phase, unattended: implement, verify, review, commit, resume. A separate reviewer must approve each phase before the run moves on, and every approval leaves a signed record and its own commit.';
@@ -71,6 +73,14 @@ const heroLede =
       {steps.map((s) => <li class="reveal" set:html={inlineMd(s)} />)}
     </ol>
     <LoopDiagram />
+  </Section>
+
+  <Section id="ways" eyebrow={`${no('ways')} · plugin, dsh, core`} title="Three ways to run it" intro="One engine, two hosts on top of it. Pick the one that matches the agent you already use. The loop, the gates, the records and the commits are the same in all three.">
+    <div class="ways">
+      {products.map((p, i) => (
+        <div class:list={['reveal', { lead: i === 0 }]}><ProductCard product={p} showSkills={false} /></div>
+      ))}
+    </div>
   </Section>
 
   <Section id="why" eyebrow={`${no('why')} · unattended`} title="Built for unattended work" tone="raised" intro="For people who leave agents running on real work and need to trust the result when they come back.">
@@ -227,6 +237,15 @@ const heroLede =
   .demo video { width: 100%; height: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
   .demo figcaption { font-size: 0.9375rem; max-width: 56rem; }
   @media (prefers-reduced-motion: reduce) { .demo video { animation: none; } }
+
+  /* Three ways: the plugin card leads, wider and lit. */
+  .ways { display: grid; gap: var(--space-5); }
+  .ways > div { display: flex; }
+  .ways > div > :global(.card) { flex: 1; }
+  .ways .lead > :global(.card) { --edge: 85%; }
+  @media (min-width: 900px) {
+    .ways { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); }
+  }
 
   .env { max-width: 44rem; }
   .afternote { font-size: 0.9375rem; max-width: 52rem; margin: var(--space-4) 0 0; }

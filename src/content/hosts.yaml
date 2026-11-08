@@ -3,4 +3,9 @@
 - id: claude-code
   name: Claude Code
   order: 1
-  blurb: The host Specstride ships for today. A plugin whose skills take a Spec Kit feature to done, phase by phase, unattended.
+  blurb: The first host. A plugin whose skills take a Spec Kit feature to done, phase by phase, unattended.
+- id: dsh
+  name: dsh
+  url: https://github.com/deepseek-ai/deepseek-harness
+  order: 2
+  blurb: The DeepSeek Harness. Three skills and a shim over the same pinned engine, on any provider and model dsh reaches.

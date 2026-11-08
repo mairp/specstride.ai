@@ -8,6 +8,8 @@ export default defineConfig({
   trailingSlash: 'always',
   output: 'static',
   integrations: [mdx(), sitemap({ filter: (page) => !page.includes('/404') })],
+  // No Shiki: its token colours are inline style attributes, which the CSP blocks.
+  markdown: { syntaxHighlight: false },
   build: {
     format: 'directory',
     // Keep every style and script in its own file so the CSP needs no 'unsafe-inline'.
