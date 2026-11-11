@@ -412,3 +412,5 @@ role to "judge", or add a second accent or display face), or mock up first. The 
 - **Checks (local build):** `astro check` 0 errors; screenshots at 390/768/1440 in both themes with no overflow and no
   console errors; axe clean; linkinator OK; Lighthouse mobile on `/` 0.98 performance, 1.0 accessibility, best practices
   and SEO, CLS 0.
+- **Phones (same day).** Under 760 px the three variant cards are hidden: the stack figure and the table already carry
+  their content and the links to the product pages, and the phone page had grown by about a third.

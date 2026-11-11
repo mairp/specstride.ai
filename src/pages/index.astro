@@ -188,7 +188,7 @@ const heroLede =
         <div class:list={['reveal', { lead: i === 0 }]}><ProductCard product={p} showSkills={false} /></div>
       ))}
     </div>
-    <div class="reveal"><VariantTable /></div>
+    <div class="reveal ways-table"><VariantTable /></div>
   </Section>
 
   <Section id="why" eyebrow={`${no('why')} · unattended`} title="Built for unattended work" tone="raised" intro="For people who leave agents running on real work and need to trust the result when they come back.">
@@ -380,6 +380,8 @@ const heroLede =
 
   /* Three ways: the plugin card leads, wider and lit. */
   .ways { display: grid; gap: var(--space-5); margin: var(--space-7) 0; }
+  /* On a phone the stack figure and the table already say what the cards say. */
+  @media (max-width: 759px) { .ways { display: none; } .ways-table { margin-top: var(--space-6); } }
   .ways > div { display: flex; }
   .ways > div > :global(.card) { flex: 1; }
   .ways .lead > :global(.card) { --edge: 85%; }
