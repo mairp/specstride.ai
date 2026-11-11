@@ -1,0 +1,59 @@
+---
+// The available products side by side. Every cell but "Pick it when" comes from
+// the collections (products, hosts, install), so the table cannot drift from
+// the cards and the install tabs. "Pick it when" is the FAQ's own answer.
+import { getCollection, getEntry } from 'astro:content';
+import { isAvailable } from '../lib/site';
+const PICK: Record<string, string> = {
+  'claude-code-plugin': 'You work in Claude Code.',
+  'specstride-dsh': 'You work in the DeepSeek Harness.',
+  'specstride-core': 'You run the CLI from a shell, or build a host for another agent.',
+};
+const products = (await getCollection('products')).filter(isAvailable).sort((a, b) => a.data.order - b.data.order);
+const cols = await Promise.all(products.map(async (p) => {
+  const host = p.data.host ? await getEntry(p.data.host) : undefined;
+  const install = p.data.install ? await getEntry(p.data.install) : undefined;
+  return {
+    id: p.id,
+    name: p.data.name,
+    runsIn: host ? host.data.name : 'Your shell',
+    pick: PICK[p.id] ?? '',
+    install: install ? `${install.data.steps.length} steps, run by hand on ${install.data.verified}` : '',
+    unit: p.data.kind === 'plugin' ? 'skills' : 'commands',
+    skills: p.data.skills.map((s) => s.name),
+    note: p.data.statusNote,
+  };
+}));
+---
+<div class="table-scroll vt" tabindex="0" role="region" aria-label="The three variants compared">
+  <table>
+    <thead>
+      <tr>
+        <td></td>
+        {cols.map((c) => <th scope="col"><a href={`/products/${c.id}/`}>{c.name}</a></th>)}
+      </tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">Runs in</th>{cols.map((c) => <td>{c.runsIn}</td>)}</tr>
+      <tr><th scope="row">Pick it when</th>{cols.map((c) => <td>{c.pick}</td>)}</tr>
+      <tr><th scope="row">Install</th>{cols.map((c) => <td>{c.install}<br /><a href={`/products/${c.id}/#install`}>The steps →</a></td>)}</tr>
+      <tr><th scope="row">You drive it with</th>{cols.map((c) => <td>{c.skills.length} {c.unit}<br />{c.skills.map((s, i) => <>{i > 0 && ' '}<code>{s}</code></>)}</td>)}</tr>
+      <tr><th scope="row">Status</th>{cols.map((c) => <td>{c.note}</td>)}</tr>
+      <tr><th scope="row">The loop</th><td colspan={cols.length} class="same">The same in all three: same gates, same records, same commits.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .vt { background: var(--card); }
+  table { min-width: 46rem; font-size: 0.875rem; table-layout: fixed; }
+  thead td, thead th { background: var(--surface); }
+  thead th { font-family: var(--font-display); font-weight: 600; font-size: var(--step-0); }
+  thead th a { color: var(--fg-strong); text-decoration: none; }
+  thead th a:hover { color: var(--accent); text-decoration: underline; }
+  thead td, tbody th { width: 9.5rem; }
+  tbody th { background: transparent; color: var(--accent); font-weight: 400; font-size: 0.75rem; letter-spacing: 0.02em; }
+  td { color: var(--fg); line-height: 1.55; }
+  td code { display: inline-block; margin-top: var(--space-1); font-size: 0.75rem; overflow-wrap: anywhere; }
+  .same { color: var(--muted); }
+</style>

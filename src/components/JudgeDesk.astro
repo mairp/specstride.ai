@@ -1,0 +1,104 @@
+---
+// The reviewer's desk: what reaches it, what is held back, and what comes out.
+// Sources: the plugin wiki (How it works, step 3 and 4) and the core README
+// ("Why governance"). Classes only: the CSP has no 'unsafe-inline' for styles.
+const reads = [
+  { what: 'the tasks', note: 'of this phase' },
+  { what: 'the claim', note: 'what the implementer says it did' },
+  { what: 'the test output', note: 'from the engine\'s own run' },
+  { what: 'the change', note: 'including the contents of new files' },
+];
+const withheld = [
+  { what: 'tools', note: 'the reviewer session has none' },
+  { what: 'the implementer\'s notebook', note: 'and its repair history' },
+  { what: 'credentials', note: 'redacted before it reads' },
+];
+---
+<figure class="desk" aria-label="The reviewer's desk. It reads the tasks of the phase, the implementer's claim, the test output from the engine's own run, and the change including the contents of new files. Held back from it: tools, the implementer's notebook and repair history, and credentials. It answers approved or rejected with a one-time nonce. An approval becomes a signed record and one commit; a rejection goes back with the reasons.">
+  <div class="col in" aria-hidden="true">
+    <p class="label mono">reaches the reviewer</p>
+    <ul role="list">
+      {reads.map((r) => <li><span class="mark mono">+</span><span><b>{r.what}</b> <span class="note">{r.note}</span></span></li>)}
+    </ul>
+    <p class="label mono held">held back</p>
+    <ul role="list" class="no">
+      {withheld.map((r) => <li><span class="mark mono">−</span><span><b>{r.what}</b> <span class="note">{r.note}</span></span></li>)}
+    </ul>
+  </div>
+
+  <div class="flow mono" aria-hidden="true"><span class="flow-h">──▶</span><span class="flow-v">▼</span></div>
+
+  <div class="col judge" aria-hidden="true">
+    <p class="label mono">the reviewer</p>
+    <p class="who">A separate session.<br />No tools. One question:</p>
+    <p class="question">does the change do what the tasks say?</p>
+    <p class="nonce mono"><span class="k">nonce</span> one-time, per attempt</p>
+  </div>
+
+  <div class="flow mono" aria-hidden="true"><span class="flow-h">──▶</span><span class="flow-v">▼</span></div>
+
+  <div class="col out" aria-hidden="true">
+    <p class="label mono">comes out</p>
+    <div class="verdict ok">
+      <p class="v mono">APPROVED</p>
+      <p class="then">tasks ticked · a signed record, read back · one commit</p>
+    </div>
+    <div class="verdict no">
+      <p class="v mono">REJECTED</p>
+      <p class="then">back to the implementer with the reasons · up to 3 attempts</p>
+    </div>
+  </div>
+  <figcaption class="muted mono">facts in · opinion bound to a nonce · verdict on the record</figcaption>
+</figure>
+
+<style>
+  .desk { margin: 0; display: grid; gap: var(--space-3); align-items: stretch; }
+  .col {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--card);
+    padding: var(--space-5);
+    min-width: 0;
+  }
+  .label { margin: 0 0 var(--space-3); font-size: 0.75rem; color: var(--accent); letter-spacing: 0.04em; text-transform: uppercase; }
+  .held { margin-top: var(--space-5); color: var(--muted); }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+  li { display: flex; gap: var(--space-3); align-items: baseline; font-size: 0.9375rem; }
+  li b { color: var(--fg-strong); font-weight: 500; }
+  .note { color: var(--muted); }
+  .mark { color: var(--accent); flex: none; width: 1ch; }
+  .no .mark { color: var(--muted); }
+  .no b { color: var(--fg); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 70%, transparent); }
+
+  .judge {
+    border-color: color-mix(in srgb, var(--accent) 70%, var(--border));
+    background: color-mix(in srgb, var(--accent) 7%, var(--card));
+    box-shadow: 0 0 60px -22px color-mix(in srgb, var(--accent) 70%, transparent);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .who { margin: 0 0 var(--space-3); color: var(--fg); }
+  .question { margin: 0 0 var(--space-5); font-family: var(--font-display); font-weight: 500; font-size: var(--step-2); line-height: 1.25; color: var(--fg-strong); text-wrap: balance; }
+  .nonce { margin: 0; font-size: 0.75rem; color: var(--muted); }
+  .k { color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent); border-radius: 4px; padding: 0.1em 0.45em; margin-right: var(--space-2); }
+
+  .out { display: flex; flex-direction: column; gap: var(--space-4); }
+  .out .label { margin-bottom: 0; }
+  .verdict { border-left: 2px solid var(--tone); padding: var(--space-2) 0 var(--space-2) var(--space-4); }
+  .verdict.ok { --tone: var(--ok); }
+  .verdict.no { --tone: var(--err); }
+  .v { margin: 0 0 var(--space-1); color: var(--tone); font-weight: 700; font-size: var(--step--1); letter-spacing: 0.06em; }
+  .then { margin: 0; font-size: 0.875rem; color: var(--muted); }
+
+  .flow { display: grid; place-items: center; color: var(--accent); font-size: var(--step--1); line-height: 1; }
+  .flow-h { display: none; }
+  figcaption { font-size: 0.75rem; }
+
+  @media (min-width: 960px) {
+    .desk { grid-template-columns: minmax(0, 1.15fr) auto minmax(0, 1fr) auto minmax(0, 1.05fr); gap: var(--space-3); }
+    .flow-h { display: inline; }
+    .flow-v { display: none; }
+    figcaption { grid-column: 1 / -1; }
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+// How the three variants relate: two thin hosts over one pinned engine, joined
+// by the CLI protocol. Source: the core README ("Architecture", L7 and L6) and
+// the dsh README (the shim is the only channel; the engine tarballs are pinned).
+import { getCollection, getEntry } from 'astro:content';
+import { isAvailable } from '../lib/site';
+const products = (await getCollection('products')).filter(isAvailable).sort((a, b) => a.data.order - b.data.order);
+const hosts = await Promise.all(products.filter((p) => p.data.kind === 'plugin').map(async (p) => ({
+  id: p.id,
+  name: p.data.name,
+  host: p.data.host ? (await getEntry(p.data.host))?.data.name : undefined,
+  skills: p.data.skills.length,
+})));
+const core = products.find((p) => p.data.kind === 'core');
+---
+<figure class="stack" aria-label={`How the variants relate: ${hosts.map((h) => h.name).join(' and ')} are thin hosts over a pinned release of Specstride core, the engine. A host talks to the engine only through the CLI protocol.`}>
+  <div class="hosts" aria-hidden="true">
+    {hosts.map((h) => (
+      <a class="box host" href={`/products/${h.id}/`} tabindex="-1">
+        <span class="tier mono">host · in {h.host}</span>
+        <span class="name">{h.name}</span>
+        <span class="meta mono">{h.skills} skills</span>
+      </a>
+    ))}
+    <div class="box host shell">
+      <span class="tier mono">host · your shell</span>
+      <span class="name">The CLI on its own</span>
+      <span class="meta mono">specstride &lt;verb&gt;</span>
+    </div>
+  </div>
+  <p class="wire mono" aria-hidden="true"><span class="wire-line"></span><span class="wire-text">CLI protocol v1 · argv in, exit code and terse lines out</span><span class="wire-line"></span></p>
+  {core && (
+    <a class="box engine" href={`/products/${core.id}/`} tabindex="-1" aria-hidden="true">
+      <span class="tier mono">the engine · one pinned release</span>
+      <span class="name">{core.data.name}</span>
+      <span class="layers mono">gate · reviewer · approval record · loop layers · router · runtime · adapters</span>
+    </a>
+  )}
+  <figcaption class="muted mono">thin hosts · one engine · the same loop, gates, records and commits</figcaption>
+</figure>
+
+<style>
+  .stack { margin: 0; display: grid; gap: var(--space-3); }
+  .hosts { display: grid; gap: var(--space-3); }
+  .box {
+    display: grid;
+    gap: var(--space-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--card);
+    padding: var(--space-4) var(--space-5);
+    color: inherit;
+    text-decoration: none;
+    min-width: 0;
+  }
+  a.box:hover { border-color: var(--accent); }
+  .tier { font-size: 0.6875rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
+  .name { font-family: var(--font-display); font-weight: 500; font-size: var(--step-1); color: var(--fg-strong); }
+  .meta, .layers { font-size: 0.75rem; color: var(--muted); }
+  .shell { border-style: dashed; }
+  .shell .tier { color: var(--muted); }
+  .wire { margin: 0; display: flex; align-items: center; gap: var(--space-3); font-size: 0.75rem; color: var(--muted); text-align: center; }
+  .wire-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--accent), transparent); }
+  .engine {
+    border-color: color-mix(in srgb, var(--accent) 70%, var(--border));
+    background: color-mix(in srgb, var(--accent) 7%, var(--card));
+    box-shadow: 0 0 60px -24px color-mix(in srgb, var(--accent) 70%, transparent);
+    text-align: center;
+    justify-items: center;
+    padding-block: var(--space-5);
+  }
+  figcaption { font-size: 0.75rem; }
+  @media (min-width: 760px) { .hosts { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>

@@ -379,3 +379,36 @@ calls loop engineering. Changes:
 
 The source for every claim is the core README on `main` (sections "Why loop engineering", "Why governance" and "Benefits at
 a glance"). The plugin's How-It-Works wiki is the source for the cap of 3 attempts and exit 2.
+
+## Design lift, the judge and the variants (2026-11-11)
+
+The owner asked for a better design and for content on the variants, the benefits of loop engineering and LLM-as-a-judge.
+The request met two existing rules: the page says "reviewer" (2026-11-05), and "LLM-as-a-judge for coding agents" was
+rejected as the one-line promise. Three paths were weighed: stay within the rules, take a bounded exception (rename the
+role to "judge", or add a second accent or display face), or mock up first. The first was taken, so no rule changed.
+
+- **The judge has a section** (02, "LLM-as-a-judge, held to evidence"), not the tagline. The industry term names the
+  pattern; the role is still "the reviewer" everywhere. A figure shows what reaches the reviewer, what is held back and
+  what comes out, and six cards say why the verdict counts. Sources: the plugin wiki's "How it works" (what the reviewer
+  receives, the nonce, the signed record) and the core README's "Why governance" (notebook and repair history withheld,
+  one ingress, records verified on resume). The cost is stated in the wiki's words: every attempt makes at least two
+  model calls.
+- **Loop engineering shows its benefit.** A five-row comparison puts one loop with no brakes beside the engineered loops.
+  The left column says only what follows from the READMEs' description of a plain session; it has no figures. The
+  principle cards were cut to two or three lines, and "Yields instead of dead waits" is its own card again.
+- **The variants are shown as a stack and a table.** The stack figure has the hosts (plugin, dsh, the plain shell) over
+  one pinned engine, joined by the core's CLI protocol line. The table is generated from the products, hosts and install
+  collections; only "Pick it when" is typed, in the FAQ's words. Each product page has a switcher to the other two.
+- **"What you get"** is a full-width grid of the same eight benefits in the same words.
+- **Order:** how it works, the judge, loop engineering, what you get, three ways, unattended, see it run, governance,
+  your models, parallel units, open source, FAQ.
+- **Design, all from existing tokens:** the hero headline is three lines and the caption two at 1440 px, the small line
+  sits on one line above both columns, and a phase rail (implement, verify, review, commit, next phase) shows the
+  mechanism on the first screen. Section heads put the intro beside the title on wide screens. The header has in-page
+  links from 1024 px up. The demo video sits in the terminal frame. Green and red appear only as verdicts. No new
+  motion, face, colour or request.
+- **Faults fixed on the way:** the agents tiles touched the terminal below them (the scoped `.env` rule never reached
+  the child component), and the harness notes printed their backticks.
+- **Checks (local build):** `astro check` 0 errors; screenshots at 390/768/1440 in both themes with no overflow and no
+  console errors; axe clean; linkinator OK; Lighthouse mobile on `/` 0.98 performance, 1.0 accessibility, best practices
+  and SEO, CLS 0.

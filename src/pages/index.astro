@@ -11,6 +11,10 @@ import FAQ from '../components/FAQ.astro';
 import Glow from '../components/Glow.astro';
 import ProductCard from '../components/ProductCard.astro';
 import LoopNest from '../components/LoopNest.astro';
+import LoopCompare from '../components/LoopCompare.astro';
+import JudgeDesk from '../components/JudgeDesk.astro';
+import VariantStack from '../components/VariantStack.astro';
+import VariantTable from '../components/VariantTable.astro';
 import { inlineMd } from '../lib/inline-md';
 import { SITE, isAvailable } from '../lib/site';
 import { repoFacts } from '../lib/github';
@@ -39,13 +43,34 @@ const why = [
 // Loop engineering: the principles of the core README's "Why loop engineering"
 // that the unattended cards above do not already cover.
 const principles = [
-  { title: 'Every loop has an end', body: 'Attempts per phase are capped, passes have watchdogs and breakers, and every way a run can stop is a named stop reason with a fixed exit code. Long jobs run detached while the pass yields, and a wait that can no longer complete ends early instead of burning its timer. Nothing ends with "it went quiet".' },
-  { title: 'Deterministic checks before any opinion', body: 'Each phase has a frozen check manifest. The verification gate runs those commands, with a fixed argument list and no shell, before the reviewer sees anything. A phase whose tests fail never reaches review.' },
-  { title: 'Stuck phases get unstuck, not retried blindly', body: 'A plain retry makes the same mistake again. When a rejection names new unmet tasks, a diagnostician reads the phase from the outside first, in a separate session. The next attempt is narrowed to those tasks, with the diagnosis as its first instruction, and the reviewer judges it like any other attempt.' },
-  { title: 'A router with no I/O', body: 'Check order, which loop layer to use, and escalation to the next model tier of the same harness come from a pure function over versioned rule tables. Every decision records its rule id and table version, so a run can be explained after the fact.' },
-  { title: 'Loop layers you can stack', body: '`none` is the classic loop. `micro` adds inner checks that end in keep, repair or unresolved at a checkpoint. `parallel`, opt-in, runs tasks with disjoint files at once and runs the full gate on the merged tree before review.' },
-  { title: 'It learns, with guardrails', body: 'The learning layer reads the run\'s own telemetry, suggests per-phase settings, evaluates each change against a baseline and reverts any that make things worse. It has its own writer and its own file, and it is off unless you turn it on.' },
+  { title: 'Every loop has an end', body: 'Attempts are capped, passes have watchdogs and breakers, and every way a run can stop is a named stop reason with a fixed exit code.' },
+  { title: 'Deterministic checks before any opinion', body: 'The verification gate runs the phase\'s frozen check manifest, with a fixed argument list and no shell. A phase whose tests fail never reaches review.' },
+  { title: 'Stuck phases get unstuck', body: 'A rejection that names new unmet tasks is diagnosed first, in a separate session. The next attempt is narrowed to those tasks, and the reviewer judges it like any other.' },
+  { title: 'A router with no I/O', body: 'Check order, loop layer and escalation to the next model tier come from a pure function over versioned rule tables. Every decision records its rule id.' },
+  { title: 'Loop layers you can stack', body: '`none` is the classic loop. `micro` adds inner checks that end in keep, repair or unresolved. `parallel`, opt-in, runs tasks with disjoint files at once.' },
+  { title: 'Yields instead of dead waits', body: 'Long jobs run detached while the pass yields. A wait that can no longer complete ends early instead of burning its timer.' },
+  { title: 'It learns, with guardrails', body: 'The learning layer suggests per-phase settings from the run\'s own telemetry and reverts any change that makes things worse. Off unless you turn it on.' },
 ];
+
+// The judge: what makes the reviewer's verdict worth something. Sources: the
+// plugin wiki (How it works) and the core README (Why governance).
+const guarantees = [
+  { title: 'Independent', body: 'The reviewer is a separate session, chosen independently of the implementer, on any provider. A phase is never approved without one.' },
+  { title: 'Evidence, not a summary', body: 'It reads the actual change against the phase\'s tasks, including the contents of new files. The implementer\'s notebook and repair history are withheld from it.' },
+  { title: 'Facts before opinion', body: 'The engine runs the tests itself, before the reviewer sees anything. A phase whose tests fail never reaches review.' },
+  { title: 'Cannot be imitated', body: 'The verdict is bound to a one-time nonce for that attempt. Text planted in the evidence cannot pass for it, and an implementer that prints "APPROVED" achieves nothing.' },
+  { title: 'Outside text is data', body: 'Everything from outside the runtime enters through one ingress, where it is size-capped, framed as data and stripped of credentials. It fails closed.' },
+  { title: 'A verdict on the record', body: 'An approval is a signed record outside the implementer\'s write scope, read back and verified again on resume. A forged or missing approval stops the run.' },
+];
+
+// One phase, as the hero shows it.
+const rail = [
+  { verb: 'implement', note: 'the phase\'s tasks' },
+  { verb: 'verify', note: 'the engine runs the tests' },
+  { verb: 'review', note: 'a separate session, no tools' },
+  { verb: 'commit', note: 'a signed record, one commit' },
+];
+
 
 // The core README's "Benefits at a glance".
 const benefits = [
@@ -71,7 +96,7 @@ const controls = [
 ];
 
 // Sections are numbered in the order they render.
-const order = ['loop', 'engineering', 'ways', 'why', 'demo', 'benefits', 'governance', 'agents', 'units', 'open-source', 'faq'];
+const order = ['loop', 'judge', 'engineering', 'benefits', 'ways', 'why', 'demo', 'governance', 'agents', 'units', 'open-source', 'faq'];
 const no = (id: string) => String(order.indexOf(id) + 1).padStart(2, '0');
 const heroLede =
   'An agent that grades its own work says "done" when it isn\'t. Specstride is a Claude Code plugin that takes a Spec Kit feature to done, phase by phase, unattended: implement, verify, review, commit, resume. A separate reviewer must approve each phase before the run moves on, and every approval leaves a signed record and its own commit.';
@@ -80,8 +105,8 @@ const heroLede =
   <section class="hero" aria-labelledby="hero-title">
     <Glow />
     <div class="wrap hero-grid">
+      <p class="oss mono">Loop engineering <span aria-hidden="true">·</span> LLM-as-a-judge <span aria-hidden="true">·</span> Open source <span aria-hidden="true">·</span> Runs on your machine <span aria-hidden="true">·</span> Your models, your keys</p>
       <div class="hero-head">
-        <p class="oss mono">Loop engineering <span aria-hidden="true">·</span> Open source <span aria-hidden="true">·</span> Runs on your machine <span aria-hidden="true">·</span> Your models, your keys</p>
         <h1 id="hero-title"><span class="line">{SITE.tagline}</span> <span class="line caption">{SITE.caption}</span></h1>
       </div>
       <div class="hero-body">
@@ -91,6 +116,12 @@ const heroLede =
           <a class="btn btn-primary" href="#install">Install <span class="arrow" aria-hidden="true">→</span></a>
         </p>
       </div>
+      <ol class="rail" aria-label="One phase: implement, verify, review, commit. Then the next phase; a stopped run resumes.">
+        {rail.map((r, i) => (
+          <li><span class="rail-no mono" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><span class="rail-verb">{r.verb}</span><span class="rail-note">{r.note}</span></li>
+        ))}
+        <li class="rail-next"><span class="rail-no mono" aria-hidden="true">↻</span><span class="rail-verb">next phase</span><span class="rail-note">or resume where it stopped</span></li>
+      </ol>
     </div>
   </section>
 
@@ -109,7 +140,22 @@ const heroLede =
     <LoopDiagram />
   </Section>
 
-  <Section id="engineering" eyebrow={`${no('engineering')} · loop engineering`} title="Loop engineering" tone="raised" intro="A single agent session is one loop with no brakes. Specstride treats the loop itself as the thing to engineer: which loops exist, what ends each of them, what may cross between them, and what happens when one gets stuck.">
+  <Section id="judge" eyebrow={`${no('judge')} · the reviewer`} title="LLM-as-a-judge, held to evidence" tone="raised" intro="A model judging another model's work is only worth something when the judge is independent, reads the real change, and cannot be imitated. Specstride's reviewer is that judge, and the engine around it is what makes its verdict count.">
+    <div class="reveal"><JudgeDesk /></div>
+    <div class="grid grid-2 grid-3 guarantees">
+      {guarantees.map((g, i) => (
+        <div class="card card-top reveal">
+          <p class="card-no mono" aria-hidden="true">{String(i + 1).padStart(2, '0')}</p>
+          <h3>{g.title}</h3>
+          <p set:html={inlineMd(g.body)} />
+        </div>
+      ))}
+    </div>
+    <p class="afternote muted">The price is stated too: every attempt makes at least two model calls, on your own subscription or key. The diagnostician that reads a stuck phase gives no verdict; nothing it says approves or rejects.</p>
+  </Section>
+
+  <Section id="engineering" eyebrow={`${no('engineering')} · loop engineering`} title="Loop engineering" intro="A single agent session is one loop with no brakes. Specstride treats the loop itself as the thing to engineer: which loops exist, what ends each of them, what may cross between them, and what happens when one gets stuck.">
+    <LoopCompare />
     <div class="eng">
       <div class="eng-figure reveal"><LoopNest /></div>
       <div class="eng-cards">
@@ -124,12 +170,25 @@ const heroLede =
     <p class="more-link mono"><a href="/products/specstride-core/">The engine, layer by layer →</a></p>
   </Section>
 
-  <Section id="ways" eyebrow={`${no('ways')} · plugin, dsh, core`} title="Three ways to run it" intro="One engine, two hosts on top of it. Pick the one that matches the agent you already use. The loop, the gates, the records and the commits are the same in all three.">
+  <Section id="benefits" eyebrow={`${no('benefits')} · what you get`} title="What you get" tone="raised" intro="Each benefit comes from a specific part of how the loop is built. Read every line as: you get this, because the engine does that.">
+    <dl class="benefits">
+      {benefits.map((b, i) => (
+        <div class="benefit card card-top reveal">
+          <dt><span class="card-no mono" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>{b.get}</dt>
+          <dd><span class="because mono">because</span> <span set:html={inlineMd(b.because)} /></dd>
+        </div>
+      ))}
+    </dl>
+  </Section>
+
+  <Section id="ways" eyebrow={`${no('ways')} · plugin, dsh, core`} title="Three ways to run it" intro="One engine, and thin hosts on top of it. Pick the one that matches the agent you already use. The loop, the gates, the records and the commits are the same in all three.">
+    <div class="reveal"><VariantStack /></div>
     <div class="ways">
       {products.map((p, i) => (
         <div class:list={['reveal', { lead: i === 0 }]}><ProductCard product={p} showSkills={false} /></div>
       ))}
     </div>
+    <div class="reveal"><VariantTable /></div>
   </Section>
 
   <Section id="why" eyebrow={`${no('why')} · unattended`} title="Built for unattended work" tone="raised" intro="For people who leave agents running on real work and need to trust the result when they come back.">
@@ -148,25 +207,16 @@ const heroLede =
 
   <Section id="demo" eyebrow={`${no('demo')} · see it run`} title="See it run" intro="The example repository is a tiny Node project with one Spec Kit feature, in three phases, nothing implemented yet — Specstride does that, one reviewed and committed phase at a time.">
     <figure class="demo">
-      <video data-demo autoplay muted loop playsinline preload="none" poster="/media/demo-poster.png" width="1010" height="692" aria-label="A Specstride run on the example repository: three phases implemented, tested, reviewed and committed">
-        <source src="/media/demo.webm" type="video/webm" />
-        <source src="/media/demo.mp4" type="video/mp4" />
-      </video>
+      <Terminal title="specstride-example · a real run, sped up" class="demo-term">
+        <video data-demo autoplay muted loop playsinline preload="none" poster="/media/demo-poster.png" width="1010" height="692" aria-label="A Specstride run on the example repository: three phases implemented, tested, reviewed and committed">
+          <source src="/media/demo.webm" type="video/webm" />
+          <source src="/media/demo.mp4" type="video/mp4" />
+        </video>
+      </Terminal>
       <figcaption class="muted">
         A real run on <a href={SITE.exampleUrl}>the example repository</a>, sped up (waits capped at 1.5&nbsp;s, paths shortened). In phase 3 the two <code>[P]</code> tasks ran as a parallel group; the merge check caught a test one worker wrote for a framework the project does not use, so the engine redid both tasks in order before the reviewer saw the phase.
       </figcaption>
     </figure>
-  </Section>
-
-  <Section id="benefits" eyebrow={`${no('benefits')} · what you get`} title="What you get" intro="Each benefit comes from a specific part of how the loop is built.">
-    <dl class="benefits">
-      {benefits.map((b) => (
-        <div class="benefit reveal">
-          <dt>{b.get}</dt>
-          <dd><span class="because mono">because</span> <span set:html={inlineMd(b.because)} /></dd>
-        </div>
-      ))}
-    </dl>
   </Section>
 
   <Section id="governance" eyebrow={`${no('governance')} · governance`} title="Controls an agent can't talk its way past" tone="raised" intro="Autonomy is useful only when you can trust what it reports. These controls are in the engine, so every host gets them.">
@@ -189,7 +239,7 @@ const heroLede =
   </Section>
 
   <Section id="units" eyebrow={`${no('units')} · parallel units, opt-in`} title="Parallel units, opt-in" tone="raised" intro="Mark tasks [P] in your Spec Kit tasks.md and turn the layer on. Tasks whose files are disjoint run at once, each in its own worker tree, and the project's files are untouched while they run. The engine merges their work and runs the phase's checks before the reviewer sees the phase; tasks whose files overlap are refused, with the reason printed, and run in order.">
-    <Terminal title="~/.config/specstride/config.yaml" label="The user configuration that turns parallel units on">
+    <Terminal title="~/.config/specstride/config.yaml" label="The user configuration that turns parallel units on" class="env">
       <pre><span class="muted"># your user configuration, read from this file only</span>{'\n'}loop:{'\n'}  parallel:{'\n'}    units: on{'\n'}    allow_detect: on</pre>
     </Terminal>
     <p class="afternote muted">Groups run only when the implementer runs on dsh, the one harness whose concurrent sessions are tested; with any other harness the layer stays off and the run continues in order.</p>
@@ -242,19 +292,35 @@ const heroLede =
     isolation: isolate;
     overflow: clip;
     min-height: calc(100svh - 60px);
-    padding: clamp(3rem, 11vh, 7.5rem) 0 15rem;
+    padding: clamp(3rem, 9vh, 6rem) 0 15rem;
   }
   .hero-grid { display: grid; gap: var(--space-6); text-align: center; }
-  .oss { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-5); }
-  h1 { margin: 0; font-size: var(--step-5); line-height: 1.08; letter-spacing: -0.03em; }
+  .oss { color: var(--accent); font-size: var(--step--1); margin: 0; }
+  h1 { margin: 0; font-size: clamp(2.4rem, 1.3rem + 4.2vw, 4.25rem); line-height: 1.06; letter-spacing: -0.03em; }
   .line { display: block; }
-  .caption { color: var(--muted); }
+  .caption { color: var(--muted); font-size: 0.6em; line-height: 1.2; letter-spacing: -0.02em; margin-top: var(--space-4); }
+
+  /* One phase as a rail: four steps, then the next phase. */
+  .rail { list-style: none; margin: var(--space-6) 0 0; padding: 0; display: grid; gap: 1px; text-align: left; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--border); }
+  .rail li { display: grid; grid-template-columns: 2rem minmax(0, 1fr); column-gap: var(--space-2); align-items: baseline; padding: var(--space-3) var(--space-4); background: color-mix(in srgb, var(--card) 88%, transparent); backdrop-filter: blur(6px); }
+  .rail-no { color: var(--accent); font-size: 0.75rem; grid-row: span 2; }
+  .rail-verb { font-family: var(--font-display); font-weight: 500; color: var(--fg-strong); }
+  .rail-note { grid-column: 2; font-size: var(--step--1); color: var(--muted); }
+  .rail-next .rail-verb { color: var(--fg); }
+  @media (min-width: 760px) {
+    .rail { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .rail li { grid-template-columns: minmax(0, 1fr); padding: var(--space-4); }
+    .rail-no { grid-row: auto; margin-bottom: var(--space-2); }
+    .rail-note { grid-column: 1; }
+  }
   .hero-body .lede { font-size: clamp(1.0625rem, 0.9rem + 0.6vw, 1.3125rem); color: var(--fg); margin: 0 auto; max-width: 40rem; }
   .ctas { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin: var(--space-6) 0 0; }
   .hero .ctas, .closing .ctas { justify-content: center; }
   @media (min-width: 960px) {
-    .hero-grid { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: var(--space-7); text-align: left; align-items: start; }
-    .hero-body { padding-top: calc(var(--step--1) * 1.6 + var(--space-5) + 0.6rem); }
+    .hero-grid { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: var(--space-6) var(--space-7); text-align: left; align-items: start; }
+    .rail { grid-column: 1 / -1; margin-top: var(--space-5); }
+    .oss { grid-column: 1 / -1; margin-bottom: calc(var(--space-2) * -1); }
+    .hero-body { padding-top: 0.6rem; }
     .hero-body .lede { margin: 0; }
     .hero .ctas { justify-content: flex-start; }
   }
@@ -263,10 +329,12 @@ const heroLede =
     .line { animation-delay: 0.12s; }
     .caption { animation-delay: 0.28s; }
     .hero-body > * { animation: from-right 1s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both; }
+    .rail { animation: from-below 1s cubic-bezier(0.16, 1, 0.3, 1) 0.75s both; }
     .hero-body .ctas { animation-delay: 0.6s; }
   }
   @keyframes from-left { from { opacity: 0; translate: -3rem 0; } }
   @keyframes from-right { from { opacity: 0; translate: 3rem 0; } }
+  @keyframes from-below { from { opacity: 0; translate: 0 2rem; } }
 
   .install-band { padding: var(--space-8) 0; }
   .install-wrap { max-width: 60rem; }
@@ -305,12 +373,13 @@ const heroLede =
 
   /* See it run: the demo of the example repository. */
   .demo { margin: 0; display: grid; gap: var(--space-4); }
-  .demo video { width: 100%; height: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  .demo video { display: block; width: 100%; height: auto; background: var(--surface); }
+  .demo :global(.demo-term .body) { padding: 0; }
   .demo figcaption { font-size: 0.9375rem; max-width: 56rem; }
   @media (prefers-reduced-motion: reduce) { .demo video { animation: none; } }
 
   /* Three ways: the plugin card leads, wider and lit. */
-  .ways { display: grid; gap: var(--space-5); }
+  .ways { display: grid; gap: var(--space-5); margin: var(--space-7) 0; }
   .ways > div { display: flex; }
   .ways > div > :global(.card) { flex: 1; }
   .ways .lead > :global(.card) { --edge: 85%; }
@@ -319,9 +388,12 @@ const heroLede =
   }
 
   /* Loop engineering: the nested loops beside the principles. */
-  .eng { display: grid; gap: var(--space-6); }
+  .eng { display: grid; gap: var(--space-6); margin-top: var(--space-7); }
   .eng-cards { display: grid; gap: var(--space-4); }
-  .eng-cards p, .controls p { margin: 0; }
+  .eng-cards p, .controls p, .guarantees p:last-child { margin: 0; }
+  .eng-cards > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .guarantees { margin-top: var(--space-6); }
+  .card-no { color: var(--accent); font-size: 0.75rem; margin: 0 0 var(--space-3); }
   /* seven controls: the last one takes the whole row instead of sitting alone */
   .controls > :last-child { grid-column: 1 / -1; }
   @media (min-width: 640px) { .eng-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -331,15 +403,17 @@ const heroLede =
   }
   .more-link { font-size: var(--step--1); margin: var(--space-6) 0 0; }
 
-  /* What you get: benefit, then the reason. */
-  .benefits { margin: 0; display: grid; gap: 0; border-top: 1px solid var(--border); max-width: 60rem; }
-  .benefit { display: grid; gap: var(--space-2); padding: var(--space-4) 0; border-bottom: 1px solid var(--border); }
-  .benefit dt { color: var(--fg-strong); font-family: var(--font-display); font-weight: 500; font-size: var(--step-1); }
-  .benefit dd { margin: 0; color: var(--muted); }
+  /* What you get: benefit, then the reason, as a full-width grid. */
+  .benefits { margin: 0; display: grid; gap: var(--space-4); }
+  .benefit { display: flex; flex-direction: column; gap: var(--space-3); }
+  .benefit dt { display: grid; gap: var(--space-3); color: var(--fg-strong); font-family: var(--font-display); font-weight: 500; font-size: var(--step-1); line-height: 1.25; }
+  .benefit dt .card-no { margin: 0; font-family: var(--font-mono); font-weight: 400; }
+  .benefit dd { margin: 0; font-size: 0.9375rem; }
   .because { color: var(--accent); font-size: 0.75rem; margin-right: var(--space-1); }
-  @media (min-width: 760px) { .benefit { grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); gap: var(--space-6); align-items: baseline; } }
+  @media (min-width: 640px) { .benefits { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1100px) { .benefits { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
-  .env { max-width: 44rem; }
+  :global(.section .env) { max-width: 44rem; margin-top: var(--space-5); }
   .afternote { font-size: 0.9375rem; max-width: 52rem; margin: var(--space-4) 0 0; }
 
   .closing { position: relative; isolation: isolate; text-align: center; padding: var(--space-9) 0 13rem; }

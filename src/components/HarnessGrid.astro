@@ -5,6 +5,7 @@
 // implementer and reviewer.
 import { getCollection } from 'astro:content';
 import { isAvailable } from '../lib/site';
+import { inlineMd } from '../lib/inline-md';
 const ROLE = { proposer: 'implementer', critic: 'reviewer' } as const;
 interface Props { compact?: boolean }
 const { compact = false } = Astro.props;
@@ -15,7 +16,7 @@ const harnesses = (await getCollection('harnesses')).filter(isAvailable).sort((a
     <li class="tile card card-top">
       <p class="hname">{h.data.url ? <a href={h.data.url}>{h.data.name}</a> : h.data.name}</p>
       <p class="roles mono">{h.data.roles.map((r) => ROLE[r]).join(' · ')}</p>
-      {!compact && <p class="hnote">{h.data.note}</p>}
+      {!compact && <p class="hnote" set:html={inlineMd(h.data.note)} />}
     </li>
   ))}
 </ul>
