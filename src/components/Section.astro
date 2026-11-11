@@ -1,15 +1,20 @@
 ---
 // A home-page section: an anchor, a numbered terminal-style eyebrow, a title and
-// an optional intro. Content goes in the default slot. `raised` sections sit on
-// the dot grid; plain ones on the bare canvas.
+// an optional intro. On wide screens the title and the intro share a row, so the
+// head uses the width. Content goes in the default slot. `raised` sections sit
+// on the dot grid; plain ones on the bare canvas.
 interface Props { id: string; eyebrow?: string; title: string; intro?: string; tone?: 'plain' | 'raised' }
 const { id, eyebrow, title, intro, tone = 'plain' } = Astro.props;
 ---
 <section id={id} class:list={['section', tone]} aria-labelledby={`${id}-title`}>
   <div class="wrap">
-    {eyebrow && <p class="eyebrow mono reveal"><span aria-hidden="true">// </span>{eyebrow}</p>}
-    <h2 id={`${id}-title`} class="reveal">{title}</h2>
-    {intro && <p class="lede intro reveal">{intro}</p>}
+    <header class:list={['head', { split: !!intro }]}>
+      <div class="head-title">
+        {eyebrow && <p class="eyebrow mono reveal"><span aria-hidden="true">// </span>{eyebrow}</p>}
+        <h2 id={`${id}-title`} class="reveal">{title}</h2>
+      </div>
+      {intro && <p class="lede intro reveal">{intro}</p>}
+    </header>
     <slot />
   </div>
 </section>
@@ -24,7 +29,21 @@ const { id, eyebrow, title, intro, tone = 'plain' } = Astro.props;
     background: radial-gradient(circle, var(--dot) 1px, transparent 1.5px) 0 0 / 12px 12px;
     mask-image: linear-gradient(to bottom, transparent, #000 7rem, #000 calc(100% - 7rem), transparent);
   }
+  .head { margin-bottom: var(--space-7); }
   .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-3); letter-spacing: 0.02em; }
-  h2 { font-size: var(--step-4); max-width: 22ch; }
-  .intro { margin-bottom: var(--space-7); color: var(--muted); }
+  h2 { font-size: var(--step-4); max-width: 20ch; margin: 0; }
+  .intro { margin: var(--space-4) 0 0; color: var(--muted); }
+  @media (min-width: 960px) {
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--space-7);
+      align-items: start;
+    }
+    .split .intro {
+      margin: calc(var(--step--1) * 1.6 + var(--space-3) + 0.35rem) 0 0;
+      padding-left: var(--space-5);
+      border-left: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+    }
+  }
 </style>

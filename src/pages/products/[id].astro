@@ -16,9 +16,14 @@ const d = product.data;
 const host = d.host ? await getEntry(d.host) : undefined;
 const install = d.install ? await getEntry(d.install) : undefined;
 const { Content } = await render(product);
+const variants = (await getCollection('products')).filter(isAvailable).sort((a, b) => a.data.order - b.data.order);
 ---
 <Base title={d.name} description={d.summary.replace(/`/g, '')}>
   <div class="wrap page">
+    <nav class="variants mono" aria-label="Variants">
+      {variants.map((v) => <a href={`/products/${v.id}/`} aria-current={v.id === product.id ? 'page' : undefined}>{v.data.name}</a>)}
+      <a class="all" href="/#ways">Compare all three →</a>
+    </nav>
     <p class="eyebrow mono">// {d.kind === 'plugin' ? 'plugin' : 'engine'}{host && host.id !== 'shell' ? ` · ${host.data.name}` : ''}</p>
     <h1>{d.name}</h1>
     <p class="lede" set:html={inlineMd(d.summary)} />
@@ -52,6 +57,11 @@ const { Content } = await render(product);
 
 <style>
   .page { padding-top: var(--space-7); max-width: 56rem; }
+  .variants { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-6); font-size: var(--step--1); }
+  .variants a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-4); border: 1px solid var(--border); border-radius: 999px; color: var(--fg); text-decoration: none; background: var(--card); }
+  .variants a:hover { border-color: var(--accent); color: var(--fg-strong); }
+  .variants a[aria-current='page'] { border-color: var(--accent); color: var(--fg-strong); background: color-mix(in srgb, var(--accent) 12%, var(--card)); }
+  .variants .all { border-color: transparent; background: none; color: var(--accent); padding: 0 var(--space-2); }
   .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-2); }
   .lede { margin: var(--space-5) 0 var(--space-3); }
   .prose :global(pre) { overflow-x: auto; max-width: 100%; padding: var(--space-4); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.8125rem; line-height: 1.5; }

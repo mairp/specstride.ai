@@ -4,7 +4,7 @@ export const SITE = {
   url: 'https://specstride.ai',
   title: 'Specstride: development governance for coding agents',
   description:
-    'Specstride is loop engineering and governance for coding agents: a Claude Code plugin, also on dsh, that takes a Spec Kit feature to done, phase by phase, unattended. Every loop has an end, deterministic checks come before the reviewer, and every approved phase is a signed record and its own commit. Open source, on your machine, with your models and your keys.',
+    'Specstride is loop engineering and governance for coding agents: a Claude Code plugin, also on dsh, that takes a Spec Kit feature to done, phase by phase, unattended. Every loop has an end, tests run before an independent LLM judge reviews the change, and every approved phase is a signed record and its own commit. Open source, on your machine, with your models and your keys.',
   tagline: 'Development governance for coding agents.',
   caption: 'Every phase reviewed, signed and committed.',
   repo: 'mairp/specstride-plugin',
@@ -18,6 +18,15 @@ export const SITE = {
   productLicense: 'Apache-2.0',
   siteLicense: 'MIT',
 } as const;
+
+/** In-page links of the home page, shown in the header on wide screens. */
+export const SECTIONS = [
+  { href: '/#loop', label: 'How it works' },
+  { href: '/#judge', label: 'The judge' },
+  { href: '/#engineering', label: 'Loop engineering' },
+  { href: '/#ways', label: 'Variants' },
+  { href: '/#faq', label: 'FAQ' },
+] as const;
 
 export const NAV = [
   { href: '/install/', label: 'Install' },
