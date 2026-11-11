@@ -1,0 +1,38 @@
+---
+// The phone form of a card grid: the same titles and bodies as native
+// disclosure widgets, shown only under 640 px, where the grid it stands in for
+// is hidden. No script; a hidden copy is out of the accessibility tree.
+import { inlineMd } from '../lib/inline-md';
+interface Props { items: readonly { title: string; body: string }[]; label: string }
+const { items, label } = Astro.props;
+---
+<div class="fold" role="group" aria-label={label}>
+  {items.map((it) => (
+    <details>
+      <summary><span>{it.title}</span></summary>
+      <p set:html={inlineMd(it.body)} />
+    </details>
+  ))}
+</div>
+
+<style>
+  .fold { border-top: 1px solid var(--border); }
+  @media (min-width: 640px) { .fold { display: none; } }
+  details { border-bottom: 1px solid var(--border); }
+  summary {
+    cursor: pointer;
+    list-style: none;
+    padding: var(--space-3) 0;
+    font-family: var(--font-display);
+    font-weight: 500;
+    color: var(--fg-strong);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 44px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: '+'; color: var(--accent); flex: none; width: 1ch; font-family: var(--font-mono); }
+  details[open] summary::before { content: '−'; }
+  details p { color: var(--muted); margin: 0 0 var(--space-4) calc(1ch + var(--space-3)); }
+</style>

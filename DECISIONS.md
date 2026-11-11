@@ -414,3 +414,6 @@ role to "judge", or add a second accent or display face), or mock up first. The 
   and SEO, CLS 0.
 - **Phones (same day).** Under 760 px the three variant cards are hidden: the stack figure and the table already carry
   their content and the links to the product pages, and the phone page had grown by about a third.
+- **Phones, folded cards (same day).** Under 640 px the six judge cards and the seven loop-engineering cards are native
+  disclosure lists (`Fold.astro`): titles visible, bodies one tap away, no script. The card grids are hidden there, and
+  the folded copy is hidden from 640 px up, so only one of the two is ever in the accessibility tree.
