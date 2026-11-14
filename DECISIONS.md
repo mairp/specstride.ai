@@ -417,3 +417,23 @@ role to "judge", or add a second accent or display face), or mock up first. The 
 - **Phones, folded cards (same day).** Under 640 px the six judge cards and the seven loop-engineering cards are native
   disclosure lists (`Fold.astro`): titles visible, bodies one tap away, no script. The card grids are hidden there, and
   the folded copy is hidden from 640 px up, so only one of the two is ever in the accessibility tree.
+
+## The hermes host joins the site (2026-11-14)
+
+- The owner asked for the new variant on the site the day campaign 151
+  (`specs/151-hermes-kanban`, the kanban board) went green. The mirror
+  `mairp/specstride-hermes` was made public the same day, so the product page
+  has a working repo link.
+- `hermes` is the third host and fourth product: entry, install path and
+  comparison row drawn from the hermes README on `main` — the same discipline
+  as core and dsh on 2026-11-08. Every claim in the entry is a line of that
+  README or of a rendered `skills/specstride/*/SKILL.md`.
+- The install entry is the README quickstart's commands, as written. Its
+  `verified: 2026-11-14` rests on the owner's recorded evidence in that
+  repository (the 2026-11-13 live probe lane and the 2026-11-14 quickstart
+  measurement, `evals/quickstart-151-metrics.md`), not on a fresh interactive
+  run of the six steps; nothing was invented to fill the gap.
+- The skills list names the three the installer installs (run, status, curate;
+  the doctor is part of the host CLI). The repo renders a reverse skill too,
+  but the installer skips it on engine 0.1.0 — the statusNote says that
+  plainly.

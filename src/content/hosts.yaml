@@ -9,3 +9,8 @@
   url: https://github.com/deepseek-ai/deepseek-harness
   order: 2
   blurb: The DeepSeek Harness. Three skills and a shim over the same pinned engine, on any provider and model dsh reaches.
+- id: hermes
+  name: Hermes
+  url: https://github.com/hermes-agent/hermes-agent
+  order: 3
+  blurb: The Hermes agent platform. Skills, a shim and plugin hooks over the same pinned engine, with push notices to Telegram when a run needs its owner.
