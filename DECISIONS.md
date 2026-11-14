@@ -473,5 +473,8 @@ plugin `046e779`, dsh `294fdba`, hermes `c9e9202` and core `82d27ab`.
   path on this site was broken from a fresh clone too. This was fixed in specstride-hermes PR "fix: build a
   fresh clone without specs/" (merged as `c9e9202`), and the rerun passed with exit 0. The doctor showed 6
   `ok`/`info` and two `warn`s (the plugin list and the kanban board cannot be read in an empty HOME).
-  `npm test` in a specs-less clone still has 46 fixture/eval failures, all from git-ignored inputs. That
-  is outside the install path and left for the hermes repo.
+  `npm test` in a specs-less clone then had 46 failures. The fixture workspaces were swallowed by the
+  `specs/` and `.specstride*/` ignore rules, and four checks read the local-only spec. That was fixed the
+  same day in specstride-hermes PR #6 (`37392fe`): a fresh clone now shows 624 pass, 0 fail, 8 skipped.
+  The same PR stopped the live hermes lane from running on `npm test` and writing a real
+  `~/.local/bin/specstride-probe` wrapper.
