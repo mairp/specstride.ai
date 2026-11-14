@@ -1,9 +1,13 @@
 # specstride.ai
 
-The website of Specstride, development governance for coding agents. It covers three repositories:
-the Claude Code plugin [mairp/specstride-plugin](https://github.com/mairp/specstride-plugin) (the lead
-product), the dsh host [mairp/specstride-dsh](https://github.com/mairp/specstride-dsh) and the engine
-[mairp/specstride-core](https://github.com/mairp/specstride-core). Live at **https://specstride.ai**.
+The website of Specstride, development governance for coding agents. It covers the engine
+[mairp/specstride-core](https://github.com/mairp/specstride-core), the foundation, and the three hosts
+built on it: the Claude Code plugin [mairp/specstride-plugin](https://github.com/mairp/specstride-plugin)
+(the lead product), the dsh host [mairp/specstride-dsh](https://github.com/mairp/specstride-dsh) and the
+Hermes host [mairp/specstride-hermes](https://github.com/mairp/specstride-hermes). Live at
+**https://specstride.ai**. Any of them installs with one command,
+`curl -fsSL https://specstride.ai/install.sh | bash -s -- <plugin|dsh|hermes|core>` (the script is
+`public/install.sh`).
 
 It is also a template. Products, hosts, harnesses, FAQ entries and install paths are
 data in `src/content/`; pages render from them. Adding a product is one Markdown file. See

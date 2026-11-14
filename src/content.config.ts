@@ -26,6 +26,10 @@ const products = defineCollection({
     repo: z.url().optional(),
     links: z.array(link).default([]),
     install: reference('install').optional(),
+    /** The engine a host is built on. Set on every host; the core has none: it is the foundation. */
+    builtOn: reference('products').optional(),
+    /** How the host carries the engine, in a few words ("bundles core 0.1.0"). */
+    relation: z.string().optional(),
   }),
 });
 
@@ -74,6 +78,8 @@ const install = defineCollection({
     /** Date the steps were last executed by hand, as shown. Required when steps exist. */
     verified: z.string().optional(),
     watch: link.optional(),
+    /** The one-command install (public/install.sh). Shown only after the live one-liner ran by hand. */
+    script: z.string().optional(),
   }),
 });
 

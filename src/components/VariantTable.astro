@@ -1,5 +1,5 @@
 ---
-// The available products side by side. Every cell but "Pick it when" comes from
+// The three hosts side by side; the core is the engine under all of them, not a column. Every cell but "Pick it when" comes from
 // the collections (products, hosts, install), so the table cannot drift from
 // the cards and the install tabs. "Pick it when" is the FAQ's own answer.
 import { getCollection, getEntry } from 'astro:content';
@@ -7,10 +7,9 @@ import { isAvailable } from '../lib/site';
 const PICK: Record<string, string> = {
   'claude-code-plugin': 'You work in Claude Code.',
   'specstride-dsh': 'You work in the DeepSeek Harness.',
-  'specstride-core': 'You run the CLI from a shell, or build a host for another agent.',
   'specstride-hermes': 'You work in Hermes.',
 };
-const products = (await getCollection('products')).filter(isAvailable).sort((a, b) => a.data.order - b.data.order);
+const products = (await getCollection('products')).filter(isAvailable).filter((p) => p.data.builtOn).sort((a, b) => a.data.order - b.data.order);
 const cols = await Promise.all(products.map(async (p) => {
   const host = p.data.host ? await getEntry(p.data.host) : undefined;
   const install = p.data.install ? await getEntry(p.data.install) : undefined;
@@ -23,10 +22,11 @@ const cols = await Promise.all(products.map(async (p) => {
     unit: p.data.kind === 'plugin' ? 'skills' : 'commands',
     skills: p.data.skills.map((s) => s.name),
     note: p.data.statusNote,
+    relation: p.data.relation ?? '',
   };
 }));
 ---
-<div class="table-scroll vt" tabindex="0" role="region" aria-label="The four variants compared">
+<div class="table-scroll vt" tabindex="0" role="region" aria-label="The three hosts compared">
   <table>
     <thead>
       <tr>
@@ -36,18 +36,19 @@ const cols = await Promise.all(products.map(async (p) => {
     </thead>
     <tbody>
       <tr><th scope="row">Runs in</th>{cols.map((c) => <td>{c.runsIn}</td>)}</tr>
+      <tr><th scope="row">Built on</th>{cols.map((c) => <td><a href="/products/specstride-core/">Specstride core</a><br />{c.relation}</td>)}</tr>
       <tr><th scope="row">Pick it when</th>{cols.map((c) => <td>{c.pick}</td>)}</tr>
       <tr><th scope="row">Install</th>{cols.map((c) => <td>{c.install}<br /><a href={`/products/${c.id}/#install`}>The steps →</a></td>)}</tr>
       <tr><th scope="row">You drive it with</th>{cols.map((c) => <td>{c.skills.length} {c.unit}<br />{c.skills.map((s, i) => <>{i > 0 && ' '}<code>{s}</code></>)}</td>)}</tr>
       <tr><th scope="row">Status</th>{cols.map((c) => <td>{c.note}</td>)}</tr>
-      <tr><th scope="row">The loop</th><td colspan={cols.length} class="same">The same in all four: same gates, same records, same commits.</td></tr>
+      <tr><th scope="row">The loop</th><td colspan={cols.length} class="same">The same in all three, because the engine underneath is the same: same gates, same records, same commits.</td></tr>
     </tbody>
   </table>
 </div>
 
 <style>
   .vt { background: var(--card); }
-  table { min-width: 46rem; font-size: 0.875rem; table-layout: fixed; }
+  table { min-width: 40rem; font-size: 0.875rem; table-layout: fixed; }
   thead td, thead th { background: var(--surface); }
   thead th { font-family: var(--font-display); font-weight: 600; font-size: var(--step-0); }
   thead th a { color: var(--fg-strong); text-decoration: none; }

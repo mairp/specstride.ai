@@ -8,6 +8,8 @@ statusNote: 'Version 0.1.0, built from a clone: nothing is on npm yet. Linux is 
 host: dsh
 repo: https://github.com/mairp/specstride-dsh
 install: dsh
+builtOn: specstride-core
+relation: Pins the core 0.1.0 release tarballs by sha256.
 skills:
   - name: specstride-run
     does: Run Specstride on a Spec Kit feature. It captures your comment, checks the CLI through the shim, derives the plan, judges the batches and validates. Then it launches in the foreground and supervises with one blocking wait per cycle. In `dry-run` it stops at the plan and launches nothing.

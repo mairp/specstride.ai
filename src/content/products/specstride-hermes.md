@@ -1,13 +1,15 @@
 ---
-name: hermes host
+name: Hermes host
 kind: plugin
 status: available
-order: 4
+order: 3
 summary: Specstride inside Hermes — from a chat, the TUI or Telegram, derive, dry-run, launch, supervise, stop, resume and curate Spec Kit features through the same pinned engine as the other hosts. Push notices to Telegram and a kanban board of the runs come with it.
 statusNote: 'Built from a clone: nothing is on npm yet. Linux is verified, macOS is not. The pinned engine has no reverse verb yet, so the installer skips the reverse skill.'
 host: hermes
 repo: https://github.com/mairp/specstride-hermes
 install: hermes
+builtOn: specstride-core
+relation: Pins the core 0.1.0 release tarballs by sha256.
 skills:
   - name: specstride-run
     does: Run Specstride on the finished features of the repository — derive, judge, validate, render, launch and supervise to the digest. Invoking the skill is the consent to launch; `dry-run` stops after the plan.

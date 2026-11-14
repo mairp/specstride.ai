@@ -24,7 +24,7 @@ export const SECTIONS = [
   { href: '/#loop', label: 'How it works' },
   { href: '/#judge', label: 'The judge' },
   { href: '/#engineering', label: 'Loop engineering' },
-  { href: '/#ways', label: 'Variants' },
+  { href: '/#ways', label: 'Hosts' },
   { href: '/#faq', label: 'FAQ' },
 ] as const;
 

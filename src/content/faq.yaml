@@ -1,7 +1,7 @@
 - id: which
   order: 0
-  q: Which one do I want — the plugin, dsh or core?
-  a: 'The one that matches the agent you already use. In Claude Code, the [plugin](/products/claude-code-plugin/), installed with two `/plugin` commands. In the DeepSeek Harness, the [dsh host](/products/specstride-dsh/). The [core](/products/specstride-core/) is for running the `specstride` CLI from a shell, or for building a host for another agent. Both hosts bundle or pin the same core, so the loop, the gates, the records and the commits are the same whichever you pick.'
+  q: Which one do I want — the plugin, dsh, Hermes or core?
+  a: 'The host that matches the agent you already use: in Claude Code, the [plugin](/products/claude-code-plugin/); in the DeepSeek Harness, the [dsh host](/products/specstride-dsh/); in Hermes, the [Hermes host](/products/specstride-hermes/). Each is one command: `curl -fsSL https://specstride.ai/install.sh | bash -s -- plugin` (or `dsh`, `hermes`). The [core](/products/specstride-core/) is not a fourth choice but the engine all three are built on: the plugin bundles it and the other two pin its release, so the loop, the gates, the records and the commits are the same whichever host you pick. Install the core alone only to run the `specstride` CLI from a shell or to build a host for another agent.'
 - id: loop-engineering
   order: 0.5
   q: What is loop engineering?

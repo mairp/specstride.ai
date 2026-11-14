@@ -8,6 +8,8 @@ statusNote: Version 0.1.0. Runs on Linux; macOS is not verified.
 host: claude-code
 repo: https://github.com/mairp/specstride-plugin
 install: claude-code
+builtOn: specstride-core
+relation: Bundles core 0.1.0 inside the plugin.
 skills:
   - name: specstride-run
     does: Run Specstride on the finished features of this repository — derive and judge the launch contract, validate, promote, render, launch, and supervise the run. Invoking the skill is the consent to launch; the mode `dry-run` stops after the plan.
