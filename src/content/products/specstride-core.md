@@ -2,8 +2,8 @@
 name: Specstride core
 kind: core
 status: available
-order: 3
-summary: The engine behind both hosts. It holds the `specstride` CLI, the contracts, the loop layers, the runtime, the adapters, and the kits a host is built from. Use it to run the CLI on its own, to build a host for another agent, or to read how the loop and its governance work.
+order: 0
+summary: The engine every host is built on. It holds the `specstride` CLI, the contracts, the loop layers, the runtime, the adapters, and the kits a host is built from. Use it to run the CLI on its own, to build a host for another agent, or to read how the loop and its governance work.
 statusNote: 'Release 0.1.0, packed from a clone: nothing is on npm yet. Linux is verified, macOS is not.'
 repo: https://github.com/mairp/specstride-core
 install: core
@@ -43,7 +43,7 @@ A single agent session is one loop with no brakes. The core treats the loop itse
 ## Layers
 
 ```
-L7 HOSTS      Claude Code plugin · dsh · plain shell
+L7 HOSTS      Claude Code plugin · dsh · Hermes · plain shell
 L6 CLI        derive · validate · launch · status · wait · stop · resume · doctor · learn
 L5 RUNTIME    detached runtime root · lock and lease · run-state owner
 L4 ENGINE     run → phase → attempt · verification gate → critic → approval record

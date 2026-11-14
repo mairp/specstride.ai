@@ -23,6 +23,8 @@ import { repoFacts } from '../lib/github';
 const facts = await repoFacts();
 const install = await getCollection('install');
 const products = (await getCollection('products')).filter(isAvailable).sort((a, b) => a.data.order - b.data.order);
+const hostProducts = products.filter((p) => p.data.builtOn);
+const coreProduct = products.find((p) => p.data.kind === 'core');
 
 // The README's four steps, one phase of a Spec Kit feature at a time.
 const steps = [
@@ -184,13 +186,14 @@ const heroLede =
     </dl>
   </Section>
 
-  <Section id="ways" eyebrow={`${no('ways')} · plugin, dsh, core, hermes`} title="Four ways to run it" intro="One engine, and thin hosts on top of it. Pick the one that matches the agent you already use. The loop, the gates, the records and the commits are the same in all four.">
+  <Section id="ways" eyebrow={`${no('ways')} · core → plugin · dsh · hermes`} title="One engine, three hosts" intro="Specstride core is the engine. The plugin, the dsh host and the Hermes host are built on it: each carries one release of the core and adds only what its agent needs. Pick the host that matches the agent you already use; the loop, the gates, the records and the commits are the same in all three.">
     <div class="reveal"><VariantStack /></div>
     <div class="ways">
-      {products.map((p, i) => (
+      {hostProducts.map((p, i) => (
         <div class:list={['reveal', { lead: i === 0 }]}><ProductCard product={p} showSkills={false} /></div>
       ))}
     </div>
+    {coreProduct && <div class="reveal foundation"><ProductCard product={coreProduct} showSkills={false} /></div>}
     <div class="reveal ways-table"><VariantTable /></div>
   </Section>
 
@@ -381,7 +384,7 @@ const heroLede =
   .demo figcaption { font-size: 0.9375rem; max-width: 56rem; }
   @media (prefers-reduced-motion: reduce) { .demo video { animation: none; } }
 
-  /* Four ways: the plugin card leads, wider and lit. */
+  /* One engine, three hosts: the plugin card leads, wider and lit; the core sits under them. */
   .ways { display: grid; gap: var(--space-5); margin: var(--space-7) 0; }
   /* On a phone the stack figure and the table already say what the cards say. */
   @media (max-width: 759px) { .ways { display: none; } .ways-table { margin-top: var(--space-6); } }
@@ -389,8 +392,11 @@ const heroLede =
   .ways > div > :global(.card) { flex: 1; }
   .ways .lead > :global(.card) { --edge: 85%; }
   @media (min-width: 900px) {
-    .ways { grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); }
+    .ways { grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)); }
   }
+  .foundation { margin: calc(-1 * var(--space-4)) 0 var(--space-7); }
+  .foundation > :global(.card) { border-style: dashed; background: color-mix(in srgb, var(--accent) 5%, var(--card)); }
+  @media (max-width: 759px) { .foundation { display: none; } }
 
   /* Loop engineering: the nested loops beside the principles. */
   .eng { display: grid; gap: var(--space-6); margin-top: var(--space-7); }

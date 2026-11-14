@@ -3,6 +3,7 @@
 // - /ecosystem/ moved home: with the plugin release there is one product and one
 //   host, which the home page already shows, so the page redirects to its
 //   agents section.
+// - /install.sh (the one-command installer) is served as text/plain, uncached.
 // - With SITE_MODE "construction" (wrangler.construction.jsonc), every request
 //   that isn't one of the placeholder's own files gets the placeholder page
 //   with 503 + Retry-After, so search engines treat the outage as temporary.
@@ -19,6 +20,16 @@ export default {
       url.search = '';
       url.hash = 'agents';
       return Response.redirect(url.toString(), 301);
+    }
+    if (url.pathname === '/install.sh' && env.SITE_MODE !== 'construction') {
+      // The installer: plain text so a browser shows it before anyone pipes it to bash,
+      // and never cached, so a fix reaches the next install.
+      const res = await env.ASSETS.fetch(request);
+      if (!res.ok) return res;
+      const headers = new Headers(res.headers);
+      headers.set('Content-Type', 'text/plain; charset=utf-8');
+      headers.set('Cache-Control', 'no-cache');
+      return new Response(request.method === 'HEAD' ? null : res.body, { status: 200, headers });
     }
     if (env.SITE_MODE !== 'construction') return env.ASSETS.fetch(request);
 

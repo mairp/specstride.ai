@@ -437,3 +437,41 @@ role to "judge", or add a second accent or display face), or mock up first. The 
   the doctor is part of the host CLI). The repo renders a reverse skill too,
   but the installer skips it on engine 0.1.0 — the statusNote says that
   plainly.
+
+## Core as the foundation, one install script, stars (2026-11-14)
+
+The owner asked for three things: show the hierarchy (the core appeared as a fourth variant, but it is
+what everything else is built on), add one script that installs any variant, and suggest a GitHub star
+in every variant.
+
+- **The core is the foundation, not a variant.** Products gain `builtOn` and `relation` (the plugin
+  bundles core 0.1.0; dsh and Hermes pin its release tarballs by sha256). The home section is now
+  "One engine, three hosts": three host cards, the core as a full-width foundation card under them, and
+  the comparison table covers the hosts only, with a "Built on" row. Product pages group the nav into
+  engine and hosts, a host page carries a `Specstride core › <host>` breadcrumb, and the core page lists
+  the hosts built on it. On `/install` the core tab is last and labelled "for host builders". The header
+  link "Variants" is now "Hosts".
+- **One command per path.** `public/install.sh`, served at `/install.sh` as `text/plain`, uncached (the
+  Worker sets both). `curl -fsSL https://specstride.ai/install.sh | bash -s -- <plugin|dsh|hermes|core>`
+  runs the same steps as the install tab, in order, into `~/.specstride/src/<repo>` (fast-forward on a
+  rerun). It has `--ref`, `--src` and `--dry-run`. It never uses sudo and never stars anything. A doctor
+  finding is reported, not fatal. The manual steps stay on the page, since they are what the script runs.
+- **Stars, suggested only.** Every product page has a "Star <repo> on GitHub" button and a line that also
+  names the engine repo. Every install tab ends with the suggestion. The script ends with the repo URLs
+  and the `gh api -X PUT user/starred/...` form, because gh 2.46 has no `gh repo star`.
+
+**Script runs, 2026-11-14,** each piped through `bash -s --` from a scratch directory with an isolated
+`HOME` and npm prefix (and `CLAUDE_CONFIG_DIR` for the plugin), against public `main`. The SHAs were
+plugin `046e779`, dsh `294fdba`, hermes `c9e9202` and core `82d27ab`.
+
+- plugin: the marketplace was added and `specstride@specstride-marketplace` installed (scope user). Exit 0.
+- core: `npm ci`, `pack-release`, a global install, `specstride --protocol` = 1, and `specstride doctor`
+  all `ok` in a clone of specstride-example. Exit 0. A second run took the update path. Exit 0.
+- dsh: build, a global install, three skills under `.dsh/skills/`, and every doctor check `ok`/`info`. Exit 0.
+- hermes: the **first run failed**. `npm run build` in a fresh public clone hit ENOENT, because the
+  contract-mirror step copied from `specs/`, which stays local since the split. So the hand-run Hermes
+  path on this site was broken from a fresh clone too. This was fixed in specstride-hermes PR "fix: build a
+  fresh clone without specs/" (merged as `c9e9202`), and the rerun passed with exit 0. The doctor showed 6
+  `ok`/`info` and two `warn`s (the plugin list and the kanban board cannot be read in an empty HOME).
+  `npm test` in a specs-less clone still has 46 fixture/eval failures, all from git-ignored inputs. That
+  is outside the install path and left for the hermes repo.

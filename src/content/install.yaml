@@ -6,6 +6,7 @@
   status: available
   order: 1
   product: claude-code-plugin
+  script: curl -fsSL https://specstride.ai/install.sh | bash -s -- plugin
   summary: Install the plugin in Claude Code, then take the ready-made example feature through its first run before pointing it at your own repository.
   prereqs:
     - 'Linux. macOS is not verified: no Mac has run it.'
@@ -30,6 +31,7 @@
   status: available
   order: 2
   product: specstride-dsh
+  script: curl -fsSL https://specstride.ai/install.sh | bash -s -- dsh
   summary: Build the dsh host from a clone, install it with the engine's CLI from the tarball it pins, then put the three skills into your repository. Nothing is on npm yet.
   prereqs:
     - 'Linux. macOS is not verified.'
@@ -54,8 +56,9 @@
 - id: hermes
   label: Hermes
   status: available
-  order: 4
+  order: 3
   product: specstride-hermes
+  script: curl -fsSL https://specstride.ai/install.sh | bash -s -- hermes
   summary: Build the Hermes host from a clone, install it with the engine's CLI from the tarball it pins, then put the skills and the plugin into a dedicated Hermes profile. Nothing is on npm yet.
   prereqs:
     - 'Linux. macOS is not verified.'
@@ -79,11 +82,12 @@
   after: 'Then, in a Hermes session on your repository (`hermes -p specstride`), say "run the specstride-run skill in dry-run on the feature". It plans and validates and launches nothing. Drop "in dry-run" to run the feature for real. Add `--with-kanban` to the install for the kanban board.'
   verified: '2026-11-14'
 - id: core
-  label: Core (CLI)
+  label: Core (CLI, for host builders)
   status: available
-  order: 3
+  order: 4
   product: specstride-core
-  summary: Build the engine from a clone and pack its release. Install the `specstride` CLI on its own, to run it from a shell or to build a host on it. Nothing is on npm yet.
+  script: curl -fsSL https://specstride.ai/install.sh | bash -s -- core
+  summary: Every host above already carries the core. Install it on its own only to run the `specstride` CLI from a shell or to build a host on it. Build the engine from a clone and pack its release. Nothing is on npm yet.
   prereqs:
     - 'Linux. macOS is not verified.'
     - Node 22+ and git

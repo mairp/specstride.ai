@@ -5,11 +5,16 @@ import type { CollectionEntry } from 'astro:content';
 import CopyButton from './CopyButton.astro';
 import Terminal from './Terminal.astro';
 import { inlineMd } from '../lib/inline-md';
+import { getEntry } from 'astro:content';
 
-interface Props { entries: CollectionEntry<'install'>[]; full?: boolean; id?: string; headingLevel?: 'h2' | 'h3' }
-const { entries, full = false, id = 'install-tabs', headingLevel = 'h3' } = Astro.props;
+interface Props { entries: CollectionEntry<'install'>[]; full?: boolean; id?: string; headingLevel?: 'h2' | 'h3'; star?: boolean }
+const { entries, full = false, id = 'install-tabs', headingLevel = 'h3', star = true } = Astro.props;
 const H = headingLevel;
 const items = [...entries].sort((a, b) => a.data.order - b.data.order);
+const repos = Object.fromEntries(await Promise.all(items.map(async (e) => {
+  const prod = await getEntry(e.data.product);
+  return [e.id, prod?.data.repo];
+})));
 ---
 <div class="tabs" data-tabs id={id}>
   <div class="tablist" role="tablist" aria-label="Install options" hidden>
@@ -32,6 +37,16 @@ const items = [...entries].sort((a, b) => a.data.order - b.data.order);
             <ul>{e.data.prereqs.map((p) => <li set:html={inlineMd(p)} />)}</ul>
           </div>
         )}
+        {e.data.script && (
+          <div class="oneliner">
+            <p class="mono small">In one command <span class="muted">— runs the steps below, in order (<a href="/install.sh">read the script</a>)</span></p>
+            <Terminal title="install.sh" label={`${e.data.label} in one command`}>
+              <CopyButton slot="actions" text={e.data.script} label="Copy" />
+              <pre><span class="prompt">{e.data.script}</span>{'\n'}</pre>
+            </Terminal>
+            <p class="mono small">Or step by step</p>
+          </div>
+        )}
         {e.data.steps.length > 0 && (
           <Terminal title={e.data.label} label={`${e.data.label} commands`}>
             <CopyButton slot="actions" text={cmds} label="Copy" />
@@ -41,6 +56,7 @@ const items = [...entries].sort((a, b) => a.data.order - b.data.order);
           </Terminal>
         )}
         {e.data.after && <p class="after" set:html={inlineMd(e.data.after)} />}
+        {star && repos[e.id] && <p class="star mono">Useful? A <a href={repos[e.id]}>★ star on {repos[e.id].replace('https://github.com/', '')}</a> helps others find it.</p>}
         {full && e.data.verified && <p class="verified mono">Commands last run as shown: {e.data.verified}</p>}
       </div>
     );
@@ -81,6 +97,8 @@ const items = [...entries].sort((a, b) => a.data.order - b.data.order);
   .note { color: var(--muted); }
   .prereqs .small { font-size: var(--step--1); color: var(--muted); margin-bottom: var(--space-1); }
   .after { margin-top: var(--space-3); color: var(--muted); font-size: 0.9375rem; }
+  .oneliner .small { font-size: var(--step--1); color: var(--muted); margin: var(--space-3) 0 var(--space-1); }
+  .star { margin-top: var(--space-3); font-size: 0.8125rem; color: var(--muted); }
   .verified { margin-top: var(--space-3); font-size: 0.75rem; color: var(--muted); }
 </style>
 

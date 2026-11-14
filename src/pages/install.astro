@@ -5,15 +5,15 @@ import InstallTabs from '../components/InstallTabs.astro';
 import { SITE } from '../lib/site';
 const entries = (await getCollection('install'));
 ---
-<Base title="Install" description="Install Specstride: the plugin in Claude Code, the dsh host, or the core CLI on its own, each with its prerequisites and the commands as they were run by hand.">
+<Base title="Install" description="Install Specstride in one command or step by step: the plugin in Claude Code, the dsh host or the Hermes host, all built on the core, or the core CLI on its own, each with its prerequisites and the commands as they were run by hand.">
   <div class="wrap page">
     <p class="eyebrow mono">// install</p>
     <h1>Install</h1>
-    <p class="lede">Commands are run by hand, exactly as written; the date under the path says when it was last verified that way.</p>
+    <p class="lede">Every host carries the core, so pick the host for your agent; install the core alone only to use the <code>specstride</code> CLI from a shell or to build a host. Each path is one command, <code>curl -fsSL https://specstride.ai/install.sh | bash -s -- &lt;plugin|dsh|hermes|core&gt;</code>, which runs the listed steps in order (add <code>--dry-run</code> to print them first). Commands are run by hand, exactly as written; the date under the path says when it was last verified that way.</p>
     <InstallTabs entries={entries} full id="install-page" headingLevel="h2" />
     <h2 class="next">After the first run</h2>
     <ul>
-      <li>Something look off? The <code>specstride-doctor</code> skill (in Claude Code or dsh) checks this machine: it runs the doctor, lists each finding with its fix, and installs nothing.</li>
+      <li>Something look off? The <code>specstride-doctor</code> skill (in Claude Code, dsh or Hermes) checks this machine: it runs the doctor, lists each finding with its fix, and installs nothing.</li>
       <li>To end a run cleanly, use the <code>stop</code> verb of the <code>specstride</code> CLI that the plugin bundles (or that you installed with dsh or the core): the run ends at the next safe boundary, the record closes whole, no survivor.</li>
       <li>Settings live in your user configuration, <code>~/.config/specstride/config.yaml</code> — parallel units are turned on there, and with several features in <code>specs/</code> you set <code>SPECSTRIDE_FEATURE</code> to the directory name.</li>
       <li>Every error a run can print, with its fix, is in the wiki's <a href={`${SITE.repoUrl}/blob/main/wiki/Troubleshooting.md`}>Troubleshooting</a> page.</li>
