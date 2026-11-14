@@ -51,6 +51,33 @@
       cmd: specstride-host-dsh doctor
   after: 'Then, in a dsh session in your repository, say "run the specstride-run skill in dry-run on the feature". It plans and validates and launches nothing. Drop "in dry-run" to run the feature for real.'
   verified: '2026-11-08'
+- id: hermes
+  label: Hermes
+  status: available
+  order: 4
+  product: specstride-hermes
+  summary: Build the Hermes host from a clone, install it with the engine's CLI from the tarball it pins, then put the skills and the plugin into a dedicated Hermes profile. Nothing is on npm yet.
+  prereqs:
+    - 'Linux. macOS is not verified.'
+    - Node 22+ and git
+    - 'Hermes 0.22.2 (the pinned hermes-agent), with a profile `specstride` (`hermes profile create specstride` if absent)'
+    - 'The engine CLI on PATH or `SPECSTRIDE_BIN` set'
+    - 'A Spec Kit feature in a git repository'
+  steps:
+    - cmd: git clone https://github.com/mairp/specstride-hermes
+    - cmd: cd specstride-hermes
+    - note: resolves the pinned engine tarballs; nothing compiles
+      cmd: npm install
+    - note: renders the skills and the shim, runs every build gate
+      cmd: npm run build
+    - note: specstride-host-hermes and the specstride CLI this repository pins
+      cmd: npm install -g . vendor/core/specstride-0.1.0.tgz
+    - note: skills and plugin into the dedicated profile; run it again → already installed, unchanged
+      cmd: specstride-host-hermes install --profile specstride
+    - note: eight host.* findings, one line each, no model
+      cmd: specstride-host-hermes doctor
+  after: 'Then, in a Hermes session on your repository (`hermes -p specstride`), say "run the specstride-run skill in dry-run on the feature". It plans and validates and launches nothing. Drop "in dry-run" to run the feature for real. Add `--with-kanban` to the install for the kanban board.'
+  verified: '2026-11-14'
 - id: core
   label: Core (CLI)
   status: available

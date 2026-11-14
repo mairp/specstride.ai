@@ -184,7 +184,7 @@ const heroLede =
     </dl>
   </Section>
 
-  <Section id="ways" eyebrow={`${no('ways')} · plugin, dsh, core`} title="Three ways to run it" intro="One engine, and thin hosts on top of it. Pick the one that matches the agent you already use. The loop, the gates, the records and the commits are the same in all three.">
+  <Section id="ways" eyebrow={`${no('ways')} · plugin, dsh, core, hermes`} title="Four ways to run it" intro="One engine, and thin hosts on top of it. Pick the one that matches the agent you already use. The loop, the gates, the records and the commits are the same in all four.">
     <div class="reveal"><VariantStack /></div>
     <div class="ways">
       {products.map((p, i) => (
@@ -381,7 +381,7 @@ const heroLede =
   .demo figcaption { font-size: 0.9375rem; max-width: 56rem; }
   @media (prefers-reduced-motion: reduce) { .demo video { animation: none; } }
 
-  /* Three ways: the plugin card leads, wider and lit. */
+  /* Four ways: the plugin card leads, wider and lit. */
   .ways { display: grid; gap: var(--space-5); margin: var(--space-7) 0; }
   /* On a phone the stack figure and the table already say what the cards say. */
   @media (max-width: 759px) { .ways { display: none; } .ways-table { margin-top: var(--space-6); } }
@@ -389,7 +389,7 @@ const heroLede =
   .ways > div > :global(.card) { flex: 1; }
   .ways .lead > :global(.card) { --edge: 85%; }
   @media (min-width: 900px) {
-    .ways { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); }
+    .ways { grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); }
   }
 
   /* Loop engineering: the nested loops beside the principles. */
