@@ -4,7 +4,7 @@
 #   curl -fsSL https://specstride.ai/install.sh | bash -s -- <plugin|dsh|hermes|core> [options]
 #
 # Variants
-#   plugin   the Claude Code plugin (it bundles the core)
+#   plugin   the Claude Code plugin, with the engine CLI its skills run from your PATH
 #   dsh      the DeepSeek Harness host (pins the core release tarballs)
 #   hermes   the Hermes host (pins the core release tarballs)
 #   core     the engine on its own: the `specstride` CLI, to run from a shell or to build a host
@@ -38,7 +38,7 @@ usage() {
   cat <<'USAGE'
 Usage: install.sh <plugin|dsh|hermes|core> [--ref REF] [--src DIR] [--dry-run]
 
-  plugin   the Claude Code plugin (it bundles the core)
+  plugin   the Claude Code plugin, with the engine CLI its skills run
   dsh      the DeepSeek Harness host (pins the core release tarballs)
   hermes   the Hermes host (pins the core release tarballs)
   core     the engine on its own: the specstride CLI
@@ -110,11 +110,32 @@ pinned_cli() {
   printf '%s\n' "$DIR/vendor/core/specstride-0.1.0.tgz"
 }
 
+# The engine CLI, built from a clone of the core and installed from its release tarball.
+install_core_cli() {
+  clone_or_update specstride-core
+  step "Building the engine and packing its release"
+  run npm --prefix "$DIR" ci --no-audit --no-fund
+  in_dir "$DIR" node scripts/pack-release.mjs
+  TGZ=""
+  for t in "$DIR"/.build/release/specstride-[0-9]*.tgz; do [ -e "$t" ] && TGZ="$t"; done
+  [ -n "$TGZ" ] || TGZ="$DIR/.build/release/specstride-0.1.0.tgz"
+  step "Installing the specstride CLI"
+  run npm install -g --no-audit --no-fund "$TGZ"
+  step "Checking"
+  run specstride --protocol
+}
+
 STAR_REPOS=()
 
 case "$VARIANT" in
   plugin)
     need claude "Install Claude Code first: https://docs.anthropic.com/claude-code"
+    # The plugin is skills only: they run the engine CLI from the search path.
+    if command -v specstride >/dev/null 2>&1 && [ "$(specstride --protocol 2>/dev/null)" = 1 ]; then
+      step "The specstride CLI is already on PATH (protocol 1)"
+    else
+      install_core_cli
+    fi
     step "Installing the Specstride plugin into Claude Code"
     run claude plugin marketplace add mairp/specstride-plugin
     run claude plugin install specstride@specstride-marketplace
@@ -126,17 +147,7 @@ case "$VARIANT" in
     ;;
 
   core)
-    clone_or_update specstride-core
-    step "Building the engine and packing its release"
-    run npm --prefix "$DIR" ci --no-audit --no-fund
-    in_dir "$DIR" node scripts/pack-release.mjs
-    TGZ=""
-    for t in "$DIR"/.build/release/specstride-[0-9]*.tgz; do [ -e "$t" ] && TGZ="$t"; done
-    [ -n "$TGZ" ] || TGZ="$DIR/.build/release/specstride-0.1.0.tgz"
-    step "Installing the specstride CLI"
-    run npm install -g --no-audit --no-fund "$TGZ"
-    step "Checking"
-    run specstride --protocol
+    install_core_cli
     if in_git_repo; then run specstride doctor || doctor_note; else say "  (not in a git repository: run 'specstride doctor' in yours)"; fi
     STAR_REPOS=(specstride-core)
     ;;

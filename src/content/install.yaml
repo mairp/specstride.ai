@@ -7,7 +7,7 @@
   order: 1
   product: claude-code-plugin
   script: curl -fsSL https://specstride.ai/install.sh | bash -s -- plugin
-  summary: Install the plugin in Claude Code, then take the ready-made example feature through its first run before pointing it at your own repository.
+  summary: Install the engine's CLI, then the plugin in Claude Code, then take the ready-made example feature through its first run before pointing it at your own repository. The plugin is skills only; they run the `specstride` CLI from your PATH, and nothing is on npm yet, so the CLI is packed from a clone.
   prereqs:
     - 'Linux. macOS is not verified: no Mac has run it.'
     - Node 22+, git and Claude Code
@@ -15,7 +15,16 @@
     - A `test` script in `package.json`
     - Your own subscription or API key for the models you choose
   steps:
-    - note: in Claude Code
+    - note: the engine CLI the plugin's skills run
+      cmd: git clone https://github.com/mairp/specstride-core
+    - cmd: cd specstride-core
+    - cmd: npm ci
+    - note: packs the release tarballs into .build/release/
+      cmd: node scripts/pack-release.mjs
+    - cmd: npm install -g .build/release/specstride-0.1.0.tgz
+    - note: prints the CLI protocol, 1
+      cmd: specstride --protocol
+    - note: then the plugin, in Claude Code
       cmd: /plugin marketplace add mairp/specstride-plugin
     - cmd: /plugin install specstride@specstride-marketplace
     - note: to try it on a ready-made feature first
@@ -25,7 +34,7 @@
     - note: then say
       cmd: Run Specstride on the feature in this repo.
   after: On your own repository — any git repo with a `specs/NAME/tasks.md` and a `test` script in `package.json` — say the same sentence. Each approved phase becomes its own commit.
-  verified: '2026-11-05'
+  verified: '2026-11-15'
 - id: dsh
   label: dsh
   status: available
@@ -87,7 +96,7 @@
   order: 4
   product: specstride-core
   script: curl -fsSL https://specstride.ai/install.sh | bash -s -- core
-  summary: Every host above already carries the core. Install it on its own only to run the `specstride` CLI from a shell or to build a host on it. Build the engine from a clone and pack its release. Nothing is on npm yet.
+  summary: The dsh and Hermes hosts pin the core, and the Claude Code path above installs its CLI. Install it on its own only to run the `specstride` CLI from a shell or to build a host on it. Build the engine from a clone and pack its release. Nothing is on npm yet.
   prereqs:
     - 'Linux. macOS is not verified.'
     - Node 22+ and git
