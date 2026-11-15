@@ -44,17 +44,23 @@ const repos = Object.fromEntries(await Promise.all(items.map(async (e) => {
               <CopyButton slot="actions" text={e.data.script} label="Copy" />
               <pre><span class="prompt">{e.data.script}</span>{'\n'}</pre>
             </Terminal>
-            <p class="mono small">Or step by step</p>
+            {full && <p class="mono small">Or step by step</p>}
           </div>
         )}
-        {e.data.steps.length > 0 && (
-          <Terminal title={e.data.label} label={`${e.data.label} commands`}>
-            <CopyButton slot="actions" text={cmds} label="Copy" />
-            <pre>{e.data.steps.map((s) => (
-              <>{s.note && <span class="note"># {s.note}{'\n'}</span>}<span class="prompt">{s.cmd}</span>{'\n'}</>
-            ))}</pre>
-          </Terminal>
-        )}
+        {e.data.steps.length > 0 && (() => {
+          const stepsTerm = (
+            <Terminal title={e.data.label} label={`${e.data.label} commands`}>
+              <CopyButton slot="actions" text={cmds} label="Copy" />
+              <pre>{e.data.steps.map((s) => (
+                <>{s.note && <span class="note"># {s.note}{'\n'}</span>}<span class="prompt">{s.cmd}</span>{'\n'}</>
+              ))}</pre>
+            </Terminal>
+          );
+          // On the home page the one command leads and the hand steps fold under it.
+          return !full && e.data.script
+            ? <details class="by-hand"><summary>Or step by step: the {e.data.steps.length} commands it runs</summary>{stepsTerm}</details>
+            : stepsTerm;
+        })()}
         {e.data.after && <p class="after" set:html={inlineMd(e.data.after)} />}
         {star && repos[e.id] && <p class="star mono">Useful? A <a href={repos[e.id]}>★ star on {repos[e.id].replace('https://github.com/', '')}</a> helps others find it.</p>}
         {full && e.data.verified && <p class="verified mono">Commands last run as shown: {e.data.verified}</p>}
@@ -98,6 +104,12 @@ const repos = Object.fromEntries(await Promise.all(items.map(async (e) => {
   .prereqs .small { font-size: var(--step--1); color: var(--muted); margin-bottom: var(--space-1); }
   .after { margin-top: var(--space-3); color: var(--muted); font-size: 0.9375rem; }
   .oneliner .small { font-size: var(--step--1); color: var(--muted); margin: var(--space-3) 0 var(--space-1); }
+  .by-hand { margin-top: var(--space-3); }
+  .by-hand summary { cursor: pointer; font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); min-height: 44px; display: flex; align-items: center; gap: var(--space-2); list-style: none; }
+  .by-hand summary::-webkit-details-marker { display: none; }
+  .by-hand summary::before { content: '+'; color: var(--accent); }
+  .by-hand[open] summary::before { content: '−'; }
+  .by-hand summary:hover { color: var(--fg-strong); }
   .star { margin-top: var(--space-3); font-size: 0.8125rem; color: var(--muted); }
   .verified { margin-top: var(--space-3); font-size: 0.75rem; color: var(--muted); }
 </style>

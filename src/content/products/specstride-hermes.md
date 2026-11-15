@@ -3,7 +3,8 @@ name: Hermes host
 kind: plugin
 status: available
 order: 3
-summary: Specstride inside Hermes — from a chat, the TUI or Telegram, derive, dry-run, launch, supervise, stop, resume and curate Spec Kit features through the same pinned engine as the other hosts. Push notices to Telegram and a kanban board of the runs come with it.
+summary: Specstride inside Hermes — from a chat, the TUI or Telegram, derive, dry-run, launch, supervise, stop, resume and curate Spec Kit features through the same pinned engine as the other hosts. Push notices to Telegram come with it, and a kanban board of the runs is an install option.
+description: 'The Specstride host for Hermes: run Spec Kit features from a chat, the TUI or Telegram on the same pinned engine, with a push notice when a run needs you.'
 statusNote: 'Built from a clone: nothing is on npm yet. Linux is verified, macOS is not. The pinned engine has no reverse verb yet, so the installer skips the reverse skill.'
 host: hermes
 repo: https://github.com/mairp/specstride-hermes
@@ -30,7 +31,7 @@ The installer installs, reports and removes. It never touches the default Hermes
 profile: `--profile specstride` enables the plugin in a dedicated profile, and `--user`
 writes files and prints the enable command instead of running it. The doctor prints,
 after `specstride doctor`, one `<severity> <check> — <fix>` line per finding — eight
-checks, no model, done within two seconds.
+checks, no model, within 2 s on the reference machine.
 
 Two things the other hosts do not have. The watcher unit sends one Telegram line per
 run state change or attention item — a failed delivery is one log line and never gates

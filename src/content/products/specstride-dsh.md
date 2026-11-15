@@ -4,7 +4,8 @@ kind: plugin
 status: available
 order: 2
 summary: Specstride inside the DeepSeek Harness (dsh). Three skills run a Spec Kit feature through the same gated loop, or plan a reverse specification. A shim is the only path from a skill to the Specstride CLI.
-statusNote: 'Version 0.1.0, built from a clone: nothing is on npm yet. Linux is verified, macOS is not, and the paid live probe of the skills inside dsh has not run yet.'
+description: 'The Specstride host for the DeepSeek Harness (dsh): three skills and a shim over the same pinned engine, on any provider and model dsh reaches.'
+statusNote: 'Version 0.1.0, built from a clone: nothing is on npm yet. Linux is verified, macOS is not. The live probe inside dsh ran on 2026-11-06; the trigger suite and the release gate are a paid lane a person starts.'
 host: dsh
 repo: https://github.com/mairp/specstride-dsh
 install: dsh

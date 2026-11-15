@@ -1,0 +1,117 @@
+---
+// The hero's figure: the stored log of a real run (src/data/demo-timeline.ts,
+// the plugin README's "A real run", verbatim) with four notes beside the lines
+// that matter. Everything is visible from the first paint. With JavaScript and
+// without prefers-reduced-motion, a highlight walks down the log once, and
+// again on Replay; nothing is ever hidden.
+import Terminal from './Terminal.astro';
+import { TIMELINE } from '../data/demo-timeline';
+
+// `at` is the 1-based log line a note sits beside; `rows` is how many lines it may use.
+const notes = [
+  { at: 3, rows: 2, text: 'The tests passed. The reviewer still said no.' },
+  { at: 6, rows: 1, text: 'Diagnosed first, in a separate session.' },
+  { at: 8, rows: 1, text: 'Retried on the two unmet tasks only.' },
+  { at: 11, rows: 2, text: 'Approved: tasks ticked, a signed record, one commit.' },
+];
+---
+<figure class="run" data-run>
+  <div class="frame">
+    <Terminal title="specstride · a real run (2026-11-04)" label="The log of a real run, from the product README">
+      <button slot="actions" type="button" class="replay" data-replay hidden>Replay</button>
+      <pre class="log">{TIMELINE.map((l, i) => (
+        <span class={`tl tone-${l.tone}`} data-step={i + 1}>{l.text}</span>
+      ))}</pre>
+    </Terminal>
+    <ol class="notes" aria-label="What the log shows">
+      {notes.map((n) => <li class={`note at-${n.at} rows-${n.rows}`} data-at={n.at}>{n.text}</li>)}
+    </ol>
+  </div>
+  <figcaption class="muted">The engine's own output, trimmed, from a stored log: the phase's tests passed, the reviewer still said no, the rejection was diagnosed, and the narrowed second attempt was approved.</figcaption>
+</figure>
+
+<style>
+  .run { margin: 0; min-width: 0; --lh: 1.34rem; }
+  .frame { display: grid; gap: var(--space-4); min-width: 0; }
+  .log { line-height: var(--lh); }
+  .run :global(.term .body pre.log) { font-size: 0.78rem; line-height: var(--lh); }
+  /* One block per log line: the highlight spans the row, and no newline is needed between them. */
+  .tl { display: block; width: max-content; min-width: 100%; }
+  .tone-muted, .tone-rail { color: var(--muted); }
+  .tone-accent { color: var(--accent); }
+  .tone-ok { color: var(--ok); }
+  .tone-err { color: var(--err); }
+  .tone-warn { color: var(--warn); }
+  .tone-info { color: var(--info); }
+  .tone-plain { color: var(--fg); }
+  .tl.current { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+
+  .notes { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+  .note {
+    position: relative;
+    padding-left: var(--space-5);
+    font-size: 0.875rem;
+    line-height: var(--lh);
+    color: var(--fg);
+    transition: color 0.25s;
+  }
+  .note::before { content: ''; position: absolute; left: 0.3rem; top: calc(var(--lh) / 2 - 3px); width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .note.on { color: var(--fg-strong); }
+
+  .replay {
+    font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); background: transparent;
+    border: 1px solid var(--border); border-radius: 4px; padding: 0.3rem 0.6rem; cursor: pointer; min-height: 32px;
+  }
+  .replay:hover { color: var(--fg-strong); border-color: var(--accent); }
+  /* Room for the button before the script shows it: the title bar never grows. */
+  .replay[hidden] { display: inline-block; visibility: hidden; }
+  figcaption { font-size: var(--step--1); margin-top: var(--space-3); max-width: 62rem; }
+
+  /* Wide: the notes sit beside the lines they explain. The list's rows match
+     the log's lines; its top offset is the title bar plus the body padding. */
+  @media (min-width: 1040px) {
+    .frame { grid-template-columns: minmax(0, 1fr) 19rem; gap: 0 var(--space-4); align-items: start; }
+    .notes {
+      grid-template-rows: repeat(12, var(--lh));
+      gap: 0;
+      padding-top: calc(41px + var(--space-4));
+    }
+    .note { white-space: normal; }
+    .at-3 { grid-row: 3 / span 2; }
+    .at-6 { grid-row: 6 / span 1; }
+    .at-8 { grid-row: 8 / span 1; }
+    .at-11 { grid-row: 11 / span 2; }
+  }
+  @media (prefers-reduced-motion: reduce) { .note { transition: none; } }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-run]');
+  if (root && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const lines = [...root.querySelectorAll<HTMLElement>('.tl')];
+    const notes = [...root.querySelectorAll<HTMLElement>('.note')];
+    const replay = root.querySelector<HTMLButtonElement>('[data-replay]')!;
+    let timer: number | undefined;
+    const clear = () => { lines.forEach((l) => l.classList.remove('current')); notes.forEach((n) => n.classList.remove('on')); };
+    const walk = () => {
+      if (timer) clearTimeout(timer);
+      clear();
+      let i = 0;
+      const step = () => {
+        lines.forEach((l) => l.classList.remove('current'));
+        if (i >= lines.length) { notes.forEach((n) => n.classList.remove('on')); timer = undefined; return; }
+        lines[i].classList.add('current');
+        notes.forEach((n) => n.classList.toggle('on', Number(n.dataset.at) <= i + 1 && Number(n.dataset.at) + 2 > i + 1));
+        i++;
+        timer = window.setTimeout(step, 650);
+      };
+      step();
+    };
+    replay.hidden = false;
+    replay.addEventListener('click', walk);
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) { io.disconnect(); window.setTimeout(walk, 900); }
+    }, { threshold: 0.6 });
+    io.observe(root);
+  }
+</script>

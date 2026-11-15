@@ -1,14 +1,15 @@
 ---
 // The accent used as light: a blurred orb with a bright core rising from the
 // bottom edge of its section, a thin ring around it, and the dot grid behind.
-// Decorative. The parent needs position: relative and isolation: isolate.
-interface Props { low?: boolean }
-const { low = false } = Astro.props;
+// `orb={false}` keeps only the dot grid. Decorative. The parent needs
+// position: relative and isolation: isolate.
+interface Props { low?: boolean; orb?: boolean }
+const { low = false, orb = true } = Astro.props;
 ---
 <div class:list={['glow', { low }]} aria-hidden="true">
   <span class="grid dots"></span>
-  <span class="orb"></span>
-  <span class="ring"></span>
+  {orb && <span class="orb"></span>}
+  {orb && <span class="ring"></span>}
 </div>
 
 <style>

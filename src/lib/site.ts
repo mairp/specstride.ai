@@ -4,7 +4,9 @@ export const SITE = {
   url: 'https://specstride.ai',
   title: 'Specstride: development governance for coding agents',
   description:
-    'Specstride is loop engineering and governance for coding agents: a Claude Code plugin, also on dsh, that takes a Spec Kit feature to done, phase by phase, unattended. Every loop has an end, tests run before an independent LLM judge reviews the change, and every approved phase is a signed record and its own commit. Open source, on your machine, with your models and your keys.',
+    'Specstride takes a Spec Kit feature to done, unattended: the engine runs the tests, a separate reviewer judges the change, every approved phase is committed.',
+  /** The home page H1 (set in two lines in index.astro): the first row of the core README's "Benefits at a glance". */
+  headline: '“Done” that means done.',
   tagline: 'Development governance for coding agents.',
   caption: 'Every phase reviewed, signed and committed.',
   repo: 'mairp/specstride-plugin',
@@ -14,6 +16,9 @@ export const SITE = {
   licenseUrl: 'https://github.com/mairp/specstride-plugin/blob/main/LICENSE',
   contributingUrl: 'https://github.com/mairp/specstride-plugin/blob/main/CONTRIBUTING.md',
   exampleUrl: 'https://github.com/mairp/specstride-example',
+  coreUrl: 'https://github.com/mairp/specstride-core',
+  /** The one-command install of the lead host (public/install.sh). */
+  installCmd: 'curl -fsSL https://specstride.ai/install.sh | bash -s -- plugin',
   copyright: 'Marlon De Paz',
   productLicense: 'Apache-2.0',
   siteLicense: 'MIT',
@@ -21,9 +26,10 @@ export const SITE = {
 
 /** In-page links of the home page, shown in the header on wide screens. */
 export const SECTIONS = [
+  { href: '/#compare', label: 'Why it differs' },
   { href: '/#loop', label: 'How it works' },
-  { href: '/#judge', label: 'The judge' },
-  { href: '/#engineering', label: 'Loop engineering' },
+  { href: '/#judge', label: 'The reviewer' },
+  { href: '/#unattended', label: 'Unattended' },
   { href: '/#ways', label: 'Hosts' },
   { href: '/#faq', label: 'FAQ' },
 ] as const;

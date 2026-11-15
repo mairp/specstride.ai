@@ -18,7 +18,7 @@ const cols = await Promise.all(products.map(async (p) => {
     name: p.data.name,
     runsIn: host ? host.data.name : 'Your shell',
     pick: PICK[p.id] ?? '',
-    install: install ? `${install.data.steps.length} steps, run by hand on ${install.data.verified}` : '',
+    install: install ? `One command, or ${install.data.steps.length} steps by hand. Last run as written on ${install.data.verified}.` : '',
     unit: p.data.kind === 'plugin' ? 'skills' : 'commands',
     skills: p.data.skills.map((s) => s.name),
     note: p.data.statusNote,
@@ -38,7 +38,7 @@ const cols = await Promise.all(products.map(async (p) => {
       <tr><th scope="row">Runs in</th>{cols.map((c) => <td>{c.runsIn}</td>)}</tr>
       <tr><th scope="row">Built on</th>{cols.map((c) => <td><a href="/products/specstride-core/">Specstride core</a><br />{c.relation}</td>)}</tr>
       <tr><th scope="row">Pick it when</th>{cols.map((c) => <td>{c.pick}</td>)}</tr>
-      <tr><th scope="row">Install</th>{cols.map((c) => <td>{c.install}<br /><a href={`/products/${c.id}/#install`}>The steps →</a></td>)}</tr>
+      <tr><th scope="row">Install</th>{cols.map((c) => <td>{c.install}<br /><a href={`/products/${c.id}/#install`}>The steps</a></td>)}</tr>
       <tr><th scope="row">You drive it with</th>{cols.map((c) => <td>{c.skills.length} {c.unit}<br />{c.skills.map((s, i) => <>{i > 0 && ' '}<code>{s}</code></>)}</td>)}</tr>
       <tr><th scope="row">Status</th>{cols.map((c) => <td>{c.note}</td>)}</tr>
       <tr><th scope="row">The loop</th><td colspan={cols.length} class="same">The same in all three, because the engine underneath is the same: same gates, same records, same commits.</td></tr>
@@ -54,7 +54,7 @@ const cols = await Promise.all(products.map(async (p) => {
   thead th a { color: var(--fg-strong); text-decoration: none; }
   thead th a:hover { color: var(--accent); text-decoration: underline; }
   thead td, tbody th { width: 9.5rem; }
-  tbody th { background: transparent; color: var(--accent); font-weight: 400; font-size: 0.75rem; letter-spacing: 0.02em; }
+  tbody th { background: transparent; color: var(--accent); font-family: var(--font-sans); font-weight: 600; font-size: var(--step--1); }
   td { color: var(--fg); line-height: 1.55; }
   td code { display: inline-block; margin-top: var(--space-1); font-size: 0.75rem; overflow-wrap: anywhere; }
   .same { color: var(--muted); }

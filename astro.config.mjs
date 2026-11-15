@@ -7,7 +7,7 @@ export default defineConfig({
   site: 'https://specstride.ai',
   trailingSlash: 'always',
   output: 'static',
-  integrations: [mdx(), sitemap({ filter: (page) => !page.includes('/404') })],
+  integrations: [mdx(), sitemap({ filter: (page) => !page.includes('/404'), lastmod: new Date() })],
   // No Shiki: its token colours are inline style attributes, which the CSP blocks.
   markdown: { syntaxHighlight: false },
   build: {

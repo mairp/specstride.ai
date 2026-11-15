@@ -71,7 +71,7 @@ so the token needs no zone permission. Without the secrets the job is skipped. S
 ```
 src/content/        data: products/*.md, hosts, harnesses, faq, install (YAML)
 src/content.config.ts   the Zod schemas for all of it
-src/components/     Terminal, InstallTabs, AsciiArt, LoopDiagram, Glow, ProductCard, ...
+src/components/     Terminal, InstallTabs, HeroRun, InstallCommand, LoopDiagram, Glow, ...
 src/pages/          /, /install, /docs, /products/[id], 404
 src/styles/tokens.css   every colour and size, dark and light
 scripts/            ASCII art, OG image and font generators; screenshot and a11y checks; deploy

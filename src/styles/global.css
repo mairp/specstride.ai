@@ -134,8 +134,7 @@ pre { margin: 0; }
   transition: --edge 0.6s, color 0.6s;
 }
 .card:hover, .card:focus-within { --edge: 100%; color: var(--fg); }
-.card h3, .card h4 { margin-bottom: var(--space-2); transition: translate 0.6s; }
-.card:hover h3, .card:hover h4 { translate: 3px -2px; }
+.card h3, .card h4 { margin-bottom: var(--space-2); }
 .card-top { --edge-dir: to bottom; --halo: 0 -12px; }
 
 /* A group of cards hanging from a line that ends in a glowing node. */
@@ -244,7 +243,6 @@ main:has(> .page)::before {
 }
 @keyframes reveal { from { opacity: 0; translate: 0 2rem; } }
 @media (prefers-reduced-motion: reduce) {
-  .btn, .btn .arrow, .card, .card h3, .card h4 { transition: none; }
-  .card:hover h3, .card:hover h4 { translate: none; }
+  .btn, .btn .arrow, .card { transition: none; }
 }
 th[scope="row"] { white-space: nowrap; }

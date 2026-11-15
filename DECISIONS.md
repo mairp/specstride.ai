@@ -478,3 +478,85 @@ plugin `046e779`, dsh `294fdba`, hermes `c9e9202` and core `82d27ab`.
   same day in specstride-hermes PR #6 (`37392fe`): a fresh clone now shows 624 pass, 0 fail, 8 skipped.
   The same PR stopped the live hermes lane from running on `npm test` and writing a real
   `~/.local/bin/specstride-probe` wrapper.
+
+## Benefits first, proof early (2026-11-15)
+
+The owner asked for the site to expose the product properly, to highlight all the benefits and to say why
+the product is the best at what it does; a redesign was allowed. The page was read at 1440 and 390 px
+first, and three research passes grounded the work: every claim in the five public repositories with its
+quote, the market's own words for the problem, and a technical audit of the live site.
+
+**What was wrong.** The headline named a category, not a result. The first screen had no proof. The page
+was 17,209 px tall at 1440 (22,718 px at 390), in twelve sections of the same shape, and said the same
+five facts up to five times. Benefits were the fourth section and the recorded run the seventh, while a
+full install block sat directly under the hero.
+
+**The request met two rules:** only sourced claims (so no superlative and no named rival), and the
+tagline is the README's first line. Three paths were weighed: sell with the product's own evidence and
+keep the identity; take a bounded exception (superlatives, a table against named tools, a new palette);
+or mock up first. The first was taken, so no rule changed.
+
+- **The H1 is the result:** "“Done” that means done.", the first row of the core README's "Benefits at a
+  glance". The tagline stays as the line under it, the caption as the closing line, and the page title is
+  unchanged.
+- **The hero's figure is a real rejection.** The stored log of the plugin README's "A real run" moved
+  from the second section to the first screen, with four notes beside the lines that matter. It is
+  visible from the first paint; a highlight walks it once, and nothing is hidden for it. The orb left the
+  hero and stays in the closing band.
+- **Install on the first screen as one command,** with its copy button; the four-tab block moved down to
+  `#install`, and on the home page the hand steps fold under the command.
+- **Order:** hero, what you get, a plain agent loop or Specstride, how it works with the recorded run,
+  the reviewer and the controls, unattended work, hosts and models, install, costs and limits, questions.
+  Eight titled sections instead of twelve. 12,686 px at 1440 and 18,585 px at 390: a quarter shorter, not
+  the third the brief aimed for, because the comparison and the limits are new.
+- **Benefits lead and point at their proof.** The eight benefits are a ruled list, each a link to the
+  section that shows why.
+- **The comparison is its own section** with seven rows. The plain column uses the sources' words where
+  they have them ("it went quiet", "not retried blindly", "explained after the fact").
+- **Each fact once.** The judge and the governance sections merged: the reviewer's desk, six guarantees,
+  six controls. Loop engineering and "built for unattended work" merged, with parallel units as a part of
+  it. The hosts section lost its three cards and its foundation card (the stack and the table carry them)
+  and gained the role choice.
+- **Limits are part of the pitch.** A new section states what the READMEs and the core's security note
+  state: Linux only, the extra model calls, the implementer runs with your permissions, approval records
+  are a trail and not proof against an adversary on your machine, nothing is on npm.
+- **Three objections lead the FAQ:** a judge that is an LLM, why not CI, why not a plain loop. The entry
+  on the reviewer waving work through merged into the first.
+- **Design.** Same tokens, faces and mark. Gone: the numbered `//` eyebrows, numbers on cards that are
+  not steps, upper-case mono labels, the dot-joined captions under figures, the scroll reveal and the
+  heading nudge on hover. Mono is for what a terminal prints.
+
+**A broken install path, found while grounding.** Since plugin `046e779` (2026-11-11) the plugin is
+skills only and runs the `specstride` CLI from the search path; its README sends the reader to
+`npm install -g specstride@0.1.0`, which is not on npm. The site still said the plugin bundles the core
+and listed two `/plugin` commands, so its lead install path ended in `reason=cli-not-found` on a fresh
+machine. Fixed on the site: the Claude Code path installs the CLI first by the core path, then the
+plugin; `install.sh plugin` does the same unless a CLI with protocol 1 is already on the path; every
+"bundles" became "runs the core's CLI from your PATH". The plugin README's npm step is the product's to
+fix and was reported, not changed.
+
+**Hand run, 2026-11-15,** `bash -s -- plugin < public/install.sh` from a scratch directory with an
+isolated `HOME`, npm prefix and `CLAUDE_CONFIG_DIR`, against public `main` (core `82d27ab`, plugin
+`046e779`): the engine was packed and installed, `specstride --protocol` printed 1, the marketplace was
+added and the plugin installed (`claude plugin list`: 0.1.1, enabled). Exit 0. In a fresh clone of
+specstride-example, `specstride doctor` was all `ok`, and the plugin's `specstride-doctor` skill, loaded
+from that install in a Claude Code session, found the CLI and printed the same five lines. No run of the
+example feature was repeated; the last full run is still the recorded one.
+
+**Other statements corrected against the sources:** the dsh live probe ran on 2026-11-06 (the site said
+it had not); the Hermes doctor's two seconds are "on the reference machine"; the Hermes kanban board is
+an install option; the troubleshooting page is not "every error"; the plugin is 0.1.1.
+
+**Head and delivery.** Every meta description is 100 to 160 characters (the home one was 377). Structured
+data is per page: `SoftwareApplication` and `FAQPage` on the home page, `SoftwareSourceCode` with its own
+repository on each product page, none elsewhere. The 404 has no canonical. The sitemap carries `lastmod`.
+Fonts and media are cached for a week. The demo video no longer carries `autoplay`; the observer starts
+it, and without JavaScript it keeps its controls. The social card carries the new headline. Left alone:
+the 307 on slash-less URLs and the two-hop `http://www` redirect, which are the platform's behaviour.
+
+**Guards added.** The build fails when `faq.yaml` or `install.yaml` loads empty: a YAML slip had emptied
+the FAQ with only a warning. The checks cover the Hermes page.
+
+**Checks (local build):** `astro check` 0 errors; screenshots at 390/768/1440 in both themes with no
+overflow and no console errors; axe clean on eight pages in both themes; linkinator 45 links OK;
+Lighthouse mobile on `/` 0.98 performance, 1.0 accessibility, best practices and SEO, CLS 0.

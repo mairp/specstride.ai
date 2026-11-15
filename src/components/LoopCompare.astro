@@ -1,27 +1,31 @@
 ---
-// One loop with no brakes beside the engineered loops. The left column says
-// only what follows from the product READMEs' description of a plain agent
-// session; the right column is the core README's "Why loop engineering".
+// A plain agent loop beside the same work under Specstride. The left column
+// says only what follows from the product READMEs' description of a plain
+// agent session, in their words where they have them ("not retried blindly",
+// "it went quiet", "explained after the fact"); the right column is the core
+// README's "Why loop engineering" and "Why governance".
 // No figures. Each row carries its own labels, so it reads without the head.
 const rows = [
-  { q: 'How it ends', plain: 'It can end with "it went quiet".', eng: 'A named stop reason with a fixed exit code.' },
   { q: 'Who says "done"', plain: 'The agent that did the work.', eng: 'The tests first, then a separate reviewer.' },
-  { q: 'What a retry is', plain: 'The same attempt again, with the same mistake.', eng: 'A diagnosis first, then an attempt narrowed to the unmet tasks.' },
-  { q: 'Why a decision was made', plain: 'No rule to point to.', eng: 'A rule id and a table version on every decision.' },
+  { q: 'What "the tests pass" means', plain: 'A line in the agent\'s own report.', eng: 'The engine ran the phase\'s frozen checks itself, before any review.' },
+  { q: 'What a retry is', plain: 'A blind retry.', eng: 'A diagnosis first, then an attempt narrowed to the unmet tasks.' },
+  { q: 'How it ends', plain: 'It can end with "it went quiet".', eng: 'A named stop reason with a fixed exit code.' },
   { q: 'What a kill costs', plain: 'The loop stops there.', eng: 'No engine process survives, and the next start resumes where it stopped.' },
+  { q: 'Why a decision was made', plain: 'Nothing to explain it after the fact.', eng: 'A rule id and a table version on every decision.' },
+  { q: 'What is left at the end', plain: 'The agent\'s word.', eng: 'One commit per approved phase, and a signed approval record for each.' },
 ];
 ---
 <div class="cmp">
-  <div class="cmp-row cmp-head mono" aria-hidden="true">
+  <div class="cmp-row cmp-head" aria-hidden="true">
     <span></span>
-    <span class="h">one loop, no brakes</span>
-    <span class="h h-eng">engineered loops</span>
+    <span class="h">A plain agent loop</span>
+    <span class="h h-eng">Specstride</span>
   </div>
   {rows.map((r) => (
-    <div class="cmp-row reveal">
+    <div class="cmp-row">
       <h3 class="q">{r.q}</h3>
-      <p class="plain"><span class="tag mono">One loop: </span>{r.plain}</p>
-      <p class="eng"><span class="tag mono">Engineered: </span>{r.eng}</p>
+      <p class="plain"><span class="tag">A plain loop: </span>{r.plain}</p>
+      <p class="eng"><span class="tag">Specstride: </span>{r.eng}</p>
     </div>
   ))}
 </div>
@@ -35,13 +39,13 @@ const rows = [
   .cmp-row p { margin: 0; }
   .plain { color: var(--muted); }
   .eng { color: var(--fg); }
-  .tag { font-size: 0.75rem; color: var(--muted); }
+  .tag { font-size: var(--step--1); font-weight: 600; color: var(--muted); }
   .eng .tag { color: var(--accent); }
   @media (min-width: 760px) {
     .cmp-row { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--space-5); align-items: baseline; }
     .cmp-head { display: grid; border-top: 0; background: var(--surface); padding-block: var(--space-3); }
     .cmp-row:nth-child(2) { border-top: 1px solid var(--border); }
-    .h { font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+    .h { font-size: var(--step--1); font-weight: 600; color: var(--muted); }
     .h-eng { color: var(--accent); }
     .tag { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }

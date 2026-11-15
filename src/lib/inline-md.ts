@@ -7,3 +7,8 @@ export function inlineMd(src: string): string {
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\[([^\]]+)\]\(((?:https:\/\/|\/)[^)\s]+)\)/g, '<a href="$2">$1</a>');
 }
+
+/** The same source as plain text, for structured data: no backticks, links as their text. */
+export function plainMd(src: string): string {
+  return src.replace(/`([^`]+)`/g, '$1').replace(/\[([^\]]+)\]\((?:https:\/\/|\/)[^)\s]+\)/g, '$1');
+}

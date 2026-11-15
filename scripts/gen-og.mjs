@@ -56,9 +56,10 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" vi
   <g font-family="JetBrains Mono NL">
     <text x="80" y="104" font-size="24" fill="${C.accent}">open source · runs on your machine · your models, your keys</text>
     ${markShapes(80, 160, unit)}
-    <text x="540" y="214" font-size="64" font-weight="700" fill="${C.fg}">specstride</text>
-    <text x="540" y="272" font-size="24" fill="${C.text}">Development governance for coding agents.</text>
-    <text x="540" y="312" font-size="24" fill="${C.muted}">Every phase reviewed, signed and committed.</text>
+    <text x="540" y="200" font-size="30" font-weight="700" fill="${C.muted}">specstride</text>
+    <text x="540" y="268" font-size="42" font-weight="700" fill="${C.fg}">“Done” that means done.</text>
+    <text x="540" y="318" font-size="23" fill="${C.text}">Development governance for coding agents.</text>
+    <text x="540" y="354" font-size="23" fill="${C.muted}">Every phase reviewed, signed and committed.</text>
     <text x="80" y="488" font-size="26" fill="${C.text}" xml:space="preserve">━━━━┿━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━┿╍╍╍╍╍╍╍╍╍┿╍╍╍╍</text>
     <text x="80" y="526" font-size="26" xml:space="preserve"><tspan fill="${C.ok}">    ✓ 1       ✓ 2       ✓ 3       </tspan><tspan fill="${C.accent}">• 4       </tspan><tspan fill="${C.muted}">· 5</tspan></text>
     <text x="1120" y="566" font-size="24" fill="${C.muted}" text-anchor="end">specstride.ai</text>
