@@ -5,6 +5,7 @@ import AsciiArt from '../components/AsciiArt.astro';
 import InstallTabs from '../components/InstallTabs.astro';
 import InstallCommand from '../components/InstallCommand.astro';
 import HeroRun from '../components/HeroRun.astro';
+import ClaudeSession from '../components/ClaudeSession.astro';
 import LoopDiagram from '../components/LoopDiagram.astro';
 import Section from '../components/Section.astro';
 import HarnessGrid from '../components/HarnessGrid.astro';
@@ -172,18 +173,11 @@ const appSchema = {
       <LoopDiagram />
     </div>
     <div class="demo-row" id="demo">
-      <figure class="demo">
-        <Terminal title="specstride-example · a real run, sped up" class="demo-term">
-          <video data-demo controls muted loop playsinline preload="none" poster="/media/demo-poster.png" width="1010" height="692" aria-label="A Specstride run on the example repository: three phases implemented, tested, reviewed and committed">
-            <source src="/media/demo.webm" type="video/webm" />
-            <source src="/media/demo.mp4" type="video/mp4" />
-          </video>
-        </Terminal>
-      </figure>
+      <ClaudeSession />
       <div class="demo-side">
-        <h3>See it run</h3>
-        <p>A real run on <a href={SITE.exampleUrl}>the example repository</a>, a tiny Node project with one Spec Kit feature in three phases, sped up (waits capped at 1.5&nbsp;s, paths shortened).</p>
-        <p>In phase 3 the two <code>[P]</code> tasks ran as a parallel group; the merge check caught a test one worker wrote for a framework the project does not use, so the engine redid both tasks in order before the reviewer saw the phase.</p>
+        <h3>See it run, inside Claude Code</h3>
+        <p>A real session on <a href={SITE.exampleUrl}>the example repository</a>, a tiny Node project with one Spec Kit feature in three phases. One sentence starts it; the plugin's skill derives and validates the launch contract, launches the run and reports back in the CLI's own lines, so your session keeps its context.</p>
+        <p>Replayed from the session's transcript and trimmed: commands are shown as the CLI call, paths are cut to the repository, waits are shortened. The engine's own log of a phase is the one at the top of this page.</p>
         <Terminal title="git log --oneline" label="The example repository's history after the run: one commit per approved phase" class="gitlog">
           <pre>{commits.join('\n')}</pre>
         </Terminal>
