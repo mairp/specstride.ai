@@ -7,6 +7,7 @@
         "http://localhost/install/",
         "http://localhost/products/claude-code-plugin/",
         "http://localhost/products/specstride-dsh/",
+        "http://localhost/products/specstride-hermes/",
         "http://localhost/products/specstride-core/"
       ],
       "numberOfRuns": 3,

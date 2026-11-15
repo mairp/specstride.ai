@@ -3,28 +3,45 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import AsciiArt from '../components/AsciiArt.astro';
 import InstallTabs from '../components/InstallTabs.astro';
+import InstallCommand from '../components/InstallCommand.astro';
+import HeroRun from '../components/HeroRun.astro';
 import LoopDiagram from '../components/LoopDiagram.astro';
 import Section from '../components/Section.astro';
 import HarnessGrid from '../components/HarnessGrid.astro';
 import Terminal from '../components/Terminal.astro';
 import FAQ from '../components/FAQ.astro';
 import Glow from '../components/Glow.astro';
-import ProductCard from '../components/ProductCard.astro';
 import LoopNest from '../components/LoopNest.astro';
 import Fold from '../components/Fold.astro';
 import LoopCompare from '../components/LoopCompare.astro';
 import JudgeDesk from '../components/JudgeDesk.astro';
 import VariantStack from '../components/VariantStack.astro';
 import VariantTable from '../components/VariantTable.astro';
-import { inlineMd } from '../lib/inline-md';
-import { SITE, isAvailable } from '../lib/site';
+import { inlineMd, plainMd } from '../lib/inline-md';
+import { SITE } from '../lib/site';
 import { repoFacts } from '../lib/github';
 
 const facts = await repoFacts();
 const install = await getCollection('install');
-const products = (await getCollection('products')).filter(isAvailable).sort((a, b) => a.data.order - b.data.order);
-const hostProducts = products.filter((p) => p.data.builtOn);
-const coreProduct = products.find((p) => p.data.kind === 'core');
+const faq = (await getCollection('faq')).sort((a, b) => a.data.order - b.data.order);
+// A YAML slip empties a collection with only a warning; an empty FAQ or install list must fail the build.
+if (faq.length === 0 || install.length === 0) throw new Error('faq.yaml or install.yaml loaded empty: check the YAML');
+
+// The hero's sub-line: the READMEs' first line (the category), then the mechanism.
+const heroSub =
+  'Specstride takes a Spec Kit feature to done, phase by phase, unattended: the engine runs the tests, a separate reviewer judges the real change, and only then is the phase signed and committed.';
+
+// The core README's "Benefits at a glance", each pointing at the section that shows why.
+const benefits = [
+  { get: '"Done" that means done', because: 'Tests run before review, an independent reviewer approves, and the commit happens or the run fails.', to: '#judge' },
+  { get: 'Unattended runs you can walk away from', because: 'A detached runtime, capped loops, a clean stop, and resume after a crash or a kill.', to: '#unattended' },
+  { get: 'Fewer wasted attempts', because: 'Diagnosis narrows each retry to the unmet tasks, and the router escalates model tiers by rule.', to: '#loop' },
+  { get: 'Your models, your keys', because: 'The implementer and the reviewer are resolved independently. The engine has Claude, dsh, Codex, pi and prime adapters and a generic descriptor (`cli`, `openai-chat`, `anthropic-messages`). The hosts ship Claude and dsh today.', to: '#ways' },
+  { get: 'An audit trail', because: 'Approval records, one commit per phase, rule ids on every decision, OTLP and Loki telemetry.', to: '#judge' },
+  { get: 'Safe parallelism', because: 'Fenced worker trees, audited deltas, and the full gate on the merged tree.', to: '#units' },
+  { get: 'Extensible without forks', because: '19 versioned extension points (`specstride.<name>/<major>`), each with a conformance suite in `@specstride/testkit`.', to: '/products/specstride-core/' },
+  { get: 'Nothing leaves your machine', because: 'Specstride runs no service of its own, so nothing is sent to its authors.', to: '#limits' },
+];
 
 // The README's four steps, one phase of a Spec Kit feature at a time.
 const steps = [
@@ -34,25 +51,11 @@ const steps = [
   'Approved: tasks ticked, one commit, signed record. Rejected: back to the implementer with the reasons, up to 3 attempts. A rejection that names new unmet tasks is diagnosed first, and the next attempt is narrowed to them.',
 ];
 
-// The README's five bullets under "Built for unattended work".
-const why = [
-  { title: 'Kill the engine mid-run, nothing survives', body: 'SIGKILL the engine in the middle of a phase and no engine process is left running. Start it again and the run picks up where it stopped.' },
-  { title: 'Approved means committed', body: 'Every approved phase becomes its own commit. If a commit is blocked, the run never reports success: the engine exits 1 and says so.' },
-  { title: 'A clean stop', body: 'The `stop` verb of the `specstride` CLI that the plugin bundles ends the run at the next safe boundary: the workers finish their pass, the merge check runs, the record closes whole, no survivor.' },
-  { title: 'A reviewer from any provider', body: 'The reviewer can come from any provider your DeepSeek Harness (`dsh`) reaches.' },
-  { title: 'Secrets held back', body: 'Credentials are redacted from what the reviewer reads, and a credential in the change blocks the commit.' },
-];
-
-// Loop engineering: the principles of the core README's "Why loop engineering"
-// that the unattended cards above do not already cover.
-const principles = [
-  { title: 'Every loop has an end', body: 'Attempts are capped, passes have watchdogs and breakers, and every way a run can stop is a named stop reason with a fixed exit code.' },
-  { title: 'Deterministic checks before any opinion', body: 'The verification gate runs the phase\'s frozen check manifest, with a fixed argument list and no shell. A phase whose tests fail never reaches review.' },
-  { title: 'Stuck phases get unstuck', body: 'A rejection that names new unmet tasks is diagnosed first, in a separate session. The next attempt is narrowed to those tasks, and the reviewer judges it like any other.' },
-  { title: 'A router with no I/O', body: 'Check order, loop layer and escalation to the next model tier come from a pure function over versioned rule tables. Every decision records its rule id.' },
-  { title: 'Loop layers you can stack', body: '`none` is the classic loop. `micro` adds inner checks that end in keep, repair or unresolved. `parallel`, opt-in, runs tasks with disjoint files at once.' },
-  { title: 'Yields instead of dead waits', body: 'Long jobs run detached while the pass yields. A wait that can no longer complete ends early instead of burning its timer.' },
-  { title: 'It learns, with guardrails', body: 'The learning layer suggests per-phase settings from the run\'s own telemetry and reverts any change that makes things worse. Off unless you turn it on.' },
+// The example README's own `git log --oneline` after its three phases.
+const commits = [
+  'specstride: phase 3 approved — Short slugs and display titles',
+  'specstride: phase 2 approved — Accents, symbols and errors',
+  'specstride: phase 1 approved — Basic slugs',
 ];
 
 // The judge: what makes the reviewer's verdict worth something. Sources: the
@@ -62,387 +65,373 @@ const guarantees = [
   { title: 'Evidence, not a summary', body: 'It reads the actual change against the phase\'s tasks, including the contents of new files. The implementer\'s notebook and repair history are withheld from it.' },
   { title: 'Facts before opinion', body: 'The engine runs the tests itself, before the reviewer sees anything. A phase whose tests fail never reaches review.' },
   { title: 'Cannot be imitated', body: 'The verdict is bound to a one-time nonce for that attempt. Text planted in the evidence cannot pass for it, and an implementer that prints "APPROVED" achieves nothing.' },
-  { title: 'Outside text is data', body: 'Everything from outside the runtime enters through one ingress, where it is size-capped, framed as data and stripped of credentials. It fails closed.' },
+  { title: 'Outside text is data', body: 'Everything from outside the runtime enters through one ingress, where it is size-capped and framed as data. It fails closed.' },
   { title: 'A verdict on the record', body: 'An approval is a signed record outside the implementer\'s write scope, read back and verified again on resume. A forged or missing approval stops the run.' },
 ];
 
-// One phase, as the hero shows it.
-const rail = [
-  { verb: 'implement', note: 'the phase\'s tasks' },
-  { verb: 'verify', note: 'the engine runs the tests' },
-  { verb: 'review', note: 'a separate session, no tools' },
-  { verb: 'commit', note: 'a signed record, one commit' },
-];
-
-
-// The core README's "Benefits at a glance".
-const benefits = [
-  { get: '"Done" that means done', because: 'Tests run before review, an independent reviewer approves, and the commit happens or the run fails.' },
-  { get: 'Unattended runs you can walk away from', because: 'A detached runtime, capped loops, a clean stop, and resume after a crash or a kill.' },
-  { get: 'Fewer wasted attempts', because: 'Diagnosis narrows each retry to the unmet tasks, and the router escalates model tiers by rule.' },
-  { get: 'Your models, your keys', because: 'The implementer and the reviewer are resolved independently. The engine has Claude, dsh, Codex, pi and prime adapters and a generic descriptor (`cli`, `openai-chat`, `anthropic-messages`). The hosts ship Claude and dsh today.' },
-  { get: 'An audit trail', because: 'Approval records, one commit per phase, rule ids on every decision, OTLP and Loki telemetry.' },
-  { get: 'Safe parallelism', because: 'Fenced worker trees, audited deltas, and the full gate on the merged tree.' },
-  { get: 'Extensible without forks', because: '19 versioned extension points (`specstride.<name>/<major>`), each with a conformance suite in `@specstride/testkit`.' },
-  { get: 'Nothing leaves your machine', because: 'Specstride runs no service of its own, so nothing is sent to its authors.' },
-];
-
-// The core README's "Why governance": controls an agent cannot talk its way past.
+// The core README's "Why governance": the controls the reviewer's desk does not already show.
 const controls = [
-  { title: 'Separation of roles', body: 'The implementer and the reviewer are separate sessions, chosen independently. A phase is never approved without a reviewer.' },
-  { title: 'Verdicts that can\'t be forged', body: 'The verdict is bound to a one-time nonce for that attempt, so an implementer that prints "APPROVED" achieves nothing.' },
-  { title: 'Approval is a record', body: 'Approvals live outside the implementer\'s write scope and are verified again on resume. A forged or missing approval stops the run.' },
+  { title: 'Approved means committed', body: 'Every approved phase becomes its own commit. If a commit is blocked, the run never reports success: the engine exits 1 and says so.' },
+  { title: 'Secrets held back', body: 'Credentials are redacted from what the reviewer and the traces see, and a credential found in the change blocks the commit.' },
+  { title: 'Integrity tripwires', body: 'Fingerprints before and after every check, protected paths and pinned toolchains catch an implementer that edits what it must not. A tripwire stops the run until a human clears it.' },
   { title: 'Configuration narrows, never widens', body: 'Project configuration can only restrict a run. Anything that widens capability comes from user scope, the environment or flags.' },
   { title: 'Containment by default', body: 'Adapters declare containment levels C0 to C3. The strongest one available is the default, and C0 is an explicit opt-in.' },
-  { title: 'Integrity tripwires', body: 'Fingerprints before and after every check, protected paths and pinned toolchains catch an implementer that edits what it must not. A tripwire stops the run until a human clears it.' },
   { title: 'Everything observable', body: 'One primary event writer per run and a read model for status. Every decision carries its rule id, so an audit can follow a run from launch to the last commit.' },
 ];
 
-// Sections are numbered in the order they render.
-const order = ['loop', 'judge', 'engineering', 'benefits', 'ways', 'why', 'demo', 'governance', 'agents', 'units', 'open-source', 'faq'];
-const no = (id: string) => String(order.indexOf(id) + 1).padStart(2, '0');
-const heroLede =
-  'An agent that grades its own work says "done" when it isn\'t. Specstride is a Claude Code plugin that takes a Spec Kit feature to done, phase by phase, unattended: implement, verify, review, commit, resume. A separate reviewer must approve each phase before the run moves on, and every approval leaves a signed record and its own commit.';
+// Unattended work: the plugin README's "Built for unattended work" and the core
+// README's "Why loop engineering", each principle once.
+const unattended = [
+  { title: 'Detached from your terminal', body: 'One runtime root per run, detached from the shell that started it, with a workspace lock and lease, a process registry and an inbox for requests.' },
+  { title: 'Kill the engine mid-run, nothing survives', body: 'SIGKILL the engine in the middle of a phase and no engine process is left running. Start it again and the run picks up where it stopped.' },
+  { title: 'A clean stop', body: 'The `stop` verb of the `specstride` CLI ends the run at the next safe boundary: the workers finish their pass, the merge check runs, the record closes whole, no survivor.' },
+  { title: 'Every loop has an end', body: 'Attempts are capped, passes have watchdogs and breakers, and every way a run can stop is a named stop reason with a fixed exit code. Nothing ends with "it went quiet".' },
+  { title: 'Stuck phases get unstuck', body: 'A rejection that names new unmet tasks is diagnosed first, in a separate session, and the next attempt is narrowed to those tasks. Two narrowed attempts never follow each other.' },
+  { title: 'A router with no I/O', body: 'Check order, loop layer and escalation to the next model tier come from a pure function over versioned rule tables, so a run can be explained after the fact.' },
+  { title: 'Yields instead of dead waits', body: 'Long jobs run detached while the pass yields. A wait that can no longer complete ends early instead of burning its timer.' },
+  { title: 'It learns, with guardrails', body: 'The learning layer suggests per-phase settings from the run\'s own telemetry and reverts any change that makes things worse. Off unless you turn it on.' },
+];
+
+// What the product's own READMEs and security notes say it costs and does not do.
+const limits = [
+  { title: 'Linux only, so far', body: 'macOS is not verified: no Mac has run it.' },
+  { title: 'It costs more than a single session', body: 'Every attempt makes at least two model calls, on your own subscription or key.' },
+  { title: 'The implementer runs with your permissions', body: 'Specstride runs coding agents in your repository, and the implementer can run shell commands. Run it on work you trust.' },
+  { title: 'A trail, not a vault', body: 'The implementer can read the local approval key, so approval records are a trail, not proof against an adversary on your machine. The secret scan is a net, not a guarantee.' },
+  { title: 'Nothing is on npm yet', body: 'Every path builds from a clone. The one-command installer does that for you.' },
+  { title: 'Version 0.1', body: 'Parallel units are off by default and run only with dsh as the implementer.' },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.data.q, acceptedAnswer: { '@type': 'Answer', text: plainMd(f.data.a) } })),
+};
+const appSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: SITE.name,
+  description: SITE.description,
+  url: SITE.url,
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Linux',
+  license: 'https://www.apache.org/licenses/LICENSE-2.0',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  codeRepository: SITE.repoUrl,
+  author: { '@type': 'Person', name: SITE.copyright },
+};
 ---
-<Base>
+<Base schema={[appSchema, faqSchema]}>
   <section class="hero" aria-labelledby="hero-title">
-    <Glow />
+    <Glow orb={false} />
     <div class="wrap hero-grid">
-      <p class="oss mono">Loop engineering <span aria-hidden="true">·</span> LLM-as-a-judge <span aria-hidden="true">·</span> Open source <span aria-hidden="true">·</span> Runs on your machine <span aria-hidden="true">·</span> Your models, your keys</p>
       <div class="hero-head">
-        <h1 id="hero-title"><span class="line">{SITE.tagline}</span> <span class="line caption">{SITE.caption}</span></h1>
+        <h1 id="hero-title"><span class="line">“Done” that</span> <span class="line">means done.</span></h1>
+        <p class="category">{SITE.tagline}</p>
       </div>
       <div class="hero-body">
-        <p class="lede">{heroLede}</p>
-        <p class="ctas">
-          <a class="btn" href={SITE.repoUrl}>GitHub{facts.stars !== null && <span class="muted"> ★ {facts.stars}</span>}</a>
-          <a class="btn btn-primary" href="#install">Install <span class="arrow" aria-hidden="true">→</span></a>
+        <p class="lede">{heroSub}</p>
+        <InstallCommand />
+        <p class="hero-links">
+          <a href="#install">Other hosts, and the steps it runs</a>
+          <a href={SITE.repoUrl}>GitHub{facts.stars !== null && <span class="muted"> ★ {facts.stars}</span>}</a>
         </p>
+        <p class="hero-facts">Open source under Apache-2.0. Runs on your machine. Your models, your keys. For Claude Code, dsh and Hermes, on Linux.</p>
       </div>
-      <ol class="rail" aria-label="One phase: implement, verify, review, commit. Then the next phase; a stopped run resumes.">
-        {rail.map((r, i) => (
-          <li><span class="rail-no mono" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><span class="rail-verb">{r.verb}</span><span class="rail-note">{r.note}</span></li>
+      <div class="hero-run"><HeroRun /></div>
+    </div>
+  </section>
+
+  <section class="section got" id="benefits" aria-labelledby="benefits-title">
+    <div class="wrap">
+      <header class="got-head">
+        <h2 id="benefits-title">What you get</h2>
+        <p class="lede">For people who leave agents running on real work and need to trust the result when they come back. Each benefit comes from a specific part of how the loop is built.</p>
+      </header>
+      <dl class="benefits">
+        {benefits.map((b) => (
+          <div class="benefit">
+            <dt><a href={b.to}>{b.get}</a></dt>
+            <dd><span class="because">because</span> <span set:html={inlineMd(b.because)} /></dd>
+          </div>
         ))}
-        <li class="rail-next"><span class="rail-no mono" aria-hidden="true">↻</span><span class="rail-verb">next phase</span><span class="rail-note">or resume where it stopped</span></li>
-      </ol>
+      </dl>
     </div>
   </section>
 
-  <section class="install-band" id="install" aria-labelledby="install-title">
-    <div class="wrap install-wrap">
-      <h2 id="install-title" class="visually-hidden">Install</h2>
-      <InstallTabs entries={install} id="home-install" />
-      <p class="more mono"><a href="/install/">Prerequisites and the first run →</a></p>
-    </div>
-  </section>
-
-  <Section id="loop" eyebrow={`${no('loop')} · how it works`} title="How it works" intro="For each phase of a Spec Kit feature, the same gate:">
-    <ol class="steps">
-      {steps.map((s) => <li class="reveal" set:html={inlineMd(s)} />)}
-    </ol>
-    <LoopDiagram />
+  <Section id="compare" title="A plain agent loop, or Specstride" tone="raised" intro="A single agent session is one loop with no brakes, and an agent that grades its own work says “done” when it isn't. Specstride treats the loop itself as the thing to engineer: which loops exist, what ends each of them, and what happens when one gets stuck.">
+    <LoopCompare />
   </Section>
 
-  <Section id="judge" eyebrow={`${no('judge')} · the reviewer`} title="LLM-as-a-judge, held to evidence" tone="raised" intro="A model judging another model's work is only worth something when the judge is independent, reads the real change, and cannot be imitated. Specstride's reviewer is that judge, and the engine around it is what makes its verdict count.">
-    <div class="reveal"><JudgeDesk /></div>
-    <div class="fold-wrap guarantees"><Fold items={guarantees} label="Why the reviewer's verdict counts" /></div>
-    <div class="grid grid-2 grid-3 guarantees wide-only">
-      {guarantees.map((g, i) => (
-        <div class="card card-top reveal">
-          <p class="card-no mono" aria-hidden="true">{String(i + 1).padStart(2, '0')}</p>
-          <h3>{g.title}</h3>
-          <p set:html={inlineMd(g.body)} />
-        </div>
-      ))}
+  <Section id="loop" title="How it works" intro="For each phase of a Spec Kit feature, the same gate. A phase moves on only when a separate reviewer approves it.">
+    <div class="how">
+      <ol class="steps">
+        {steps.map((s) => <li set:html={inlineMd(s)} />)}
+      </ol>
+      <LoopDiagram />
+    </div>
+    <div class="demo-row" id="demo">
+      <figure class="demo">
+        <Terminal title="specstride-example · a real run, sped up" class="demo-term">
+          <video data-demo controls muted loop playsinline preload="none" poster="/media/demo-poster.png" width="1010" height="692" aria-label="A Specstride run on the example repository: three phases implemented, tested, reviewed and committed">
+            <source src="/media/demo.webm" type="video/webm" />
+            <source src="/media/demo.mp4" type="video/mp4" />
+          </video>
+        </Terminal>
+      </figure>
+      <div class="demo-side">
+        <h3>See it run</h3>
+        <p>A real run on <a href={SITE.exampleUrl}>the example repository</a>, a tiny Node project with one Spec Kit feature in three phases, sped up (waits capped at 1.5&nbsp;s, paths shortened).</p>
+        <p>In phase 3 the two <code>[P]</code> tasks ran as a parallel group; the merge check caught a test one worker wrote for a framework the project does not use, so the engine redid both tasks in order before the reviewer saw the phase.</p>
+        <Terminal title="git log --oneline" label="The example repository's history after the run: one commit per approved phase" class="gitlog">
+          <pre>{commits.join('\n')}</pre>
+        </Terminal>
+        <p class="afternote muted">Each approved phase becomes its own commit.</p>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="judge" title="A verdict an agent can't talk its way past" tone="raised" intro="A model judging another model's work, the pattern called LLM-as-a-judge, is only worth something when the judge is independent, reads the real change, and cannot be imitated. Specstride's reviewer is that judge, and the engine around it is what makes its verdict count.">
+    <JudgeDesk />
+    <div class="ctl">
+      <h3 class="ctl-title">Why the verdict counts</h3>
+      <Fold items={guarantees} label="Why the reviewer's verdict counts" />
+      <ul class="ctl-list wide-only" role="list">
+        {guarantees.map((g) => <li><h4>{g.title}</h4><p set:html={inlineMd(g.body)} /></li>)}
+      </ul>
+      <h3 class="ctl-title">The controls around it</h3>
+      <Fold items={controls} label="The controls around the reviewer" />
+      <ul class="ctl-list wide-only" role="list">
+        {controls.map((c) => <li><h4>{c.title}</h4><p set:html={inlineMd(c.body)} /></li>)}
+      </ul>
     </div>
     <p class="afternote muted">The price is stated too: every attempt makes at least two model calls, on your own subscription or key. The diagnostician that reads a stuck phase gives no verdict; nothing it says approves or rejects.</p>
   </Section>
 
-  <Section id="engineering" eyebrow={`${no('engineering')} · loop engineering`} title="Loop engineering" intro="A single agent session is one loop with no brakes. Specstride treats the loop itself as the thing to engineer: which loops exist, what ends each of them, what may cross between them, and what happens when one gets stuck.">
-    <LoopCompare />
+  <Section id="unattended" title="Built for unattended work" intro="Autonomy is useful only when you can trust what it reports, and when the run is still there after you close the terminal. Every loop in a run has a defined end.">
     <div class="eng">
-      <div class="eng-figure reveal"><LoopNest /></div>
-      <Fold items={principles} label="The principles of loop engineering" />
+      <div class="eng-figure"><LoopNest /></div>
+      <Fold items={unattended} label="What makes a run safe to leave" />
       <div class="eng-cards wide-only">
-        {principles.map((p) => (
-          <div class="card reveal">
+        {unattended.map((p) => (
+          <div class="card">
             <h3>{p.title}</h3>
             <p set:html={inlineMd(p.body)} />
           </div>
         ))}
       </div>
     </div>
-    <p class="more-link mono"><a href="/products/specstride-core/">The engine, layer by layer →</a></p>
-  </Section>
-
-  <Section id="benefits" eyebrow={`${no('benefits')} · what you get`} title="What you get" tone="raised" intro="Each benefit comes from a specific part of how the loop is built. Read every line as: you get this, because the engine does that.">
-    <dl class="benefits">
-      {benefits.map((b, i) => (
-        <div class="benefit card card-top reveal">
-          <dt><span class="card-no mono" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>{b.get}</dt>
-          <dd><span class="because mono">because</span> <span set:html={inlineMd(b.because)} /></dd>
-        </div>
-      ))}
-    </dl>
-  </Section>
-
-  <Section id="ways" eyebrow={`${no('ways')} · core → plugin · dsh · hermes`} title="One engine, three hosts" intro="Specstride core is the engine. The plugin, the dsh host and the Hermes host are built on it: each carries one release of the core and adds only what its agent needs. Pick the host that matches the agent you already use; the loop, the gates, the records and the commits are the same in all three.">
-    <div class="reveal"><VariantStack /></div>
-    <div class="ways">
-      {hostProducts.map((p, i) => (
-        <div class:list={['reveal', { lead: i === 0 }]}><ProductCard product={p} showSkills={false} /></div>
-      ))}
-    </div>
-    {coreProduct && <div class="reveal foundation"><ProductCard product={coreProduct} showSkills={false} /></div>}
-    <div class="reveal ways-table"><VariantTable /></div>
-  </Section>
-
-  <Section id="why" eyebrow={`${no('why')} · unattended`} title="Built for unattended work" tone="raised" intro="For people who leave agents running on real work and need to trust the result when they come back.">
-    <div class="pin">
-      <div class="pin-figure"><AsciiArt /></div>
-      <div class="pin-cards why">
-        {why.map((w) => (
-          <div class="card reveal">
-            <h3>{w.title}</h3>
-            <p set:html={inlineMd(w.body)} />
-          </div>
-        ))}
+    <div class="units" id="units">
+      <div>
+        <h3>Parallel units, opt-in</h3>
+        <p>Mark tasks <code>[P]</code> in your Spec Kit <code>tasks.md</code> and turn the layer on. Tasks whose files are disjoint run at once, each in its own worker tree, behind eight admission checks. The engine audits and merges their work and runs the full gate on the merged tree before the reviewer sees the phase; tasks whose files overlap are refused, with the reason printed, and run in order.</p>
+        <p class="muted">It is built to be safe, not sold as a speed-up: the option's own document sets no target and promises no saving. Groups run only when the implementer runs on dsh, the one harness whose concurrent sessions are tested; with any other harness the layer stays off and the run continues in order.</p>
       </div>
-    </div>
-  </Section>
-
-  <Section id="demo" eyebrow={`${no('demo')} · see it run`} title="See it run" intro="The example repository is a tiny Node project with one Spec Kit feature, in three phases, nothing implemented yet — Specstride does that, one reviewed and committed phase at a time.">
-    <figure class="demo">
-      <Terminal title="specstride-example · a real run, sped up" class="demo-term">
-        <video data-demo autoplay muted loop playsinline preload="none" poster="/media/demo-poster.png" width="1010" height="692" aria-label="A Specstride run on the example repository: three phases implemented, tested, reviewed and committed">
-          <source src="/media/demo.webm" type="video/webm" />
-          <source src="/media/demo.mp4" type="video/mp4" />
-        </video>
+      <Terminal title="~/.config/specstride/config.yaml" label="The user configuration that turns parallel units on">
+        <pre><span class="muted"># your user configuration, read from this file only</span>{'\n'}loop:{'\n'}  parallel:{'\n'}    units: on{'\n'}    allow_detect: on</pre>
       </Terminal>
-      <figcaption class="muted">
-        A real run on <a href={SITE.exampleUrl}>the example repository</a>, sped up (waits capped at 1.5&nbsp;s, paths shortened). In phase 3 the two <code>[P]</code> tasks ran as a parallel group; the merge check caught a test one worker wrote for a framework the project does not use, so the engine redid both tasks in order before the reviewer saw the phase.
-      </figcaption>
-    </figure>
+    </div>
+    <p class="more-link"><a href="/products/specstride-core/">The engine, layer by layer</a></p>
   </Section>
 
-  <Section id="governance" eyebrow={`${no('governance')} · governance`} title="Controls an agent can't talk its way past" tone="raised" intro="Autonomy is useful only when you can trust what it reports. These controls are in the engine, so every host gets them.">
-    <div class="grid grid-2 grid-3 controls">
-      {controls.map((c) => (
-        <div class="card card-top reveal">
-          <h3>{c.title}</h3>
-          <p set:html={inlineMd(c.body)} />
-        </div>
-      ))}
+  <Section id="ways" title="One engine, three hosts, your models" tone="raised" intro="Specstride core is the engine. The Claude Code plugin, the dsh host and the Hermes host are thin hosts over it, so the loop, the gates, the records and the commits are the same in whichever agent you already use.">
+    <VariantStack />
+    <div class="ways-table"><VariantTable /></div>
+    <div class="roles" id="agents">
+      <div>
+        <h3>Choose the implementer and the reviewer independently</h3>
+        <p>By default both are separate Claude sessions through your Claude Code login. Either can instead be any provider and model your DeepSeek Harness (dsh) reaches. The loop stays the same whichever you choose: same gates, same records, same commits.</p>
+        <Terminal title="either role, on any provider dsh reaches" label="The environment variables that pick the implementer and the reviewer">
+          <pre><span class="muted"># any provider and model your dsh reaches, either role</span>{'\n'}SPECSTRIDE_PROPOSER=dsh:&lt;provider&gt;/&lt;model&gt;{'\n'}SPECSTRIDE_CRITIC=dsh:&lt;provider&gt;/&lt;model&gt;</pre>
+        </Terminal>
+      </div>
+      <HarnessGrid />
     </div>
   </Section>
 
-  <Section id="agents" eyebrow={`${no('agents')} · your models, your keys`} title="Your models, your keys" intro="Choose the implementer and the reviewer independently, on any provider and model your DeepSeek Harness (dsh) reaches. By default both are separate Claude sessions.">
-    <HarnessGrid />
-    <Terminal title="either role, on any provider dsh reaches" label="The environment variables that pick the implementer and the reviewer" class="env">
-      <pre><span class="muted"># any provider and model your dsh reaches, either role</span>{'\n'}SPECSTRIDE_PROPOSER=dsh:&lt;provider&gt;/&lt;model&gt;{'\n'}SPECSTRIDE_CRITIC=dsh:&lt;provider&gt;/&lt;model&gt;</pre>
-    </Terminal>
-    <p class="afternote muted">The loop stays the same whichever you choose: same gates, same records, same commits.</p>
+  <Section id="install" title="Install" intro="One command per host, or the same steps by hand. Each path was run as written, on the date shown on the install page.">
+    <div class="install-wrap">
+      <InstallTabs entries={install} id="home-install" />
+      <p class="more-link"><a href="/install/">Prerequisites and the first run</a></p>
+    </div>
   </Section>
 
-  <Section id="units" eyebrow={`${no('units')} · parallel units, opt-in`} title="Parallel units, opt-in" tone="raised" intro="Mark tasks [P] in your Spec Kit tasks.md and turn the layer on. Tasks whose files are disjoint run at once, each in its own worker tree, and the project's files are untouched while they run. The engine merges their work and runs the phase's checks before the reviewer sees the phase; tasks whose files overlap are refused, with the reason printed, and run in order.">
-    <Terminal title="~/.config/specstride/config.yaml" label="The user configuration that turns parallel units on" class="env">
-      <pre><span class="muted"># your user configuration, read from this file only</span>{'\n'}loop:{'\n'}  parallel:{'\n'}    units: on{'\n'}    allow_detect: on</pre>
-    </Terminal>
-    <p class="afternote muted">Groups run only when the implementer runs on dsh, the one harness whose concurrent sessions are tested; with any other harness the layer stays off and the run continues in order.</p>
-  </Section>
-
-  <Section id="open-source" eyebrow={`${no('open-source')} · open source`} title="Where your code goes">
-    <div class="grid grid-3">
-      <div class="card card-top">
-        <h3>Apache-2.0</h3>
-        <p>The whole product, free and open source under the Apache licence.</p>
-        <p><a href={SITE.licenseUrl}>Read the licence</a></p>
-      </div>
-      <div class="card card-top">
-        <h3>Runs on your machine</h3>
-        <p>No service of its own: nothing is sent to Specstride's authors. Run records, approvals and logs stay in <code>~/.specstride/</code> on your machine, and telemetry export is off by default.</p>
-      </div>
-      <div class="card card-top">
-        <h3>Your models, your keys</h3>
-        <p>The implementer and the reviewer go through your Claude Code login by default, or through the provider you set with dsh. Each provider's own data policy applies.</p>
+  <Section id="limits" title="Costs and limits, stated plainly" tone="raised" intro="A tool that asks for your trust should state its limits. These are the product's own, from its READMEs and its security notes.">
+    <div class="limits-grid">
+      <ul class="limits" role="list">
+        {limits.map((l) => <li><h3>{l.title}</h3><p set:html={inlineMd(l.body)} /></li>)}
+      </ul>
+      <div class="yours">
+        <div class="card card-top">
+          <h3>Open source, Apache-2.0</h3>
+          <p>The whole product, free and open source under the Apache licence.</p>
+        </div>
+        <div class="card card-top">
+          <h3>Runs on your machine</h3>
+          <p>No service of its own: nothing is sent to Specstride's authors. Run records, approvals and logs stay in <code>~/.specstride/</code>, and telemetry export is off by default; when you turn it on, it goes only to endpoints you configure.</p>
+        </div>
+        <div class="card card-top">
+          <h3>Your models, your keys</h3>
+          <p>The implementer and the reviewer go through your Claude Code login by default, or through the provider you set with dsh. Each provider's own data policy applies.</p>
+        </div>
       </div>
     </div>
     <p class="ctas">
       <a class="btn" href={SITE.repoUrl}>Star or fork on GitHub</a>
       <a class="btn" href={SITE.exampleUrl}>Example</a>
+      <a class="btn" href={`${SITE.coreUrl}/blob/main/SECURITY.md`}>Security notes</a>
       <a class="btn" href={SITE.contributingUrl}>Contributing</a>
     </p>
   </Section>
 
-  <Section id="faq" eyebrow={`${no('faq')} · faq`} title="Questions" tone="raised">
+  <Section id="faq" title="Questions">
     <FAQ />
   </Section>
 
   <section class="closing" aria-labelledby="closing-title">
     <Glow low />
     <div class="wrap">
-      <h2 id="closing-title" class="reveal">{SITE.caption}</h2>
-      <p class="lede reveal">Open source. Runs on your machine. Your models, your keys.</p>
-      <p class="ctas reveal">
-        <a class="btn" href={SITE.repoUrl}>GitHub</a>
-        <a class="btn btn-primary" href="/install/">Install <span class="arrow" aria-hidden="true">→</span></a>
+      <div class="closing-mark"><AsciiArt /></div>
+      <h2 id="closing-title">{SITE.caption}</h2>
+      <p class="lede">Open source. Runs on your machine. Your models, your keys.</p>
+      <div class="closing-cmd"><InstallCommand label="Install the Claude Code plugin in one command" /></div>
+      <p class="hero-links">
+        <a href="/install/">Other hosts, and the steps it runs</a>
+        <a href={SITE.repoUrl}>GitHub</a>
       </p>
     </div>
   </section>
 </Base>
 
 <style>
-  /* Hero: headline left, pitch right, the orb rising from the bottom edge. */
+  /* Hero: the claim on the left, the mechanism and the install on the right,
+     and the real run across the full width under both. */
   .hero {
     position: relative;
     isolation: isolate;
     overflow: clip;
-    min-height: calc(100svh - 60px);
-    padding: clamp(3rem, 9vh, 6rem) 0 15rem;
+    padding: clamp(2rem, 6vh, 4rem) 0 var(--space-7);
   }
-  .hero-grid { display: grid; gap: var(--space-6); text-align: center; }
-  .oss { color: var(--accent); font-size: var(--step--1); margin: 0; }
-  h1 { margin: 0; font-size: clamp(2.4rem, 1.3rem + 4.2vw, 4.25rem); line-height: 1.06; letter-spacing: -0.03em; }
-  .line { display: block; }
-  .caption { color: var(--muted); font-size: 0.6em; line-height: 1.2; letter-spacing: -0.02em; margin-top: var(--space-4); }
-
-  /* One phase as a rail: four steps, then the next phase. */
-  .rail { list-style: none; margin: var(--space-6) 0 0; padding: 0; display: grid; gap: 1px; text-align: left; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--border); }
-  .rail li { display: grid; grid-template-columns: 2rem minmax(0, 1fr); column-gap: var(--space-2); align-items: baseline; padding: var(--space-3) var(--space-4); background: color-mix(in srgb, var(--card) 88%, transparent); backdrop-filter: blur(6px); }
-  .rail-no { color: var(--accent); font-size: 0.75rem; grid-row: span 2; }
-  .rail-verb { font-family: var(--font-display); font-weight: 500; color: var(--fg-strong); }
-  .rail-note { grid-column: 2; font-size: var(--step--1); color: var(--muted); }
-  .rail-next .rail-verb { color: var(--fg); }
-  @media (min-width: 760px) {
-    .rail { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-    .rail li { grid-template-columns: minmax(0, 1fr); padding: var(--space-4); }
-    .rail-no { grid-row: auto; margin-bottom: var(--space-2); }
-    .rail-note { grid-column: 1; }
-  }
-  .hero-body .lede { font-size: clamp(1.0625rem, 0.9rem + 0.6vw, 1.3125rem); color: var(--fg); margin: 0 auto; max-width: 40rem; }
-  .ctas { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin: var(--space-6) 0 0; }
-  .hero .ctas, .closing .ctas { justify-content: center; }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
+  h1 { margin: 0; font-size: clamp(2.6rem, 1.4rem + 4.4vw, 4.6rem); line-height: 1.04; letter-spacing: -0.035em; text-wrap: wrap; }
+  h1 .line { display: block; }
+  .category { margin: var(--space-4) 0 0; font-family: var(--font-display); font-weight: 500; font-size: var(--step-2); line-height: 1.25; color: var(--muted); max-width: 18ch; text-wrap: balance; }
+  .hero-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); align-content: start; min-width: 0; }
+  .hero-body .lede { font-size: clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem); color: var(--fg); margin: 0; max-width: 38rem; }
+  .hero-links { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); margin: 0; font-size: 0.9375rem; }
+  .hero-links a { display: inline-flex; align-items: center; min-height: 44px; }
+  .hero-facts { margin: 0; font-size: var(--step--1); color: var(--muted); max-width: 38rem; }
+  .hero-run { min-width: 0; }
   @media (min-width: 960px) {
-    .hero-grid { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: var(--space-6) var(--space-7); text-align: left; align-items: start; }
-    .rail { grid-column: 1 / -1; margin-top: var(--space-5); }
-    .oss { grid-column: 1 / -1; margin-bottom: calc(var(--space-2) * -1); }
-    .hero-body { padding-top: 0.6rem; }
-    .hero-body .lede { margin: 0; }
-    .hero .ctas { justify-content: flex-start; }
+    .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: var(--space-6) var(--space-6); align-items: start; }
+    h1 .line { white-space: nowrap; }
+    .hero-body { padding-top: 0.5rem; gap: var(--space-3); }
+    .hero-run { grid-column: 1 / -1; }
   }
-  @media (prefers-reduced-motion: no-preference) {
-    .oss, .line { animation: from-left 1s cubic-bezier(0.16, 1, 0.3, 1) both; }
-    .line { animation-delay: 0.12s; }
-    .caption { animation-delay: 0.28s; }
-    .hero-body > * { animation: from-right 1s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both; }
-    .rail { animation: from-below 1s cubic-bezier(0.16, 1, 0.3, 1) 0.75s both; }
-    .hero-body .ctas { animation-delay: 0.6s; }
+
+  /* What you get: benefit, then the reason, as a ruled two-column list. */
+  .got { padding: var(--space-7) 0 var(--space-8); }
+  .got-head { display: grid; gap: var(--space-3); margin-bottom: var(--space-6); }
+  .got-head h2 { font-size: var(--step-4); margin: 0; }
+  .got-head .lede { margin: 0; color: var(--muted); }
+  .benefits { margin: 0; display: grid; gap: 0 var(--space-7); border-top: 1px solid var(--border); }
+  .benefit { padding: var(--space-4) 0; border-bottom: 1px solid var(--border); display: grid; gap: var(--space-1); align-content: start; }
+  .benefit dt { font-family: var(--font-display); font-weight: 500; font-size: var(--step-1); line-height: 1.3; }
+  .benefit dt a { color: var(--fg-strong); text-decoration: none; }
+  .benefit dt a:hover { color: var(--accent); text-decoration: underline; }
+  .benefit dd { margin: 0; font-size: 0.9375rem; color: var(--muted); }
+  .because { color: var(--accent); font-weight: 600; font-size: var(--step--1); }
+  @media (min-width: 760px) {
+    .benefits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .got-head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-7); align-items: end; }
   }
-  @keyframes from-left { from { opacity: 0; translate: -3rem 0; } }
-  @keyframes from-right { from { opacity: 0; translate: 3rem 0; } }
-  @keyframes from-below { from { opacity: 0; translate: 0 2rem; } }
 
-  .install-band { padding: var(--space-8) 0; }
-  .install-wrap { max-width: 60rem; }
-  .more { font-size: var(--step--1); margin-top: var(--space-4); }
-
-  /* The four steps of a phase. */
-  .steps { margin: 0 0 var(--space-7); padding: 0; list-style: none; display: grid; gap: var(--space-3); max-width: 52rem; counter-reset: step; }
+  /* How it works: the four steps beside the diagram, then the recorded run. */
+  .how { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
+  .steps { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-3); max-width: 52rem; counter-reset: step; }
   .steps li { counter-increment: step; display: flex; gap: var(--space-4); align-items: baseline; }
   .steps li::before { content: counter(step, decimal-leading-zero); font-family: var(--font-mono); color: var(--accent); flex: none; }
-
-  /* Why: the mark stays put on the left while the cards scroll past. */
-  .pin { display: grid; gap: var(--space-7); }
-  .pin-figure { position: relative; isolation: isolate; justify-self: center; --art-size: clamp(7px, 0.82vw, 11px); --art-phone-size: clamp(16px, 5vw, 22px); }
-  .pin-figure::before {
-    content: '';
-    position: absolute;
-    inset: -12% -8%;
-    z-index: -1;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, color-mix(in srgb, var(--orb-edge) 38%, transparent), transparent);
-    filter: blur(30px);
-  }
-  .pin-cards { display: grid; gap: var(--space-5); }
-  .why .card {
-    background:
-      linear-gradient(to right, color-mix(in srgb, var(--card-bg) 50%, transparent), var(--card-bg) 75%) padding-box,
-      radial-gradient(circle, var(--dot) 1px, transparent 1.5px) 0 0 / 12px 12px padding-box,
-      linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-      linear-gradient(to right, color-mix(in srgb, var(--accent) var(--edge), transparent), color-mix(in srgb, var(--border) 55%, transparent) 72%) border-box;
-  }
-  .why p { margin: 0; }
-  @media (min-width: 900px) {
-    .pin { grid-template-columns: minmax(0, 1fr) minmax(0, 27rem); align-items: start; }
-    .pin-figure { position: sticky; top: 22vh; justify-self: start; margin: var(--space-6) 0 var(--space-6) var(--space-5); }
-  }
-
-  /* See it run: the demo of the example repository. */
-  .demo { margin: 0; display: grid; gap: var(--space-4); }
+  .demo-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); margin-top: var(--space-8); scroll-margin-top: 5rem; }
+  .demo { margin: 0; min-width: 0; }
   .demo video { display: block; width: 100%; height: auto; background: var(--surface); }
   .demo :global(.demo-term .body) { padding: 0; }
-  .demo figcaption { font-size: 0.9375rem; max-width: 56rem; }
-  @media (prefers-reduced-motion: reduce) { .demo video { animation: none; } }
-
-  /* One engine, three hosts: the plugin card leads, wider and lit; the core sits under them. */
-  .ways { display: grid; gap: var(--space-5); margin: var(--space-7) 0; }
-  /* On a phone the stack figure and the table already say what the cards say. */
-  @media (max-width: 759px) { .ways { display: none; } .ways-table { margin-top: var(--space-6); } }
-  .ways > div { display: flex; }
-  .ways > div > :global(.card) { flex: 1; }
-  .ways .lead > :global(.card) { --edge: 85%; }
-  @media (min-width: 900px) {
-    .ways { grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)); }
+  .demo-side { min-width: 0; }
+  .demo-side h3 { font-size: var(--step-2); font-weight: 500; }
+  .demo-side p { color: var(--muted); font-size: 0.9375rem; }
+  .demo-side :global(.gitlog) { margin-top: var(--space-5); }
+  .demo-side :global(.gitlog pre) { white-space: pre-wrap; font-size: 0.75rem; }
+  @media (min-width: 1000px) {
+    .demo-row { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: start; }
   }
-  .foundation { margin: calc(-1 * var(--space-4)) 0 var(--space-7); }
-  .foundation > :global(.card) { border-style: dashed; background: color-mix(in srgb, var(--accent) 5%, var(--card)); }
-  @media (max-width: 759px) { .foundation { display: none; } }
 
-  /* Loop engineering: the nested loops beside the principles. */
-  .eng { display: grid; gap: var(--space-6); margin-top: var(--space-7); }
+  /* The controls: two ruled lists under the reviewer's desk, no cards. */
+  .ctl { margin-top: var(--space-7); }
+  .ctl-title { font-size: var(--step-2); font-weight: 500; margin: var(--space-7) 0 var(--space-4); }
+  .ctl-title:first-child { margin-top: 0; }
+  .ctl-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0 var(--space-6); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ctl-list li { border-top: 1px solid var(--border); padding: var(--space-4) 0 var(--space-3); }
+  .ctl-list h4 { font-size: var(--step-0); margin: 0 0 var(--space-1); }
+  .ctl-list p { margin: 0; color: var(--muted); font-size: 0.9375rem; }
+  @media (min-width: 960px) { .ctl-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+  /* Unattended: the nested loops beside the principles. */
+  .eng { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
   .eng-cards { display: grid; gap: var(--space-4); }
-  .eng-cards p, .controls p, .guarantees p:last-child { margin: 0; }
-  .eng-cards > :last-child:nth-child(odd) { grid-column: 1 / -1; }
-  .guarantees { margin-top: var(--space-6); }
-  /* Under 640 px the card grids give way to their folded form (Fold.astro). */
-  @media (max-width: 639px) { .wide-only { display: none; } }
-  .card-no { color: var(--accent); font-size: 0.75rem; margin: 0 0 var(--space-3); }
-  /* seven controls: the last one takes the whole row instead of sitting alone */
-  .controls > :last-child { grid-column: 1 / -1; }
+  .eng-cards p { margin: 0; }
   @media (min-width: 640px) { .eng-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 1100px) {
-    .eng { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); align-items: start; }
+    .eng { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); align-items: start; }
     .eng-figure { position: sticky; top: 14vh; }
   }
-  .more-link { font-size: var(--step--1); margin: var(--space-6) 0 0; }
+  .units { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-5); margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--border); scroll-margin-top: 5rem; }
+  .units h3 { font-size: var(--step-2); font-weight: 500; }
+  .units p { font-size: 0.9375rem; }
+  @media (min-width: 960px) { .units { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--space-7); align-items: start; } }
+  .more-link { font-size: 0.9375rem; margin: var(--space-6) 0 0; }
 
-  /* What you get: benefit, then the reason, as a full-width grid. */
-  .benefits { margin: 0; display: grid; gap: var(--space-4); }
-  .benefit { display: flex; flex-direction: column; gap: var(--space-3); }
-  .benefit dt { display: grid; gap: var(--space-3); color: var(--fg-strong); font-family: var(--font-display); font-weight: 500; font-size: var(--step-1); line-height: 1.25; }
-  .benefit dt .card-no { margin: 0; font-family: var(--font-mono); font-weight: 400; }
-  .benefit dd { margin: 0; font-size: 0.9375rem; }
-  .because { color: var(--accent); font-size: 0.75rem; margin-right: var(--space-1); }
-  @media (min-width: 640px) { .benefits { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (min-width: 1100px) { .benefits { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  /* One engine, three hosts: the stack, the table, then the role choice. */
+  .ways-table { margin-top: var(--space-6); }
+  .roles { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-5); margin-top: var(--space-8); scroll-margin-top: 5rem; }
+  .roles h3 { font-size: var(--step-2); font-weight: 500; }
+  .roles p { color: var(--muted); font-size: 0.9375rem; }
+  @media (min-width: 960px) { .roles { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--space-7); align-items: start; } }
 
-  :global(.section .env) { max-width: 44rem; margin-top: var(--space-5); }
-  .afternote { font-size: 0.9375rem; max-width: 52rem; margin: var(--space-4) 0 0; }
+  .install-wrap { max-width: 60rem; }
 
-  .closing { position: relative; isolation: isolate; text-align: center; padding: var(--space-9) 0 13rem; }
-  .closing h2 { font-size: var(--step-5); letter-spacing: -0.03em; }
-  .closing .lede { margin: 0 auto; color: var(--muted); }
+  /* Limits: the list on the left, what stays yours on the right. */
+  .limits-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
+  .limits { list-style: none; margin: 0; padding: 0; display: grid; gap: 0 var(--space-6); }
+  .limits li { border-top: 1px solid var(--border); padding: var(--space-4) 0 var(--space-3); }
+  .limits h3 { font-size: var(--step-0); margin: 0 0 var(--space-1); }
+  .limits p { margin: 0; color: var(--muted); font-size: 0.9375rem; }
+  .yours { display: grid; gap: var(--space-4); align-content: start; }
+  .yours p { margin: 0; font-size: 0.9375rem; }
+  @media (min-width: 640px) { .limits { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1000px) { .limits-grid { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--space-7); align-items: start; } }
+  .ctas { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin: var(--space-6) 0 0; }
+
+  .afternote { font-size: 0.9375rem; max-width: 52rem; margin: var(--space-5) 0 0; }
+
+  .closing { position: relative; isolation: isolate; text-align: center; padding: var(--space-8) 0 12rem; }
+  .closing-mark { display: grid; justify-content: center; margin-bottom: var(--space-6); --art-size: 6px; --art-phone-size: 15px; }
+  .closing h2 { font-size: var(--step-5); letter-spacing: -0.03em; margin-inline: auto; }
+  .closing .lede { margin: 0 auto var(--space-5); color: var(--muted); }
+  .closing-cmd { display: grid; grid-template-columns: minmax(0, max-content); justify-content: center; }
+  .closing .hero-links { justify-content: center; margin-top: var(--space-3); }
+
+  /* Under 640 px the lists and card grids give way to their folded form (Fold.astro).
+     Last, so it wins over the display rules above. */
+  @media (max-width: 639px) { .wide-only { display: none; } }
 </style>
 
 <script>
-  // The demo plays on its own; under prefers-reduced-motion it never starts
-  // without a click, and it yields when off screen.
+  // The demo never loads until it is on screen and plays only while it is.
+  // Without JavaScript, or under prefers-reduced-motion, it keeps its controls
+  // and never starts on its own.
   for (const video of document.querySelectorAll<HTMLVideoElement>('video[data-demo]')) {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      video.removeAttribute('autoplay');
-      video.pause();
-      continue;
-    }
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) continue;
+    video.controls = false;
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
         if (e.isIntersecting) video.play().catch(() => {});

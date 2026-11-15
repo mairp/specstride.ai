@@ -14,26 +14,25 @@ const hosts = await Promise.all(products.filter((p) => p.data.kind === 'plugin')
 })));
 const core = products.find((p) => p.data.kind === 'core');
 ---
-<figure class="stack" aria-label={`The hierarchy: Specstride core is the foundation. ${hosts.map((h) => h.name).join(', ')} are thin hosts built on it, each carrying one release of the core. A host talks to the engine only through the CLI protocol.`}>
+<figure class="stack" aria-label={`The hierarchy: Specstride core is the foundation. ${hosts.map((h) => h.name).join(', ')} are thin hosts built on it. A host talks to the engine only through the CLI protocol.`}>
   <div class="hosts" aria-hidden="true">
     {hosts.map((h) => (
       <a class="box host" href={`/products/${h.id}/`} tabindex="-1">
-        <span class="tier mono">host · in {h.host}</span>
+        <span class="tier">Host in {h.host}</span>
         <span class="name">{h.name}</span>
-        <span class="meta mono">{h.skills} skills · built on core</span>
+        <span class="meta">{h.skills} skills, built on core</span>
       </a>
     ))}
   </div>
   <p class="wire mono" aria-hidden="true"><span class="wire-line"></span><span class="wire-text">CLI protocol v1 · argv in, exit code and terse lines out</span><span class="wire-line"></span></p>
   {core && (
     <a class="box engine" href={`/products/${core.id}/`} tabindex="-1" aria-hidden="true">
-      <span class="tier mono">the foundation · every host is built on it</span>
+      <span class="tier">The foundation every host is built on</span>
       <span class="name">{core.data.name}</span>
-      <span class="layers mono">gate · reviewer · approval record · loop layers · router · runtime · adapters</span>
+      <span class="layers">gate, reviewer, approval record, loop layers, router, runtime, adapters</span>
       <span class="meta mono">or on its own, from a shell: specstride &lt;verb&gt;</span>
     </a>
   )}
-  <figcaption class="muted mono">one engine underneath · three thin hosts on top · the same loop, gates, records and commits</figcaption>
 </figure>
 
 <style>
@@ -51,9 +50,9 @@ const core = products.find((p) => p.data.kind === 'core');
     min-width: 0;
   }
   a.box:hover { border-color: var(--accent); }
-  .tier { font-size: 0.6875rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
+  .tier { font-size: var(--step--1); font-weight: 600; color: var(--accent); }
   .name { font-family: var(--font-display); font-weight: 500; font-size: var(--step-1); color: var(--fg-strong); }
-  .meta, .layers { font-size: 0.75rem; color: var(--muted); }
+  .meta, .layers { font-size: var(--step--1); color: var(--muted); }
   .wire { margin: 0; display: flex; align-items: center; gap: var(--space-3); font-size: 0.75rem; color: var(--muted); text-align: center; }
   .wire-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--accent), transparent); }
   .engine {
@@ -64,6 +63,5 @@ const core = products.find((p) => p.data.kind === 'core');
     justify-items: center;
     padding-block: var(--space-5);
   }
-  figcaption { font-size: 0.75rem; }
   @media (min-width: 760px) { .hosts { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 </style>

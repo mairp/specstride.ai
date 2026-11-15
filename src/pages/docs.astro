@@ -2,41 +2,55 @@
 import Base from '../layouts/Base.astro';
 import { SITE } from '../lib/site';
 const W = `${SITE.repoUrl}/blob/main/wiki`;
-const docs = [
-  { href: `${SITE.repoUrl}#readme`, title: 'Plugin README', body: 'Install, how it works, parallel units, requirements and costs.' },
-  { href: `${W}/Home.md`, title: 'Wiki home', body: 'The index of the wiki: getting started, how it works, costs and limits, troubleshooting, FAQ.' },
-  { href: `${W}/Getting-Started.md`, title: 'Getting started', body: 'Install, the shape of a feature, and the sentence that starts a run.' },
-  { href: `${W}/How-It-Works.md`, title: 'How it works', body: 'What happens in each phase — the implementer, the engine\'s verification, the reviewer, the approval and the rejection — plus the parallel-units layer.' },
-  { href: `${W}/Costs-And-Limits.md`, title: 'Costs and limits', body: 'The model and parallel-units variables with their defaults, and what each attempt costs.' },
-  { href: `${W}/Troubleshooting.md`, title: 'Troubleshooting', body: 'Every error a run can print, with its fix. Start with the specstride-doctor skill.' },
-  { href: `${W}/FAQ.md`, title: 'FAQ', body: 'Which model to use, whether your code goes anywhere new, keys, and who makes it.' },
-  { href: SITE.exampleUrl, title: 'Example repository', body: 'A tiny Node project with one three-phase Spec Kit feature to try Specstride on, with a demo of a real run.' },
-  { href: `${SITE.repoUrl}/blob/main/SECURITY.md`, title: 'Security', body: 'Report vulnerabilities privately, and read the known limits: the implementer runs with your permissions.' },
-  { href: 'https://github.com/mairp/specstride-dsh#readme', title: 'dsh host README', body: 'Install, the doctor\'s six findings, a walkthrough from dry run to supervised run, what the host writes and where, and troubleshooting.' },
-  { href: 'https://github.com/mairp/specstride-core#readme', title: 'Core README', body: 'Loop engineering and governance, the L0–L7 layering, the packages, and how to build and test the engine.' },
-  { href: 'https://github.com/mairp/specstride-core/blob/main/docs/PUBLISHING.md', title: 'Publishing the core', body: 'How the four release packages are packed and versioned, and how a host pins a core release by its tarballs and sha256.' },
-  { href: SITE.contributingUrl, title: 'Contributing', body: 'Build, typecheck, test, and an end-to-end run that needs no account; add a test with each change.' },
+const groups = [
+  { title: 'Start here', docs: [
+    { href: `${W}/Getting-Started.md`, title: 'Getting started', body: 'Install, the shape of a feature, and the sentence that starts a run.' },
+    { href: SITE.exampleUrl, title: 'Example repository', body: 'A tiny Node project with one three-phase Spec Kit feature to try Specstride on, with a demo of a real run.' },
+    { href: `${W}/How-It-Works.md`, title: 'How it works', body: 'What happens in each phase — the implementer, the engine\'s verification, the reviewer, the approval and the rejection — plus the parallel-units layer.' },
+  ] },
+  { title: 'The Claude Code plugin', docs: [
+    { href: `${SITE.repoUrl}#readme`, title: 'Plugin README', body: 'Install, how it works, parallel units, requirements and costs.' },
+    { href: `${W}/Home.md`, title: 'Wiki home', body: 'The index of the wiki: getting started, how it works, costs and limits, troubleshooting, FAQ.' },
+    { href: `${W}/Costs-And-Limits.md`, title: 'Costs and limits', body: 'The model and parallel-units variables with their defaults, and what each attempt costs.' },
+    { href: `${W}/Troubleshooting.md`, title: 'Troubleshooting', body: 'The errors a run prints, each with its fix. Start with the specstride-doctor skill.' },
+    { href: `${W}/FAQ.md`, title: 'FAQ', body: 'Which model to use, whether your code goes anywhere new, keys, and who makes it.' },
+  ] },
+  { title: 'The engine', docs: [
+    { href: `${SITE.coreUrl}#readme`, title: 'Core README', body: 'Loop engineering and governance, the L0–L7 layering, the packages, and how to build and test the engine.' },
+    { href: `${SITE.coreUrl}/blob/main/docs/options/parallel-units.md`, title: 'Parallel units', body: 'How to switch the option on, when it falls back to running in order, and what it does and does not promise.' },
+    { href: `${SITE.coreUrl}/blob/main/docs/PUBLISHING.md`, title: 'Publishing the core', body: 'How the four release packages are packed and versioned, and how a host pins a core release by its tarballs and sha256.' },
+    { href: `${SITE.coreUrl}/blob/main/SECURITY.md`, title: 'Security', body: 'Report vulnerabilities privately, and read the known limits: the implementer runs with your permissions.' },
+  ] },
+  { title: 'The other hosts', docs: [
+    { href: 'https://github.com/mairp/specstride-dsh#readme', title: 'dsh host README', body: 'Install, the doctor\'s six findings, a walkthrough from dry run to supervised run, what the host writes and where, and troubleshooting.' },
+    { href: 'https://github.com/mairp/specstride-hermes#readme', title: 'Hermes host README', body: 'The quickstart, the doctor\'s eight findings, push notices to Telegram, and the kanban board as an install option.' },
+    { href: SITE.contributingUrl, title: 'Contributing', body: 'Build, typecheck, test, and an end-to-end run that needs no account; add a test with each change.' },
+  ] },
 ];
 ---
-<Base title="Docs" description="Specstride documentation lives next to the code on GitHub: the plugin README and wiki, the dsh host and core READMEs, the example repository, security and contributing.">
+<Base title="Docs" description="Specstride documentation lives next to the code on GitHub: the plugin README and wiki, the core, dsh and Hermes READMEs, the example and security notes.">
   <div class="wrap page">
-    <p class="eyebrow mono">// docs</p>
     <h1>Docs</h1>
     <p class="lede">The documentation lives next to the code, so it changes when the code does. These links go to it on GitHub.</p>
-    <ul class="docs" role="list">
-      {docs.map((d) => (
-        <li class="card"><h2 class="t"><a href={d.href}>{d.title}</a></h2><p>{d.body}</p></li>
-      ))}
-    </ul>
+    {groups.map((g) => (
+      <section class="group">
+        <h2>{g.title}</h2>
+        <ul class="docs" role="list">
+          {g.docs.map((d) => (
+            <li class="card"><h3 class="t"><a href={d.href}>{d.title}</a></h3><p>{d.body}</p></li>
+          ))}
+        </ul>
+      </section>
+    ))}
     <p class="muted">Questions and bugs go to <a href={SITE.issuesUrl}>issues</a>.</p>
   </div>
 </Base>
 
 <style>
   .page { padding-top: var(--space-7); }
-  .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-2); }
+  .group h2 { font-size: var(--step-2); margin: 0 0 var(--space-4); }
   .lede { margin-bottom: var(--space-6); color: var(--muted); }
   .docs { list-style: none; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); margin-bottom: var(--space-6); }
-  .t { font-size: var(--step-0); margin-bottom: var(--space-2); }
+  .t { font-size: var(--step-0); font-weight: 500; margin-bottom: var(--space-2); }
   .docs p { margin: 0; font-size: 0.9375rem; }
 </style>

@@ -1,15 +1,23 @@
+- id: llm-judge
+  order: -3
+  q: Isn't an LLM judging an LLM circular?
+  a: 'It would be, if the judge only read the implementer''s report. This is LLM-as-a-judge with the parts the bare pattern leaves out. The engine runs the tests itself before the reviewer sees anything. The reviewer is a separate session with no tools, chosen independently of the implementer and on any provider. It reads the actual change against the phase''s tasks, not a summary it is handed. Its verdict is bound to a one-time nonce and written as a signed record, so planted text cannot pass for it. It is a second opinion held to evidence, not a proof: [the reviewer section](/#judge) shows what reaches it and what is held back.'
+- id: ci
+  order: -2
+  q: Why not just CI?
+  a: 'Keep your CI. It tells you after a push. Specstride gates each phase before its commit exists: the engine runs the phase''s checks itself, a phase whose tests fail never reaches review, a rejection goes back to the implementer with the reasons, and only an approved phase becomes a commit.'
+- id: plain-loop
+  order: -1
+  q: Why not just loop the agent until it says it is finished?
+  a: 'Because then the agent that did the work decides when it is done, and an agent that grades its own work says "done" when it isn''t. A plain loop also has no brakes. [The comparison](/#compare) puts it beside Specstride, where attempts are capped, every stop has a named reason and an exit code, and a rejected phase is diagnosed before it is retried.'
 - id: which
   order: 0
   q: Which one do I want — the plugin, dsh, Hermes or core?
-  a: 'The host that matches the agent you already use: in Claude Code, the [plugin](/products/claude-code-plugin/); in the DeepSeek Harness, the [dsh host](/products/specstride-dsh/); in Hermes, the [Hermes host](/products/specstride-hermes/). Each is one command: `curl -fsSL https://specstride.ai/install.sh | bash -s -- plugin` (or `dsh`, `hermes`). The [core](/products/specstride-core/) is not a fourth choice but the engine all three are built on: the plugin bundles it and the other two pin its release, so the loop, the gates, the records and the commits are the same whichever host you pick. Install the core alone only to run the `specstride` CLI from a shell or to build a host for another agent.'
+  a: 'The host that matches the agent you already use: in Claude Code, the [plugin](/products/claude-code-plugin/); in the DeepSeek Harness, the [dsh host](/products/specstride-dsh/); in Hermes, the [Hermes host](/products/specstride-hermes/). Each is one command: `curl -fsSL https://specstride.ai/install.sh | bash -s -- plugin` (or `dsh`, `hermes`). The [core](/products/specstride-core/) is not a fourth choice but the engine all three are built on: the plugin''s skills run its CLI and the other two pin its release, so the loop, the gates, the records and the commits are the same whichever host you pick. Install the core alone only to run the `specstride` CLI from a shell or to build a host for another agent.'
 - id: loop-engineering
   order: 0.5
   q: What is loop engineering?
   a: 'An agent session is a loop with no brakes. Loop engineering designs the loops around it instead: pipeline stages, phases, attempts, passes and micro cycles, each with a defined end, deterministic checks before any reviewer opinion, and a rule-driven router that decides what happens when a loop gets stuck. The [core page](/products/specstride-core/) shows the engine layer by layer.'
-- id: llm-judge
-  order: 0.7
-  q: Is this LLM-as-a-judge?
-  a: 'Yes, with the parts the bare pattern leaves out. The reviewer is an LLM that judges another LLM''s work, but it is a separate session with no tools, the tests run before it sees anything, it reads the actual change and not a summary, and its verdict is bound to a one-time nonce and written as a signed record. [The judge section](/#judge) shows what reaches it and what is held back.'
 - id: spec-kit
   order: 1
   q: Do I need Spec Kit?
@@ -18,10 +26,6 @@
   order: 2
   q: Which models can it use?
   a: 'Any you trust. Specstride is an orchestrator and does not rank models. The implementer and the reviewer are chosen independently: by default both are separate Claude sessions through your Claude Code login, and either can instead be any provider and model your DeepSeek Harness (`dsh`) reaches.'
-- id: rubber-stamp
-  order: 3
-  q: What stops the reviewer waving work through?
-  a: The reviewer is a separate session with no tools. It reads the actual change against the phase's tasks — not a summary it is handed — and it must answer with a one-time nonce, so planted text cannot pass for its verdict. The engine runs the tests itself, so the claim it reads was checked against a real run. Credentials are redacted from what it reads.
 - id: stuck
   order: 4
   q: What happens when a phase keeps failing?

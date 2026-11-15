@@ -19,6 +19,8 @@ const products = defineCollection({
     status,
     order: z.number(),
     summary: z.string(),
+    /** The page's meta description: one sentence, 120 to 160 characters. */
+    description: z.string().min(100).max(160),
     /** What the status means for this product, in one honest sentence. */
     statusNote: z.string(),
     host: reference('hosts').optional(),
@@ -28,7 +30,7 @@ const products = defineCollection({
     install: reference('install').optional(),
     /** The engine a host is built on. Set on every host; the core has none: it is the foundation. */
     builtOn: reference('products').optional(),
-    /** How the host carries the engine, in a few words ("bundles core 0.1.0"). */
+    /** How the host carries the engine, in a few words ("pins the core 0.1.0 tarballs"). */
     relation: z.string().optional(),
   }),
 });

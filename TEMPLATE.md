@@ -24,6 +24,7 @@ kind: plugin              # core | plugin
 status: planned           # available | in-progress | planned
 order: 5                  # position in lists
 summary: One or two sentences.
+description: One sentence of 100 to 160 characters for search and social cards.
 statusNote: What the status means for this product, honestly.
 host: my-host             # an id from src/content/hosts.yaml (optional)
 skills:                   # optional
@@ -90,7 +91,6 @@ import Base from '../layouts/Base.astro';
 ---
 <Base title="Title" description="One sentence for search and social cards.">
   <div class="wrap page">
-    <p class="eyebrow mono">// name</p>
     <h1>Title</h1>
   </div>
 </Base>
@@ -103,13 +103,14 @@ Add it to `NAV` in `src/lib/site.ts` if it belongs in the header and footer. The
 | Component | Props | Notes |
 |---|---|---|
 | `Terminal` | `title?`, `label?`; slots: default, `actions` | A window frame. The body scrolls horizontally on its own, so long commands never widen the page; it is focusable so keyboards can scroll it. |
-| `InstallTabs` | `entries`, `full?`, `id?`, `headingLevel?` | Install paths as ARIA tabs (arrow keys, Home, End). Without JavaScript every panel is shown. `full` adds prerequisites and the verification date. |
+| `InstallTabs` | `entries`, `full?`, `id?`, `headingLevel?` | Install paths as ARIA tabs (arrow keys, Home, End). Without JavaScript every panel is shown. `full` adds prerequisites and the verification date; without it the hand steps fold under the one command. |
 | `CopyButton` | `text`, `label?` | Copies to the clipboard. Hidden when the Clipboard API is missing. |
 | `AsciiArt` | `label?` | The hero, from `src/generated/hero.json`. Gate posts light up in run order; static under reduced motion. Phones get the mark's own glyphs, set larger. |
-| `LoopDiagram` | none | The loop as an ASCII diagram plus a replay of a real run log (`src/data/demo-timeline.ts`). Diagram boxes are found by their corners, so editing the diagram text is enough. |
-| `ProductCard` | `product`, `showSkills?`, `headingLevel?` | A product with its host, note and skills; links to its page. |
+| `LoopDiagram` | none | The loop as an ASCII diagram. Boxes are found by their corners, so editing the diagram text is enough. |
+| `HeroRun` | none | The home page's figure: a stored real run log (`src/data/demo-timeline.ts`) with notes beside the lines that matter. A highlight walks the log once; nothing is ever hidden. |
+| `InstallCommand` | `cmd?`, `label?` | The one-command install as a single line with a copy button. |
 | `HarnessGrid` | `compact?` | The implementer and reviewer harnesses. |
-| `Section` | `id`, `title`, `eyebrow?`, `intro?`, `tone?` | A home page section with an anchor; `tone="raised"` alternates the background. |
+| `Section` | `id`, `title`, `intro?`, `tone?` | A home page section with an anchor; `tone="raised"` alternates the background. |
 | `FAQ` | none | `faq.yaml` as `<details>` elements. |
 | `Header`, `Footer`, `ThemeToggle` | none | Navigation from `NAV`; GitHub stars from the build-time API call. |
 

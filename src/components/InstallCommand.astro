@@ -1,0 +1,44 @@
+---
+// The one-command install as a single line with a copy button. The command is
+// selectable without JavaScript; the line scrolls inside its box on a phone.
+import CopyButton from './CopyButton.astro';
+import { SITE } from '../lib/site';
+interface Props { cmd?: string; label?: string }
+const { cmd = SITE.installCmd, label = 'Install in one command' } = Astro.props;
+---
+<div class="cmd" role="group" aria-label={label}>
+  <code class="line" tabindex="0"><span class="ps" aria-hidden="true">$ </span>{cmd}</code>
+  <CopyButton text={cmd} label="Copy" />
+</div>
+
+<style>
+  .cmd {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    max-width: 100%;
+    padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: 0 18px 50px -34px color-mix(in srgb, var(--accent) 80%, transparent);
+  }
+  .line {
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    background: none;
+    border: 0;
+    padding: var(--space-2) 0;
+    font-size: 0.8125rem;
+    color: var(--fg-strong);
+    scrollbar-width: none;
+  }
+  .ps { color: var(--muted); user-select: none; }
+  /* The copy button keeps its room before the script shows it, so the line never re-wraps. */
+  .cmd :global(.copy[hidden]) { display: inline-block; visibility: hidden; }
+  /* On a phone the command wraps instead of hiding its end. */
+  @media (max-width: 639px) { .line { white-space: normal; overflow-wrap: anywhere; font-size: 0.75rem; } }
+  @media (min-width: 960px) { .line { font-size: 0.75rem; } }
+</style>

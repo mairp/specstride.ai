@@ -4,6 +4,7 @@ kind: core
 status: available
 order: 0
 summary: The engine every host is built on. It holds the `specstride` CLI, the contracts, the loop layers, the runtime, the adapters, and the kits a host is built from. Use it to run the CLI on its own, to build a host for another agent, or to read how the loop and its governance work.
+description: 'Specstride core is the engine every host is built on: the specstride CLI, the contracts, the loop layers, the runtime, the adapters and the host kits.'
 statusNote: 'Release 0.1.0, packed from a clone: nothing is on npm yet. Linux is verified, macOS is not.'
 repo: https://github.com/mairp/specstride-core
 install: core
