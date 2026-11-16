@@ -560,3 +560,40 @@ the FAQ with only a warning. The checks cover the Hermes page.
 **Checks (local build):** `astro check` 0 errors; screenshots at 390/768/1440 in both themes with no
 overflow and no console errors; axe clean on eight pages in both themes; linkinator 45 links OK;
 Lighthouse mobile on `/` 0.98 performance, 1.0 accessibility, best practices and SEO, CLS 0.
+
+## See it run, inside Claude Code (2026-11-16)
+
+The owner asked for a "See it run" demo that shows Specstride inside a real Claude Code session, and,
+first, a plugin fix: the demo is only honest if a fresh session of the published plugin actually runs.
+
+Two of two fresh sessions on 2026-11-15 stopped before the run with the published plugin 0.1.1: the
+run skill said "Launch (`launch`)" where the model wrote the draft contract to a path of its own and
+launched in a form the skill never named (`launch --mode run`), the supervision section named no time
+limit, and it named `contract validate` before `contract promote`, which refuses a draft with
+`contract status must be validated`. The hand run of 2026-11-15 had not included a full run, which is
+why the gap survived that check. The fix ships as plugin 0.1.2 (mairp/specstride-plugin#12, merged
+2026-11-16): the skill names the launch form, bounds every supervision call (`--timeout 60`, and "a
+call that printed nothing is NOT the end of the run"), and puts promotion before validation; the same
+four clarifications went into the kit the dsh and Hermes hosts render from (mairp/specstride-core#33).
+Three of three fresh sessions of 0.1.2 then reached the digest, and a fresh install from the public
+marketplace serves 0.1.2.
+
+The replay is a real session of 2026-11-16 on a fresh clone of the example repository, recorded with
+the marketplace-installed 0.1.2 (headless, default model, one sentence). The transcript is the
+session's own: every output line and sentence is verbatim; commands are shown as the CLI call they
+made (the session wrote `B="${SPECSTRIDE_BIN:-specstride}"; "$B" …`), paths are cut to the repository,
+and the one call that printed nothing — the first wait, while the run was still going — is one visible
+skip line that says how long the run took. No call is left out. The replay's waits are its own pauses
+(about 20 s), not the session's timing; the run itself took 1 min 25 s. The `git log` block beside the
+replay is the recorded run's own history. The skill reports only the launch line and the digest, by
+design, so the replay shows no per-phase line; the hero's log shows the engine's side of a phase.
+
+The dead video figure and its `public/media/demo.*` files were already removed (2026-11-15, "preview"
+branch); nothing references `/media/*` any more, and no header rule for it remains. The frame is the
+site's own plain terminal — it names Claude Code in its title bar but is not made to pass for an
+official screenshot; the FAQ entry "Is it from Anthropic?" stays. The JetBrains Mono subset already
+carries every glyph the transcript uses (`●`, `└`, `…`, `—`).
+
+Evidence: prompts/evidence-2026-11-16-plugin-0.1.2/ (three acceptance sessions, the recorded demo
+session, ACCEPTANCE.md, the marketplace install log), prompts/pending-plugin-fix-and-claude-demo.md
+(the task).

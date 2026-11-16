@@ -5,7 +5,7 @@ status: available
 order: 1
 summary: Specstride inside Claude Code. Two skills run a Spec Kit feature through the gated loop and report back in a few lines, so your session keeps its context.
 description: 'The Specstride plugin for Claude Code: two skills run a Spec Kit feature through the gated loop, phase by phase, and report back in a few lines.'
-statusNote: Plugin 0.1.1 on core 0.1.0. Runs on Linux; macOS is not verified.
+statusNote: Plugin 0.1.2 on core 0.1.0. Runs on Linux; macOS is not verified.
 host: claude-code
 repo: https://github.com/mairp/specstride-plugin
 install: claude-code
