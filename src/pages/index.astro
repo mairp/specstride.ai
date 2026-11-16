@@ -347,9 +347,6 @@ const appSchema = {
   .steps li { counter-increment: step; display: flex; gap: var(--space-4); align-items: baseline; }
   .steps li::before { content: counter(step, decimal-leading-zero); font-family: var(--font-mono); color: var(--accent); flex: none; }
   .demo-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); margin-top: var(--space-8); scroll-margin-top: 5rem; }
-  .demo { margin: 0; min-width: 0; }
-  .demo video { display: block; width: 100%; height: auto; background: var(--surface); }
-  .demo :global(.demo-term .body) { padding: 0; }
   .demo-side { min-width: 0; }
   .demo-side h3 { font-size: var(--step-2); font-weight: 500; }
   .demo-side p { color: var(--muted); font-size: 0.9375rem; }
@@ -418,20 +415,3 @@ const appSchema = {
      Last, so it wins over the display rules above. */
   @media (max-width: 639px) { .wide-only { display: none; } }
 </style>
-
-<script>
-  // The demo never loads until it is on screen and plays only while it is.
-  // Without JavaScript, or under prefers-reduced-motion, it keeps its controls
-  // and never starts on its own.
-  for (const video of document.querySelectorAll<HTMLVideoElement>('video[data-demo]')) {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) continue;
-    video.controls = false;
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) video.play().catch(() => {});
-        else video.pause();
-      }
-    }, { threshold: 0.3 });
-    io.observe(video);
-  }
-</script>
