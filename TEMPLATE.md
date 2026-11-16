@@ -108,6 +108,7 @@ Add it to `NAV` in `src/lib/site.ts` if it belongs in the header and footer. The
 | `AsciiArt` | `label?` | The hero, from `src/generated/hero.json`. Gate posts light up in run order; static under reduced motion. Phones get the mark's own glyphs, set larger. |
 | `LoopDiagram` | none | The loop as an ASCII diagram. Boxes are found by their corners, so editing the diagram text is enough. |
 | `HeroRun` | none | The home page's figure: a stored real run log (`src/data/demo-timeline.ts`) with notes beside the lines that matter. A highlight walks the log once; nothing is ever hidden. |
+| `ClaudeSession` | none | The "See it run" figure: a real Claude Code session (`src/data/claude-session.ts`) replayed line by line in a terminal frame; the whole transcript sits in a scrolling box under reduced motion or without JavaScript. |
 | `InstallCommand` | `cmd?`, `label?` | The one-command install as a single line with a copy button. |
 | `HarnessGrid` | `compact?` | The implementer and reviewer harnesses. |
 | `Section` | `id`, `title`, `intro?`, `tone?` | A home page section with an anchor; `tone="raised"` alternates the background. |

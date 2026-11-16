@@ -1,0 +1,99 @@
+---
+// "See it run", inside Claude Code: a real session on the example repository,
+// replayed from its own transcript (src/data/claude-session.ts). The words are
+// the session's; only the waits are shortened and paths are cut to the
+// repository. Without JavaScript, or under prefers-reduced-motion, the whole
+// transcript sits in a scrolling box and nothing moves.
+import Terminal from './Terminal.astro';
+import { SESSION, SESSION_META } from '../data/claude-session';
+---
+<figure class="cs" data-session>
+  <Terminal title={`Claude Code · ${SESSION_META.cwd}`} label="A real Claude Code session on the example repository, replayed from its transcript" class="cs-term">
+    <button slot="actions" type="button" class="replay" data-replay hidden>Replay</button>
+    <div class="feed" data-feed tabindex="0" role="log" aria-label="The session transcript">
+      {SESSION.map((it) => (
+        it.kind === 'user' ? <p class="it user" data-wait={it.wait}><span class="glyph" aria-hidden="true">&gt;</span><span class="visually-hidden">You: </span><span class="txt">{it.text}</span></p>
+        : it.kind === 'say' ? <p class="it say" data-wait={it.wait}><span class="glyph" aria-hidden="true">●</span><span class="txt">{it.text}</span></p>
+        : it.kind === 'tool' ? <p class="it tool" data-wait={it.wait}><span class="glyph" aria-hidden="true">●</span><span class="txt"><b>{it.tool}</b>({it.text})</span></p>
+        : it.kind === 'out' ? <p class:list={['it', 'out', it.tone && `tone-${it.tone}`]} data-wait={it.wait}><span class="glyph" aria-hidden="true">└</span><span class="txt">{it.text}</span></p>
+        : <p class="it skip" data-wait={it.wait}><span class="txt">{it.text}</span></p>
+      ))}
+    </div>
+  </Terminal>
+</figure>
+
+<style>
+  .cs { margin: 0; min-width: 0; }
+  .cs :global(.cs-term .body) { padding: 0; overflow: hidden; }
+  .feed {
+    height: 27rem;
+    overflow-y: auto;
+    padding: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--fg);
+    scrollbar-width: thin;
+    overscroll-behavior: contain;
+  }
+  .feed:focus-visible { outline-offset: -2px; }
+  .it { margin: 0; display: grid; grid-template-columns: 2ch minmax(0, 1fr); column-gap: 0.5ch; }
+  .txt { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; }
+  .glyph { color: var(--muted); user-select: none; }
+  .user { margin: 0 0 var(--space-3); padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: 6px; background: var(--surface-2); color: var(--fg-strong); }
+  .say { margin-top: var(--space-3); color: var(--fg-strong); }
+  .say .glyph { color: var(--fg-strong); }
+  .tool { margin-top: var(--space-3); }
+  .tool .glyph { color: var(--ok); }
+  .tool b { color: var(--fg-strong); font-weight: 700; }
+  .out { padding-left: 2.5ch; color: var(--muted); }
+  .out + .out .glyph { visibility: hidden; }
+  .tone-ok .txt { color: var(--ok); }
+  .tone-err .txt { color: var(--err); }
+  .tone-warn .txt { color: var(--warn); }
+  .skip { grid-template-columns: minmax(0, 1fr); padding-left: 2.5ch; color: var(--muted); font-style: italic; }
+
+  /* While the replay runs, only what has been shown takes room; the box keeps its height. */
+  [data-playing] .it:not(.shown) { display: none; }
+  .it.fresh .txt { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+
+  .replay {
+    font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); background: transparent;
+    border: 1px solid var(--border); border-radius: 4px; padding: 0.3rem 0.6rem; cursor: pointer; min-height: 32px;
+  }
+  .replay:hover { color: var(--fg-strong); border-color: var(--accent); }
+  .replay[hidden] { display: inline-block; visibility: hidden; }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-session]');
+  if (root && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const feed = root.querySelector<HTMLElement>('[data-feed]')!;
+    const items = [...feed.querySelectorAll<HTMLElement>('.it')];
+    const replay = root.querySelector<HTMLButtonElement>('[data-replay]')!;
+    let timer: number | undefined;
+    const play = () => {
+      if (timer) clearTimeout(timer);
+      root.dataset.playing = '';
+      items.forEach((it) => it.classList.remove('shown', 'fresh'));
+      feed.scrollTop = 0;
+      let i = 0;
+      const step = () => {
+        items.forEach((it) => it.classList.remove('fresh'));
+        if (i >= items.length) { delete root.dataset.playing; timer = undefined; feed.scrollTop = feed.scrollHeight; return; }
+        const it = items[i];
+        it.classList.add('shown', 'fresh');
+        feed.scrollTop = feed.scrollHeight;
+        i++;
+        timer = window.setTimeout(step, Number(items[i]?.dataset.wait ?? 600));
+      };
+      step();
+    };
+    replay.hidden = false;
+    replay.addEventListener('click', play);
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) { io.disconnect(); play(); }
+    }, { threshold: 0.5 });
+    io.observe(root);
+  }
+</script>
